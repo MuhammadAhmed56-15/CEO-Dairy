@@ -20,7 +20,7 @@ class Profile(models.Model):
         ('Manager', 'Manager'),
         ('HR', 'HR'),
     )
-
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=30, choices=ROLE_CHOICES, default="HR")
     employee = models.OneToOneField(

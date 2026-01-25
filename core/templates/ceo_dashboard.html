@@ -767,7 +767,7 @@
     // ================= COMMITMENT DATA =================
     const commitmentData = {
         all: [
-            {% for item in total_list %}
+            // {% for item in total_list %}
             {
                 title: '{{ item.title|escapejs }}',
                 description: '{{ item.description|escapejs|truncatewords:20 }}',
@@ -776,10 +776,10 @@
                 status: '{{ item.status }}',
                 created_by: '{{ item.created_by.user.username }}'
             },
-            {% endfor %}
+            // {% endfor %}
         ],
         pending: [
-            {% for item in pending_list %}
+            // {% for item in pending_list %}
             {
                 title: '{{ item.title|escapejs }}',
                 description: '{{ item.description|escapejs|truncatewords:20 }}',
@@ -788,10 +788,10 @@
                 status: '{{ item.status }}',
                 created_by: '{{ item.created_by.user.username }}'
             },
-            {% endfor %}
+            // {% endfor %}
         ],
         approved: [
-            {% for item in approved_list %}
+            // {% for item in approved_list %}
             {
                 title: '{{ item.title|escapejs }}',
                 description: '{{ item.description|escapejs|truncatewords:20 }}',
@@ -800,10 +800,10 @@
                 status: '{{ item.status }}',
                 created_by: '{{ item.created_by.user.username }}'
             },
-            {% endfor %}
+            // {% endfor %}
         ],
         rejected: [
-            {% for item in rejected_list %}
+            // {% for item in rejected_list %}
             {
                 title: '{{ item.title|escapejs }}',
                 description: '{{ item.description|escapejs|truncatewords:20 }}',
