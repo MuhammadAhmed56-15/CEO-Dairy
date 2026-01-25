@@ -2,9 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-# =========================================================
-# EMPLOYEE MODEL
-# =========================================================
+
 class Employee(models.Model):
     emp_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
@@ -14,9 +12,7 @@ class Employee(models.Model):
     def __str__(self):
         return f"{self.emp_id} - {self.name}"
 
-# =========================================================
-# PROFILE MODEL
-# =========================================================
+
 class Profile(models.Model):
     ROLE_CHOICES = (
         ('CEO', 'CEO'),
@@ -39,9 +35,7 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} ({self.role})"
 
-# =========================================================
-# COMMITMENT MODEL 
-# =========================================================
+
 class Commitment(models.Model):
     STATUS_CHOICES = (
         ('Pending', 'Pending'),
