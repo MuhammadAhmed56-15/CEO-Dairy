@@ -1,0 +1,9 @@
+    <h2>Assign Task to Manager</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Assign Task</button>
+    </form>
+        

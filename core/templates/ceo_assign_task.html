@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+{% block title %}Assign Task{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header Styling */
+    .page-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+    }
+    
+    .page-header h2 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .page-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.95;
+        font-size: 15px;
+        font-weight: 400;
+    }
+
+    /* Form Container */
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 45px;
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    /* Form Sections */
+    .form-section {
+        margin-bottom: 35px;
+        padding-bottom: 35px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #3b82f6;
+    }
+    
+    .section-title i {
+        color: #3b82f6;
+        font-size: 22px;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    /* Form Labels */
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-label i {
+        color: #3b82f6;
+        font-size: 14px;
+    }
+
+    /* Form Controls */
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        width: 100%;
+        background: white;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+        outline: none;
+        background: #fafbfc;
+    }
+    
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e1;
+    }
+    
+    textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    /* Form Text (Helper) */
+    .form-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .form-text::before {
+        content: "ℹ️";
+        font-size: 12px;
+    }
+
+    /* Input Group with Icon */
+    .input-group-icon {
+        position: relative;
+    }
+    
+    .input-group-icon i {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 16px;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .input-group-icon .form-control,
+    .input-group-icon .form-select {
+        padding-left: 48px;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-left: 5px solid #3b82f6;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+    
+    .info-box i {
+        color: #3b82f6;
+        font-size: 24px;
+        margin-top: 2px;
+    }
+    
+    .info-box-content {
+        flex: 1;
+    }
+    
+    .info-box-title {
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+    
+    .info-box-text {
+        color: #1e40af;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 35px;
+        padding-top: 35px;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    /* Custom Buttons */
+    .btn-custom {
+        padding: 14px 32px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .btn-cancel {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    
+    .btn-cancel:hover {
+        background: #cbd5e1;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 25px;
+        }
+        
+        .page-header {
+            padding: 25px;
+        }
+        
+        .page-header h2 {
+            font-size: 24px;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn-custom {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Animation */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2>
+                <i class="fas fa-plus-circle"></i>
+                Assign New Task
+            </h2>
+            <p>Create and track a new task commitment for approval by CEO, GM, HR, or Manager</p>
+        </div>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="POST" id="taskForm">
+        {% csrf_token %}
+
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <div class="info-box-content">
+                <div class="info-box-title">Important Information</div>
+                <p class="info-box-text">Fill in the task details below. Managers will review your commitment after approval.</p>
+            </div>
+        </div>
+
+        <!-- Basic Information Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-file-alt"></i>
+                Basic Information
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-heading"></i>
+                            Task Title <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-heading"></i>
+                            <input type="text" name="title" class="form-control" placeholder="Enter task title" required>
+                        </div>
+                        <small class="form-text">Give a clear and descriptive title for the task (Required)</small>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Description <span class="text-muted" style="font-size: 0.8rem; font-weight: normal;">(Optional)</span>
+                        </label>
+                        <textarea name="description" class="form-control" placeholder="Provide detailed information about the task"></textarea>
+                        <small class="form-text">Provide detailed information about the task (Optional)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment & Timeline Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-users"></i>
+                Assignment & Timeline
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user-check"></i>
+                            Assign To <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-user-check"></i>
+                            <select name="assigned_to" class="form-select" required>
+                                <option value="" disabled selected>Select team member...</option>
+                                {% for user in form.fields.assigned_to.queryset %}
+                                    <option value="{{ user.id }}"
+                                        {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ user.username }} - {{ user.profile.role }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small class="form-text">Select who should handle this task</small>
+                        {% if form.assigned_to.errors %}
+                            <div class="text-danger mt-2" style="font-size: 0.875rem;">{{ form.assigned_to.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due Date
+                        </label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                            <input type="date" name="due_date" class="form-control">
+                        </div>
+                        <small class="form-text">Set the expected completion date for this task</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'ceo_dashboard' %}" class="btn-custom btn-cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn-custom btn-submit">
+                <i class="fas fa-check"></i>
+                Create Task
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('taskForm');
+        const submitBtn = form.querySelector('.btn-submit');
+        
+        // Form submission handler
+        form.addEventListener('submit', function(e) {
+            // Disable submit button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Task...';
+        });
+
+        // Enhanced form interactions
+        const formControls = document.querySelectorAll('.form-control, .form-select');
+        formControls.forEach(control => {
+            // Add visual feedback on interaction
+            control.addEventListener('focus', function() {
+                this.style.borderColor = '#3b82f6';
+            });
+            
+            control.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.style.borderColor = '#e2e8f0';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

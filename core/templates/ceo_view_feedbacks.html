@@ -1,0 +1,900 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="feedback-dashboard">
+    <!-- Header Section -->
+<div class="container-fluid mb-4">
+    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 15px; overflow: hidden;">
+        <div class="card-body p-4">
+            <div class="text-white">
+                <h2 class="fw-bold mb-2" style="font-size: 1.8rem; letter-spacing: 0.5px;">
+                    <i class="fas fa-comments me-2"></i> Staff Feedback !
+                </h2>
+                
+                <div class="d-inline-flex align-items-center bg-white bg-opacity-25 rounded-pill px-3 py-1">
+                    <i class="far fa-calendar-alt me-2 text-white" style="font-size: 0.9rem;"></i>
+                    <span class="text-white small fw-medium">Wednesday, January 21, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Search and Filter Bar -->
+    {% if feedbacks %}
+    <div class="controls-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; gap: 15px; flex-grow: 1;">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by task name or staff member..." class="search-input">
+            </div>
+            <div class="filter-group">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="In Progress">In Progress</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="export-actions" style="display: flex; gap: 10px;">
+            <a href="?export=excel" id="exportExcel" class="btn btn-outline-success btn-sm" style="display: flex; align-items: center; gap: 8px; padding: 8px 15px; border: 1px solid #28a745; color: #28a745; border-radius: 5px; text-decoration: none;">
+                <i class="fas fa-file-excel"></i> 
+                <span>Excel</span>
+            </a>
+            <a href="?export=pdf" id="exportPDF" class="btn btn-outline-danger btn-sm" style="display: flex; align-items: center; gap: 8px; padding: 8px 15px; border: 1px solid #dc3545; color: #dc3545; border-radius: 5px; text-decoration: none;">
+                <i class="fas fa-file-pdf"></i> 
+                <span>PDF</span>
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+    <!-- Feedback Table (Desktop) -->
+    <div class="table-container">
+        {% if feedbacks %}
+        <table class="feedback-table">
+            <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Staff Member</th>
+                    <th>Feedback</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="feedbackTableBody">
+                {% for task in feedbacks %}
+                <tr class="feedback-row" data-status="{{ task.status|lower }}" data-search="{{ task.title|lower }} {{ task.assigned_to.username|lower }}">
+                    <td>
+                        <div class="task-cell">
+                            <div class="task-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <span class="task-title">{{ task.title }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="staff-cell">
+                            <div class="staff-avatar">
+                                {{ task.assigned_to.username|first|upper }}
+                            </div>
+                            <span class="staff-name">{{ task.assigned_to.username }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="feedback-cell">
+                            <p class="feedback-text">{{ task.remarks.last.feedback }}</p>
+                            {% if task.remarks.last.feedback|length > 100 %}
+                            <button class="expand-btn" onclick="toggleFeedback(this)">
+                                <span class="expand-text">Show more</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-cell">
+                            <i class="far fa-calendar"></i>
+                            <span>{{ task.due_date|date:"M d, Y" }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge {% if task.status == 'Completed' %}status-completed{% else %}status-pending{% endif %}">
+                            <i class="fas {% if task.status == 'Completed' %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+                            {{ task.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Mobile Cards -->
+        <div class="feedback-cards" id="feedbackCards">
+            {% for task in feedbacks %}
+            <div class="feedback-card" data-status="{{ task.status|lower }}" data-search="{{ task.title|lower }} {{ task.assigned_to.username|lower }}">
+                <div class="card-header">
+                    <div class="task-info">
+                        <div class="task-icon-mobile">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h3 class="card-task-title">{{ task.title }}</h3>
+                    </div>
+                    <span class="status-badge {% if task.status == 'Completed' %}status-completed{% else %}status-pending{% endif %}">
+                        <i class="fas {% if task.status == 'Completed' %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+                        {{ task.status }}
+                    </span>
+                </div>
+
+                <div class="card-body">
+                    <div class="card-staff">
+                        <div class="staff-avatar">
+                            {{ task.assigned_to.username|first|upper }}
+                        </div>
+                        <div class="staff-info">
+                            <span class="staff-label">Staff Member</span>
+                            <span class="staff-name">{{ task.assigned_to.username }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-feedback">
+                        <span class="feedback-label">Feedback</span>
+                        <p class="feedback-text">{{ task.remarks.last.feedback }}</p>
+                    </div>
+
+                    <div class="card-date">
+                        <i class="far fa-calendar"></i>
+                        <span>Due: {{ task.due_date|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <i class="fas fa-search"></i>
+            <p>No results found matching your criteria</p>
+            <small>Try adjusting your search or filter settings</small>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h2 class="empty-title">No Feedback Available</h2>
+            <p class="empty-description">
+                Feedback submissions from your team members will appear here once tasks are completed.
+            </p>
+            <a href="{% url 'ceo_dashboard' %}" class="btn-primary-custom">
+                <i class="fas fa-arrow-left"></i>
+                Return to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #1e40af;
+        --primary-dark: #1e3a8a;
+        --primary-light: #3b82f6;
+        --success-color: #059669;
+        --success-bg: #d1fae5;
+        --warning-color: #d97706;
+        --warning-bg: #fef3c7;
+        --text-primary: #111827;
+        --text-secondary: #4b5563;
+        --text-muted: #9ca3af;
+        --bg-primary: #f8fafc;
+        --bg-secondary: #f1f5f9;
+        --bg-white: #ffffff;
+        --border-light: #e2e8f0;
+        --border-medium: #cbd5e1;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --transition: all 0.2s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .feedback-dashboard {
+        min-height: 100vh;
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        background: var(--bg-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .header-text {
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .header-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        letter-spacing: -0.025em;
+    }
+
+    .header-title i {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+    }
+
+    .header-subtitle {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 400;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .stat-badge {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 1.25rem 2rem;
+        border-radius: var(--radius-md);
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 140px;
+    }
+
+    .stat-number {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.025em;
+    }
+
+    .stat-label {
+        font-size: 0.8125rem;
+        opacity: 0.95;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+        background: var(--bg-white);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 280px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-muted);
+        pointer-events: none;
+        font-size: 0.875rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.625rem 1rem 0.625rem 2.5rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        transition: var(--transition);
+        background: var(--bg-white);
+        color: var(--text-primary);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .filter-select {
+        padding: 0.625rem 2.5rem 0.625rem 1rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        background: var(--bg-white);
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--text-primary);
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.25rem 1.25rem;
+    }
+
+    .filter-select:hover {
+        border-color: #3b82f6;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Table Styles */
+    .table-container {
+        background: var(--bg-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border-light);
+    }
+
+    .feedback-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .feedback-table thead {
+        background: var(--bg-secondary);
+        border-bottom: 2px solid var(--border-medium);
+    }
+
+    .feedback-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+    }
+
+    .feedback-table tbody tr {
+        border-bottom: 1px solid var(--border-light);
+        transition: var(--transition);
+    }
+
+    .feedback-table tbody tr:hover {
+        background: var(--bg-primary);
+    }
+
+    .feedback-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .feedback-table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Task Cell */
+    .task-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .task-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+    }
+
+    .task-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    /* Staff Cell */
+    .staff-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .staff-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        border: 2px solid var(--bg-white);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .staff-name {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    /* Feedback Cell */
+    .feedback-cell {
+        max-width: 400px;
+        position: relative;
+    }
+
+    .feedback-text {
+        margin: 0;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-size: 0.875rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .feedback-text.expanded {
+        -webkit-line-clamp: unset;
+    }
+
+    .expand-btn {
+        margin-top: 0.5rem;
+        background: none;
+        border: none;
+        color: #3b82f6;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0;
+        transition: var(--transition);
+    }
+
+    .expand-btn:hover {
+        color: #1e40af;
+    }
+
+    .expand-btn i {
+        transition: transform 0.2s ease;
+        font-size: 0.75rem;
+    }
+
+    .expand-btn.expanded i {
+        transform: rotate(180deg);
+    }
+
+    /* Date Cell */
+    .date-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    .date-cell i {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.875rem;
+        border-radius: 6px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-completed {
+        background: var(--success-bg);
+        color: var(--success-color);
+    }
+
+    .status-pending {
+        background: var(--warning-bg);
+        color: var(--warning-color);
+    }
+
+    .status-badge i {
+        font-size: 0.875rem;
+    }
+
+    /* Mobile Cards */
+    .feedback-cards {
+        display: none;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .feedback-card {
+        background: var(--bg-white);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid var(--border-light);
+    }
+
+    .feedback-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.25rem;
+        gap: 1rem;
+    }
+
+    .task-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+
+    .task-icon-mobile {
+        width: 40px;
+        height: 40px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+    }
+
+    .card-task-title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .card-staff {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--bg-primary);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+    }
+
+    .staff-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .staff-label {
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .card-feedback {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .feedback-label {
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .card-date {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .card-date i {
+        color: var(--text-muted);
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .no-results i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .no-results p {
+        font-size: 1rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .no-results small {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--text-muted);
+        opacity: 0.25;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 0.75rem 0;
+        letter-spacing: -0.025em;
+    }
+
+    .empty-description {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+        margin: 0 0 2rem 0;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+
+    .btn-primary-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary-custom:hover {
+        box-shadow: var(--shadow-md);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .feedback-table {
+            display: none;
+        }
+
+        .feedback-cards {
+            display: grid;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .feedback-dashboard {
+            padding: 1rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1.5rem;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+        }
+
+        .stat-badge {
+            padding: 1rem 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .controls-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+
+        .filter-select {
+            flex: 1;
+        }
+
+        .feedback-cards {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-title {
+            font-size: 1.25rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .header-title i {
+            font-size: 1.5rem;
+        }
+
+        .stat-badge {
+            padding: 0.875rem 1.25rem;
+        }
+
+        .stat-number {
+            font-size: 1.875rem;
+        }
+    }
+</style>
+
+<script>
+function toggleFeedback(button) {
+    const feedbackText = button.previousElementSibling;
+    const expandText = button.querySelector('.expand-text');
+    const icon = button.querySelector('i');
+    
+    feedbackText.classList.toggle('expanded');
+    button.classList.toggle('expanded');
+    
+    if (feedbackText.classList.contains('expanded')) {
+        expandText.textContent = 'Show less';
+    } else {
+        expandText.textContent = 'Show more';
+    }
+}
+
+// Search and Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('table tbody tr');
+    
+    // Export buttons ke links hasil karein
+    const exportExcelBtn = document.getElementById('exportExcel');
+    const exportPDFBtn = document.getElementById('exportPDF');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusTerm = statusFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            // Status cell dhoondne ke liye class '.status-cell' ya span check karein
+            const statusBadge = row.querySelector('.status-badge') || row.querySelector('.badge') || row;
+            const rowStatus = statusBadge.innerText.toLowerCase();
+
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = (statusTerm === 'all') || rowStatus.includes(statusTerm);
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // --- Role-based Export Logic (Babar Azam Style Persistence) ---
+        // Jab filter badle, tab export ke URL bhi update ho jayein
+        const params = `?q=${searchInput.value}&status=${statusFilter.value}`;
+        if(exportExcelBtn) exportExcelBtn.href = `?export=excel&q=${searchInput.value}&status=${statusFilter.value}`;
+        if(exportPDFBtn) exportPDFBtn.href = `?export=pdf&q=${searchInput.value}&status=${statusFilter.value}`;
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('keyup', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %}

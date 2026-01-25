@@ -1,0 +1,768 @@
+{% extends 'base.html' %}
+{% block title %}My Tasks{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header-content h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-header-content p {
+        font-size: 16px;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    .filter-title i {
+        color: #3b82f6;
+        font-size: 20px;
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-export {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-pdf {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+    }
+
+    .btn-excel {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: white;
+    }
+
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-filter-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .search-box {
+        grid-column: 1 / -1;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #1e293b;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .filter-input:hover,
+    .filter-select:hover {
+        border-color: #cbd5e1;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+    }
+
+    .search-input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input-wrapper input {
+        padding-left: 45px;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn-filter {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+    }
+
+    .btn-reset {
+        padding: 12px 30px;
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-reset:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .custom-table {
+        margin: 0;
+        width: 100%;
+    }
+
+    .custom-table thead {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    .custom-table thead th {
+        padding: 16px;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .custom-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        font-size: 14px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f8fafc;
+        transform: scale(1.01);
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        color: white;
+    }
+
+    .status-progress {
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        color: white;
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h4 {
+        color: #64748b;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .task-title {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .task-description {
+        color: #64748b;
+    }
+
+    .assigned-by {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: #f1f5f9;
+        border-radius: 20px;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    .assigned-by i {
+        color: #3b82f6;
+    }
+
+    .due-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+    }
+
+    .due-date i {
+        color: #f59e0b;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 25px;
+        }
+
+        .page-header-content h2 {
+            font-size: 24px;
+        }
+
+        .search-filter-container {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .export-buttons {
+            width: 100%;
+        }
+
+        .btn-export {
+            flex: 1;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-filter,
+        .btn-reset {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 12px 8px;
+            font-size: 13px;
+        }
+
+        .custom-table tbody tr:hover {
+            transform: none;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .table-container {
+        animation: fadeInUp 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-content">
+        <h2>
+            <i class="fas fa-tasks"></i>
+            My Tasks
+        </h2>
+        <p>View and manage all tasks assigned to you</p>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-header">
+        <div class="filter-title">
+            <i class="fas fa-filter"></i>
+            Filter & Search
+        </div>
+        <div class="export-buttons">
+            <button class="btn-export btn-pdf" onclick="exportToPDF()">
+                <i class="fas fa-file-pdf"></i>
+                Export PDF
+            </button>
+            <button class="btn-export btn-excel" onclick="exportToExcel()">
+                <i class="fas fa-file-excel"></i>
+                Export Excel
+            </button>
+        </div>
+    </div>
+
+    <div class="search-filter-container">
+        <!-- Search Box -->
+        <div class="search-box">
+            <label class="filter-label">Search Tasks</label>
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="filter-input" placeholder="Search by title, description, or assigned by...">
+            </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="filter-group">
+            <label class="filter-label">Due Date From</label>
+            <input type="date" id="dateFrom" class="filter-input">
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Due Date To</label>
+            <input type="date" id="dateTo" class="filter-input">
+        </div>
+    </div>
+
+    <div class="filter-actions">
+        <button class="btn-filter" onclick="applyFilters()">
+            <i class="fas fa-filter"></i>
+            Apply Filters
+        </button>
+        <button class="btn-reset" onclick="resetFilters()">
+            <i class="fas fa-redo"></i>
+            Reset
+        </button>
+    </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="table custom-table" id="tasksTable">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-heading me-2"></i>Title</th>
+                    <th><i class="fas fa-align-left me-2"></i>Description</th>
+                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                    <th><i class="fas fa-calendar-alt me-2"></i>Due Date</th>
+                    <th><i class="fas fa-user-tie me-2"></i>Assigned By</th>
+                </tr>
+            </thead>
+            <tbody id="tasksTableBody">
+                {% for task in tasks %}
+                <tr class="task-row" 
+                    data-title="{{ task.title|lower }}" 
+                    data-description="{{ task.description|lower }}" 
+                    data-status="{{ task.status }}"
+                    data-due-date="{{ task.due_date|date:'Y-m-d' }}"
+                    data-assigned-by="{{ task.assigned_by.username|lower }}">
+                    <td>
+                        <span class="task-title">{{ task.title }}</span>
+                    </td>
+                    <td>
+                        <span class="task-description">{{ task.description|truncatewords:12 }}</span>
+                    </td>
+                    <td>
+                        {% if task.status == "Pending" %}
+                            <span class="status-badge status-pending">
+                                <i class="fas fa-clock"></i>
+                                Pending
+                            </span>
+                        {% elif task.status == "In Progress" %}
+                            <span class="status-badge status-progress">
+                                <i class="fas fa-spinner"></i>
+                                In Progress
+                            </span>
+                        {% elif task.status == "Completed" %}
+                            <span class="status-badge status-completed">
+                                <i class="fas fa-check-circle"></i>
+                                Completed
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-pending">
+                                {{ task.status }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="due-date">
+                            <i class="fas fa-calendar"></i>
+                            {{ task.due_date|date:"M d, Y" }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="assigned-by">
+                            <i class="fas fa-user-circle"></i>
+                            {{ task.assigned_by.username }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="emptyRow">
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h4>No Tasks Found</h4>
+                            <p>You don't have any tasks matching the selected filters.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include jsPDF and xlsx libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    // Store all tasks data
+    let allTasks = [];
+
+    // Initialize tasks data from table
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.task-row');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            allTasks.push({
+                title: cells[0].textContent.trim(),
+                description: cells[1].textContent.trim(),
+                status: row.dataset.status,
+                dueDate: row.dataset.dueDate,
+                assignedBy: cells[4].textContent.trim()
+            });
+        });
+
+        // Add real-time search
+        document.getElementById('searchInput').addEventListener('keyup', applyFilters);
+    });
+
+    // Apply filters function
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+
+        const rows = document.querySelectorAll('.task-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const title = row.dataset.title;
+            const description = row.dataset.description;
+            const assignedBy = row.dataset.assignedBy;
+            const status = row.dataset.status;
+            const dueDate = row.dataset.dueDate;
+
+            // Search filter
+            const matchesSearch = !searchTerm || 
+                title.includes(searchTerm) || 
+                description.includes(searchTerm) || 
+                assignedBy.includes(searchTerm);
+
+            // Status filter
+            const matchesStatus = !statusFilter || status === statusFilter;
+
+            // Date range filter
+            const matchesDateFrom = !dateFrom || dueDate >= dateFrom;
+            const matchesDateTo = !dateTo || dueDate <= dateTo;
+
+            // Show or hide row
+            if (matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide empty state
+        const emptyRow = document.getElementById('emptyRow');
+        if (emptyRow) {
+            emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+        }
+    }
+
+    // Reset filters function
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        
+        const rows = document.querySelectorAll('.task-row');
+        rows.forEach(row => {
+            row.style.display = '';
+        });
+
+        const emptyRow = document.getElementById('emptyRow');
+        if (emptyRow && rows.length > 0) {
+            emptyRow.style.display = 'none';
+        }
+    }
+
+    // Export to PDF function
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Add title
+        doc.setFontSize(18);
+        doc.setTextColor(30, 64, 175);
+        doc.text('My Tasks Report', 14, 22);
+
+        // Add date
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Generated on: ' + new Date().toLocaleDateString(), 14, 30);
+
+        // Get visible rows
+        const visibleRows = Array.from(document.querySelectorAll('.task-row'))
+            .filter(row => row.style.display !== 'none');
+
+        // Prepare table data
+        const tableData = visibleRows.map(row => {
+            const cells = row.querySelectorAll('td');
+            return [
+                cells[0].textContent.trim(),
+                cells[1].textContent.trim(),
+                row.dataset.status,
+                cells[3].textContent.trim().replace(/\s+/g, ' '),
+                cells[4].textContent.trim().replace(/\s+/g, ' ')
+            ];
+        });
+
+        // Generate table
+        doc.autoTable({
+            head: [['Title', 'Description', 'Status', 'Due Date', 'Assigned By']],
+            body: tableData,
+            startY: 35,
+            headStyles: {
+                fillColor: [30, 64, 175],
+                textColor: 255,
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: {
+                fillColor: [248, 250, 252]
+            },
+            styles: {
+                fontSize: 9,
+                cellPadding: 5
+            }
+        });
+
+        // Save the PDF
+        doc.save('my-tasks-' + new Date().toISOString().split('T')[0] + '.pdf');
+    }
+
+    // Export to Excel function
+    function exportToExcel() {
+        // Get visible rows
+        const visibleRows = Array.from(document.querySelectorAll('.task-row'))
+            .filter(row => row.style.display !== 'none');
+
+        // Prepare data for Excel
+        const excelData = visibleRows.map(row => {
+            const cells = row.querySelectorAll('td');
+            return {
+                'Title': cells[0].textContent.trim(),
+                'Description': cells[1].textContent.trim(),
+                'Status': row.dataset.status,
+                'Due Date': cells[3].textContent.trim().replace(/\s+/g, ' '),
+                'Assigned By': cells[4].textContent.trim().replace(/\s+/g, ' ')
+            };
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Set column widths
+        ws['!cols'] = [
+            { wch: 25 },  // Title
+            { wch: 40 },  // Description
+            { wch: 15 },  // Status
+            { wch: 15 },  // Due Date
+            { wch: 20 }   // Assigned By
+        ];
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+
+        // Save the file
+        XLSX.writeFile(wb, 'my-tasks-' + new Date().toISOString().split('T')[0] + '.xlsx');
+    }
+
+    // Smooth animation on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+            tableContainer.style.opacity = '0';
+            setTimeout(() => {
+                tableContainer.style.transition = 'opacity 0.5s ease';
+                tableContainer.style.opacity = '1';
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,538 @@
+{% extends 'base.html' %}
+{% block title %}Add Feedback{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header-content h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-header-content p {
+        font-size: 16px;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 35px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-header i {
+        font-size: 28px;
+        color: #3b82f6;
+    }
+
+    .form-header-text h3 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 5px 0;
+    }
+
+    .form-header-text p {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #3b82f6;
+        font-size: 16px;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+        font-size: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #1e293b;
+        background: white;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e1;
+    }
+
+    select.form-control {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 40px;
+        appearance: none;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+        line-height: 1.6;
+    }
+
+    .form-help-text {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .form-help-text i {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 14px 30px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 14px 30px;
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .btn-cancel:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #64748b;
+    }
+
+    .error-message {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border-left: 4px solid #ef4444;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: start;
+        gap: 12px;
+    }
+
+    .error-message i {
+        color: #ef4444;
+        font-size: 20px;
+        margin-top: 2px;
+    }
+
+    .error-message-content {
+        flex: 1;
+    }
+
+    .error-message-content strong {
+        display: block;
+        color: #991b1b;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .error-message-content ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .success-message {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-left: 4px solid #10b981;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #065f46;
+        font-size: 14px;
+    }
+
+    .success-message i {
+        color: #10b981;
+        font-size: 20px;
+    }
+
+    /* Character counter for textarea */
+    .char-counter {
+        text-align: right;
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 6px;
+    }
+
+    .char-counter.warning {
+        color: #f59e0b;
+    }
+
+    .char-counter.error {
+        color: #ef4444;
+    }
+
+    /* Loading state */
+    .btn-submit.loading {
+        pointer-events: none;
+    }
+
+    .btn-submit.loading i {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-container {
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 25px;
+        }
+
+        .page-header-content h2 {
+            font-size: 24px;
+        }
+
+        .form-container {
+            padding: 25px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-content">
+        <h2>
+            <i class="fas fa-comment-dots"></i>
+            Add Feedback for Task
+        </h2>
+        <p>Provide feedback and update task status</p>
+    </div>
+</div>
+
+<!-- Form Container -->
+<div class="form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <i class="fas fa-edit"></i>
+        <div class="form-header-text">
+            <h3>Task Feedback Form</h3>
+            <p>Complete the form below to submit your feedback</p>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="error-message-content">
+                        <strong>Error:</strong>
+                        <span>{{ message }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- Form Errors -->
+    {% if form.errors %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <div class="error-message-content">
+                <strong>Please correct the following errors:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Main Form -->
+    <form method="post" id="feedbackForm">
+        {% csrf_token %}
+        
+        <!-- Task Selection -->
+        <div class="form-group">
+            <label class="form-label" for="{{ form.task.id_for_label }}">
+                <i class="fas fa-tasks"></i>
+                Select Task
+                <span class="required">*</span>
+            </label>
+            {{ form.task }}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                Choose the task you want to provide feedback for
+            </div>
+        </div>
+
+        <!-- Feedback Textarea -->
+        <div class="form-group">
+            <label class="form-label" for="{{ form.feedback.id_for_label }}">
+                <i class="fas fa-comment-alt"></i>
+                Feedback
+                <span class="required">*</span>
+            </label>
+            {{ form.feedback }}
+            <div class="char-counter" id="charCounter">
+                <span id="charCount">0</span> characters
+            </div>
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                Provide detailed feedback about the task progress or completion
+            </div>
+        </div>
+
+        <!-- Status Update -->
+        <div class="form-group">
+            <label class="form-label" for="{{ form.status_update.id_for_label }}">
+                <i class="fas fa-sync-alt"></i>
+                Update Status
+                <span class="required">*</span>
+            </label>
+            {{ form.status_update }}
+            <div class="form-help-text">
+                <i class="fas fa-info-circle"></i>
+                Update the current status of the task
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-paper-plane"></i>
+                Submit Feedback
+            </button>
+            <a href="{% url 'manager_dashboard' %}" class="btn-cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackTextarea = document.querySelector('textarea[name="feedback"]');
+        const charCounter = document.getElementById('charCounter');
+        const charCount = document.getElementById('charCount');
+        const form = document.getElementById('feedbackForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Character counter for feedback textarea
+        if (feedbackTextarea && charCounter) {
+            function updateCharCount() {
+                const count = feedbackTextarea.value.length;
+                charCount.textContent = count;
+                
+                if (count > 500) {
+                    charCounter.classList.add('error');
+                    charCounter.classList.remove('warning');
+                } else if (count > 400) {
+                    charCounter.classList.add('warning');
+                    charCounter.classList.remove('error');
+                } else {
+                    charCounter.classList.remove('warning', 'error');
+                }
+            }
+
+            feedbackTextarea.addEventListener('input', updateCharCount);
+            updateCharCount(); // Initial count
+        }
+
+        // Form submission loading state
+        if (form && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                submitBtn.classList.add('loading');
+                submitBtn.innerHTML = '<i class="fas fa-spinner"></i> Submitting...';
+                submitBtn.disabled = true;
+            });
+        }
+
+        // Auto-hide success messages after 5 seconds
+        const successMessages = document.querySelectorAll('.success-message');
+        successMessages.forEach(msg => {
+            setTimeout(() => {
+                msg.style.transition = 'opacity 0.5s ease';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            }, 5000);
+        });
+
+        // Add animation to form elements
+        const formGroups = document.querySelectorAll('.form-group');
+        formGroups.forEach((group, index) => {
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                group.style.transition = 'all 0.4s ease';
+                group.style.opacity = '1';
+                group.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}
