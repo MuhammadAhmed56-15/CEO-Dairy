@@ -1,0 +1,155 @@
+.preview-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .preview-modal-overlay.active {
+    display: flex;
+  }
+
+  .preview-modal {
+    background: white;
+    border-radius: var(--radius-3xl);
+    width: 100%;
+    max-width: 95vw;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .preview-modal-header {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .preview-modal-header h2 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .preview-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .preview-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .preview-modal-body {
+    padding: 2rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex: 1;
+    background: #e8e8e8;
+    display: block;
+  }
+
+  .preview-page-wrapper {
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .preview-section {
+    background: white;
+    width: 90%;
+    max-width: 1000px;
+    min-height: 297mm;
+    height: auto;
+    padding: 0;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: block;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+
+  .preview-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-primary-600);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .preview-section-value {
+    font-size: 12pt;
+    color: #000000;
+    line-height: 1.6;
+    font-family: 'Calibri', Arial, sans-serif;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: normal;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
+
+  .preview-flag-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-neutral-100);
+  }
+
+  .preview-flag-row:last-child {
+    border-bottom: none;
+  }
+
+  .preview-modal-footer {
+    padding: 1rem 1.75rem;
+    background: white;
+    border-top: 1px solid var(--color-neutral-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .btn-close-preview {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-xl);
+    color: var(--color-neutral-700);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .btn-close-preview:hover {
+    background: var(--color-neutral-200);
+  }

@@ -1,0 +1,37 @@
+<!-- Preview Modal -->
+<div class="preview-modal-overlay" id="previewModalOverlay">
+  <div class="preview-modal">
+    <div class="preview-modal-header">
+      <h2>📄 Notesheet Preview</h2>
+      <button class="preview-close-btn" id="previewCloseBtn">✕</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-page-wrapper">
+        <div class="preview-section">
+          <iframe id="preview-iframe" style="width:100%; height:100%; border:none; display:block;"
+            sandbox="allow-same-origin">
+          </iframe>
+        </div>
+      </div>
+    </div>
+    <div class="preview-modal-footer">
+      <button class="btn-print-preview" id="previewPrintBtn" style="
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        border: none;
+        border-radius: var(--radius-xl);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        transition: all 0.2s;
+      ">🖨️ Print / Save as PDF</button>
+      <button class="btn-close-preview" id="previewCloseBtnFooter">✕ Close Preview</button>
+    </div>
+  </div>
+</div>
+

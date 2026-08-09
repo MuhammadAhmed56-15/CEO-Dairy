@@ -1,0 +1,866 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary: #059669;
+        --primary-dark: #0d2b1e;
+        --primary-light: #10b981;
+        --primary-tint: #ecfdf5;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --border: #e6ebf1;
+        --bg: #f6f8fa;
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --shadow-md: 0 12px 32px rgba(13, 43, 30, .07);
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    .container {
+        max-width: 1100px;
+    }
+
+    /* ---------- Page header ---------- */
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-dark), #114430);
+        border-radius: var(--radius-lg);
+        padding: 28px 34px;
+        color: #fff;
+        box-shadow: 0 18px 40px rgba(13, 43, 30, .22);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::after {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, .05);
+        border-radius: 50%;
+    }
+
+    .eyebrow-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .18);
+        color: #d1fae5;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 30px;
+        margin-bottom: 10px;
+    }
+
+    .page-header h2 {
+        font-weight: 800;
+        margin-bottom: 4px;
+        font-size: 1.6rem;
+        letter-spacing: -.4px;
+    }
+
+    .page-header p {
+        opacity: .82;
+        margin-bottom: 0;
+        font-size: .9rem;
+    }
+
+    /* ---------- Action bar ---------- */
+
+    .action-bar {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, .04);
+        padding: 24px 28px;
+    }
+
+    .step-label {
+        font-weight: 700;
+        font-size: .78rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .step-num {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--primary-tint);
+        color: var(--primary);
+        font-size: .7rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
+
+    .action-bar .form-select {
+        border: 1px solid #dbe3ec;
+        border-radius: var(--radius-md);
+        padding: 11px 14px;
+        font-size: .9rem;
+        background-color: #fbfcfe;
+    }
+
+    .action-bar .form-select:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, .12);
+    }
+
+    .btn-issue {
+        background: var(--primary-dark);
+        color: #fff;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        padding: 11px 20px;
+        border: none;
+        width: 100%;
+        transition: .2s ease;
+        box-shadow: 0 8px 18px rgba(13, 43, 30, .18);
+    }
+
+    .btn-issue:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    /* ---------- A4 letter page ---------- */
+
+    .letter-wrap {
+        background: #eef1f5;
+        border-radius: var(--radius-lg);
+        padding: 34px 18px;
+        margin-top: 26px;
+    }
+
+    .letter-page {
+        background: #ffffff;
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 50px 65px;
+        box-shadow: 0 15px 45px rgba(15, 23, 42, .12);
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+    }
+
+    /* Letterhead — matches the injected TinyMCE header spec */
+
+    .letterhead-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 18px;
+        padding: 0;
+        border: none;
+        border-bottom: 3px double #0d2b1e;
+        padding-bottom: 16px;
+    }
+
+    .letterhead-logo-cell {
+        width: 145px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 10px;
+    }
+
+    .letterhead-logo-cell img {
+        width: 135px;
+        height: 135px;
+        object-fit: contain;
+    }
+
+    .letterhead-center {
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 20px;
+        border-left: 1px solid #d8dee5;
+        border-right: 1px solid #d8dee5;
+    }
+
+    .letterhead-title {
+        font-weight: 900;
+        font-size: 15pt;
+        margin: 0 0 4px;
+        font-family: Calibri, Arial, sans-serif;
+        color: #2d3748;
+        letter-spacing: .4px;
+        line-height: 1.4;
+    }
+
+    .letterhead-address {
+        font-size: 12pt;
+        font-weight: bold;
+        margin: 0 0 4px;
+        font-family: Calibri, Arial, sans-serif;
+        color: #1a202c;
+        line-height: 1.4;
+    }
+
+    .letterhead-contact {
+        font-size: 12pt;
+        font-weight: bold;
+        margin: 0;
+        font-family: Calibri, Arial, sans-serif;
+        color: #1a202c;
+        line-height: 1.4;
+    }
+
+    .letterhead-contact u {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    /* Plain-text style inputs sitting on the letterhead */
+
+    .form-control-plaintext-custom {
+        border: none;
+        border-bottom: 1px dashed #94a3b8;
+        border-radius: 0;
+        padding: 3px 6px;
+        font-family: inherit;
+        background: transparent;
+    }
+
+    .form-control-plaintext-custom:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary-dark);
+        box-shadow: none;
+        background: #fafcfb;
+    }
+
+    .letter-section-label {
+        font-weight: 700;
+        color: #111827;
+        font-size: 17px;
+        white-space: nowrap;
+    }
+
+    .letter-body-textarea {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14.5px;
+        line-height: 1.7;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        background: #fdfdfd;
+    }
+
+    .letter-body-textarea:focus {
+        outline: none;
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, .1);
+        background: #fff;
+    }
+
+    .editor-hint {
+        font-size: .78rem;
+        color: var(--muted);
+    }
+
+    .signature-block {
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .signature-space {
+        height: 20px;
+    }
+
+    .cc-box {
+        font-size: 16px;
+    }
+
+    .attachment-box {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: .82rem;
+    }
+
+    .letter-footer-note {
+        font-size: 10.5px;
+        color: #6b7280;
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 14px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    /* ---------- TinyMCE editor theming (matches letter card) ---------- */
+
+    .tox-tinymce {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        font-family: 'Times New Roman', Times, serif !important;
+    }
+
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__primary,
+    .tox .tox-toolbar-overlord {
+        background: var(--primary-tint) !important;
+        border-bottom: 1px solid #d7ede3 !important;
+    }
+
+    .tox .tox-tbtn:hover {
+        background: #d7ede3 !important;
+    }
+
+    .tox .tox-tbtn--enabled,
+    .tox .tox-tbtn--enabled:hover {
+        background: #bfe4d4 !important;
+    }
+
+    .tox .tox-statusbar {
+        border-top: 1px solid #eef2f7 !important;
+    }
+
+    /* Auto-numbering: 1. / 2. / 3. main points, (i) / (ii) / (iii) nested sub-points */
+
+    .mce-content-body ol {
+        list-style-type: decimal;
+        padding-left: 26px;
+        margin: 0 0 8px;
+    }
+
+    .mce-content-body ol ol {
+        list-style: none;
+        counter-reset: subitem;
+        padding-left: 30px;
+        margin: 4px 0;
+    }
+
+    .mce-content-body ol ol>li {
+        counter-increment: subitem;
+        position: relative;
+    }
+
+    .mce-content-body ol ol>li::marker {
+        content: "";
+    }
+
+    .mce-content-body ol ol>li::before {
+        content: "(" counter(subitem, lower-roman) ") ";
+        position: absolute;
+        left: -30px;
+    }
+
+    @media(max-width:768px) {
+
+        .letter-page {
+            padding: 28px 22px;
+        }
+
+        .letterhead-table,
+        .letterhead-table tbody,
+        .letterhead-table tr,
+        .letterhead-table td {
+            display: block;
+            width: 100% !important;
+        }
+
+        .letterhead-logo-cell img {
+            width: 90px;
+            height: 90px;
+        }
+
+        .letterhead-title {
+            font-size: 12pt;
+        }
+
+        .letterhead-address,
+        .letterhead-contact {
+            font-size: 10pt;
+        }
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="page-header mb-4">
+        <div class="eyebrow-pill">
+            <i class="fas fa-paper-plane"></i>
+            Outgoing Correspondence
+        </div>
+        <h2>Official Letter</h2>
+        <p>Draft, route and issue an official letter on WSSP letterhead.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Step 1: Select Registry File -->
+
+        <div class="action-bar mb-1">
+            <div class="step-label"><span class="step-num">1</span> Select Registry File</div>
+
+            <select name="letter_file" class="form-select" required>
+                <option value="">-- Choose Letter File --</option>
+                {% for f in files %}
+                <option value="{{ f.id }}">{{ f.reference_number }} - {{ f.file_title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <!-- OFFICIAL A4 LETTERPAD -->
+
+        <div class="letter-wrap">
+            <div class="letter-page">
+
+                <!-- Letterhead -->
+
+                <table class="letterhead-table">
+                    <tr>
+                        <td class="letterhead-logo-cell">
+                            <img src="{% static 'images/wssp_logo.png' %}" alt="WSSP Logo"
+                                onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
+                        </td>
+
+                        <td class="letterhead-center">
+                            <p class="letterhead-title"> WATER &amp;
+                                SANITATION SERVICES PESHAWAR,</p>
+                            <p class="letterhead-title"> LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+                            <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,
+                            </p>
+                            <p class="letterhead-contact">
+                                <strong>Email:
+                                </strong><u>wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong>
+                                091-9219621-23
+                            </p>
+                        </td>
+
+                        <td class="letterhead-logo-cell">
+                            <img src="{% static 'images/kp_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
+                                onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
+                                style="width: 135px; height: 135px; object-fit: contain;">
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Ref No & Date -->
+
+                <div class="row my-3 align-items-center" style="font-size: 17px;">
+                    <div class="col-7 d-flex align-items-center">
+                        <span class="letter-section-label me-2">Reference No:</span>
+                        <input type="text" name="ref_no" class="form-control form-control-plaintext-custom" required>
+                    </div>
+                    <div class="col-5 d-flex align-items-center justify-content-end">
+                        <span class="letter-section-label me-2">Dated:</span>
+                        <input type="date" name="letter_date" class="form-control form-control-plaintext-custom w-auto"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Receiver Address -->
+
+                <div class="my-4" style="font-size: 17px; line-height: 1.6;">
+                    <span class="letter-section-label">To</span>
+                    <div class="ms-4 mt-1">
+                        <textarea name="recipient_address" class="form-control form-control-plaintext-custom" rows="3"
+                            style="resize: none;" required></textarea>
+                    </div>
+                </div>
+
+                <!-- Subject -->
+
+                <div class="my-3 d-flex align-items-start" style="font-size: 17px;">
+                    <span class="letter-section-label me-2 text-nowrap">Subject:</span>
+                    <textarea name="subject" class="form-control form-control-plaintext-custom fw-bold text-uppercase"
+                        style="resize: none; overflow: hidden; line-height: 1.5; padding-top: 0; padding-bottom: 0;"
+                        rows="1" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                        required></textarea>
+                </div>
+
+                <!-- Body -->
+
+                <div class="mb-2">
+                    <textarea id="letterBody" name="body" class="form-control letter-body-textarea" rows="10"
+                        required></textarea>
+                    <small class="editor-hint d-block mt-1">
+                        <i class="fas fa-circle-info me-1"></i>
+
+                    </small>
+                </div>
+
+                <!-- Signatory -->
+
+                <div class="row mt-2">
+                    <div class="col-6"></div>
+                    <div class="col-6 text-center signature-block">
+                        <div class="signature-space"></div>
+                        <input type="text" name="signer_name" id="signer_name"
+                            class="form-control form-control-plaintext-custom text-center fw-bold" required
+                            oninput="document.getElementById('cc_signer_name').value = this.value">
+                        <input type="text" name="signer_designation" id="signer_designation"
+                            class="form-control form-control-plaintext-custom text-center fw-bold" required
+                            oninput="document.getElementById('cc_signer_designation').value = this.value">
+                        <div class="fw-bold mt-1">Water and Sanitation Services Peshawar</div>
+                    </div>
+                </div>
+
+                <!-- CC -->
+
+                <div class="mt-4 pt-3 cc-box">
+                    <span class="letter-section-label">Copy forwarded for information to the:</span>
+                    <textarea name="cc_list" id="ccListTextarea" class="form-control form-control-plaintext-custom mt-1"
+                        rows="4"></textarea>
+                    
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const ccTextarea = document.getElementById('ccListTextarea');
+                            
+                            // Auto-insert "1. " when clicking into the empty textarea
+                            ccTextarea.addEventListener('focus', function() {
+                                if (this.value.trim() === '') {
+                                    this.value = '1. ';
+                                }
+                            });
+
+                            // Handle Enter key for auto-numbering
+                            ccTextarea.addEventListener('keydown', function(e) {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    
+                                    const cursorPos = this.selectionStart;
+                                    const textBeforeCursor = this.value.substring(0, cursorPos);
+                                    const textAfterCursor = this.value.substring(cursorPos);
+                                    
+                                    const linesBefore = textBeforeCursor.split('\n');
+                                    const currentLine = linesBefore[linesBefore.length - 1];
+                                    
+                                    // If user presses Enter on an empty numbered line, remove the number and break out
+                                    if (/^\d+\.\s*$/.test(currentLine)) {
+                                        linesBefore.pop();
+                                        this.value = linesBefore.join('\n') + '\n' + textAfterCursor;
+                                        this.selectionStart = this.selectionEnd = this.value.length - textAfterCursor.length;
+                                        return;
+                                    }
+                                    
+                                    // Determine the next number based on the current line
+                                    let nextNum = 1;
+                                    const match = currentLine.match(/^(\d+)\./);
+                                    if (match) {
+                                        nextNum = parseInt(match[1]) + 1;
+                                    } else {
+                                        // Fallback: find the last number used anywhere above
+                                        for (let i = linesBefore.length - 1; i >= 0; i--) {
+                                            const m = linesBefore[i].match(/^(\d+)\./);
+                                            if (m) {
+                                                nextNum = parseInt(m[1]) + 1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+                                    const insertText = '\n' + nextNum + '. ';
+                                    this.value = textBeforeCursor + insertText + textAfterCursor;
+                                    
+                                    // Move cursor after the inserted number
+                                    this.selectionStart = this.selectionEnd = cursorPos + insertText.length;
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+
+                <!-- CC Signatory -->
+
+                <div class="row mt-2">
+                    <div class="col-6"></div>
+                    <div class="col-6 text-center signature-block">
+                        <div class="signature-space"></div>
+                        <input type="text" name="cc_signer_name" id="cc_signer_name"
+                            class="form-control form-control-plaintext-custom text-center fw-bold" required>
+                        <input type="text" name="cc_signer_designation" id="cc_signer_designation"
+                            class="form-control form-control-plaintext-custom text-center fw-bold" required>
+                        <div class="fw-bold mt-1">Water and Sanitation Services Peshawar</div>
+                    </div>
+                </div>
+
+                <!-- Attachment -->
+
+                <div class="mt-4 attachment-box">
+                    <label class="fw-bold mb-1"><i class="fas fa-paperclip me-1 text-success"></i>Attach
+                        Document / PDF (Optional)</label>
+                    <div id="attachments-container">
+                        <div class="d-flex align-items-center mt-2">
+                            <input type="file" name="attachment" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-success mt-3" onclick="addMoreAttachment()">
+                        <i class="fas fa-plus me-1"></i> Add More Document
+                    </button>
+                </div>
+
+                <script>
+                    function addMoreAttachment() {
+                        const container = document.getElementById('attachments-container');
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'd-flex align-items-center mt-2';
+
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.name = 'attachment';
+                        input.className = 'form-control form-control-sm';
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-sm btn-outline-danger ms-2';
+                        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        removeBtn.onclick = function () {
+                            wrapper.remove();
+                        };
+
+                        wrapper.appendChild(input);
+                        wrapper.appendChild(removeBtn);
+                        container.appendChild(wrapper);
+                    }
+                </script>
+
+                <!-- Footer -->
+
+                <div class="letter-footer-note">
+                    A company incorporated u/s 42 of the Companies Act-2017 by the Government of Khyber Pakhtunkhwa
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Step 2: Send To + Issue (moved below the letter/attachments) -->
+
+        <div class="action-bar mt-3">
+            <div class="row align-items-end g-3">
+
+                <div class="col-md-7">
+                    <div class="step-label"><span class="step-num">2</span> Send To (System User Inbox)</div>
+                    <select name="receiver" class="form-select" id="receiverSelect">
+                        <option value="">-- Select System Recipient --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.username }} ({% if u.profile %}{{ u.profile.role }}{% endif %})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i>Optional if saving as Draft</small>
+                </div>
+
+                <input type="hidden" name="save_as_draft" id="saveDraftInput" value="0">
+
+                <div class="col-md-5 d-flex gap-2 justify-content-end flex-wrap">
+                    <button type="button" class="btn btn-outline-secondary px-4" id="saveDraftBtn"
+                        style="border-radius: 10px; font-weight: 700; border-color: #6b7280; color: #374151; background: #f9fafb; transition: all 0.2s;"
+                        onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#f9fafb'">
+                        <i class="fas fa-save me-2"></i>Save as Draft
+                    </button>
+                    <button type="submit" class="btn btn-issue" id="issueBtn">
+                        <i class="fas fa-paper-plane me-2"></i>Issue Letter
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+<script>
+    tinymce.init({
+        selector: '#letterBody',
+        menubar: true,
+        menu: {
+            file: { title: 'File', items: 'newdocument restoredraft | preview | importword exportpdf exportword | print | deleteallconversations' },
+            edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+            view: { title: 'View', items: 'code revisionhistory | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments' },
+            insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+            format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+            tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
+            table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+        },
+        height: 460,
+        min_height: 460,
+        autoresize_bottom_margin: 50,
+        resize: true,
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+            'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'wordcount', 'codesample',
+            'emoticons', 'nonbreaking', 'pagebreak', 'quickbars', 'autoresize'
+        ],
+        relative_urls: false,
+        remove_script_host: true,
+        toolbar_mode: 'wrap',
+        paste_data_images: true,
+        paste_as_text: false,
+        paste_postprocess: function (plugin, args) {
+            var node = args.node;
+            node.querySelectorAll('[style]').forEach(function (el) {
+                var raw = el.getAttribute('style') || '';
+                var cleaned = raw.split(';')
+                    .map(function (s) { return s.trim(); })
+                    .filter(function (s) {
+                        if (!s) return false;
+                        var prop = s.split(':')[0].trim().toLowerCase();
+                        return !prop.startsWith('mso-') && prop !== 'tab-stops' && prop !== 'layout-grid-mode' && prop !== 'punctuation-wrap' && prop !== 'text-autospace';
+                    }).join('; ');
+                if (cleaned) { el.setAttribute('style', cleaned); } else { el.removeAttribute('style'); }
+            });
+            node.querySelectorAll('[class]').forEach(function (el) { el.removeAttribute('class'); });
+            node.querySelectorAll('p').forEach(function (p) {
+                p.style.fontFamily = 'Calibri, Arial, sans-serif';
+                p.style.fontSize = '12pt';
+                p.style.lineHeight = '1.8';
+                if (!p.style.margin) p.style.margin = '0 0 6pt 0';
+            });
+            var headingSizes = { H1: '22pt', H2: '18pt', H3: '14pt', H4: '13pt' };
+            Object.keys(headingSizes).forEach(function (tag) {
+                node.querySelectorAll(tag).forEach(function (h) {
+                    h.style.fontFamily = 'Calibri, Arial, sans-serif';
+                    h.style.fontSize = headingSizes[tag];
+                    h.style.lineHeight = '1.4';
+                    h.style.fontWeight = 'bold';
+                });
+            });
+            node.querySelectorAll('span').forEach(function (span) {
+                if (!span.style.fontFamily) span.style.fontFamily = 'Calibri, Arial, sans-serif';
+                if (!span.style.fontSize) span.style.fontSize = '12pt';
+            });
+            node.querySelectorAll('table').forEach(function (tbl) {
+                tbl.style.borderCollapse = 'collapse';
+                tbl.style.width = '100%';
+                tbl.style.margin = '8pt 0';
+                tbl.removeAttribute('width'); tbl.removeAttribute('border'); tbl.removeAttribute('cellspacing'); tbl.removeAttribute('cellpadding');
+            });
+            node.querySelectorAll('td, th').forEach(function (cell) {
+                cell.style.border = '1px solid #d1d5db';
+                cell.style.padding = '6px 10px';
+                cell.style.fontFamily = 'Calibri, Arial, sans-serif';
+                cell.style.fontSize = '12pt';
+                cell.style.lineHeight = '1.6';
+            });
+            node.querySelectorAll('th').forEach(function (th) {
+                th.style.background = '#d1fae5';
+                th.style.fontWeight = '600';
+            });
+            var paras = Array.from(node.querySelectorAll('p'));
+            var lastEmpty = false;
+            paras.forEach(function (p) {
+                var isEmpty = p.textContent.trim() === '' || p.innerHTML.trim() === '&nbsp;' || p.innerHTML.trim() === '<br>';
+                if (isEmpty && lastEmpty) { p.parentNode && p.parentNode.removeChild(p); } else { lastEmpty = isEmpty; }
+            });
+            ['w\\:*', 'o\\:*', 'v\\:*'].forEach(function (sel) {
+                try { node.querySelectorAll(sel).forEach(function (el) { el.remove(); }); } catch (e) { }
+            });
+        },
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '+body[style]',
+        toolbar: [
+            'undo redo | styles | fontfamily | fontsize',
+            'bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat | fullscreen'
+        ].join(' | '),
+        font_family_formats:
+            'Calibri=Calibri,sans-serif;' +
+            'Arial=arial,helvetica,sans-serif;' +
+            'Times New Roman=times new roman,times,serif;' +
+            'Courier New=courier new,courier,monospace;' +
+            'Georgia=georgia,palatino,serif;' +
+            'Verdana=verdana,geneva,sans-serif;' +
+            'Plus Jakarta Sans=Plus Jakarta Sans,system-ui,sans-serif;',
+        font_size_formats: '8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
+        style_formats: [
+            { title: 'Heading 1', block: 'h1', styles: { 'font-size': '26pt', 'font-weight': 'bold' } },
+            { title: 'Heading 2', block: 'h2', styles: { 'font-size': '20pt', 'font-weight': 'bold' } },
+            { title: 'Heading 3', block: 'h3', styles: { 'font-size': '16pt', 'font-weight': 'bold' } },
+            { title: 'Heading 4', block: 'h4', styles: { 'font-size': '14pt', 'font-weight': 'bold' } },
+            { title: 'Normal', block: 'p', styles: { 'font-size': '12pt', 'font-weight': 'normal' } },
+            { title: 'Block Quote', block: 'blockquote' },
+            { title: 'Code', inline: 'code' },
+        ],
+        content_style: `
+            body {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 14.5px;
+                line-height: 1.7;
+                color: #000;
+            }
+            ol { list-style-type: decimal; padding-left: 26px; margin: 0 0 8px; }
+            ol ol {
+                list-style: none;
+                counter-reset: subitem;
+                padding-left: 30px;
+                margin: 4px 0;
+            }
+            ol ol > li { counter-increment: subitem; position: relative; }
+            ol ol > li::marker { content: ""; }
+            ol ol > li::before {
+                content: "(" counter(subitem, lower-roman) ") ";
+                position: absolute;
+                left: -30px;
+            }
+            h1 { font-size: 26pt; font-weight: bold; margin-bottom: 8px; }
+            h2 { font-size: 20pt; font-weight: bold; margin-bottom: 6px; }
+            h3 { font-size: 16pt; font-weight: bold; margin-bottom: 4px; }
+            h4 { font-size: 14pt; font-weight: bold; }
+            blockquote { border-left: 4px solid #059669; padding-left: 12px; color: #4b5563; }
+            table { border-collapse: collapse; width: 100%; }
+            td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
+            th { background: #d1fae5; font-weight: 600; }
+        `,
+        branding: false,
+        elementpath: true,
+        statusbar: true,
+        wordcount_countregex: /[\w\u2019\x27-]+/g,
+        quickbars_selection_toolbar: 'bold italic underline | formatselect | forecolor | bullist numlist',
+        quickbars_insert_toolbar: false,
+        setup: function (editor) {
+            editor.on('change input keyup undo redo', function () {
+                editor.save();
+            });
+        }
+    });
+
+    // Make sure the editor's content is written back to the textarea before the form posts
+    document.querySelector('form').addEventListener('submit', function () {
+        if (typeof tinymce !== 'undefined' && tinymce.get('letterBody')) {
+            tinymce.get('letterBody').save();
+        }
+    });
+
+    // Save as Draft button logic
+    document.getElementById('saveDraftBtn').addEventListener('click', function () {
+        if (typeof tinymce !== 'undefined' && tinymce.get('letterBody')) {
+            tinymce.get('letterBody').save();
+        }
+        document.getElementById('saveDraftInput').value = '1';
+        // Remove required from receiver so form can submit without it
+        document.getElementById('receiverSelect').removeAttribute('required');
+        document.querySelector('form').submit();
+    });
+</script>
+
+{% endblock %}

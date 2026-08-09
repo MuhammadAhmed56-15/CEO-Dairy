@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% load file_extras %}
+
+{% block title %}Task Details & Feedback{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --form-primary: #059669;
+        --form-primary-light: #10b981;
+        --form-dark: #0d2b1e;
+        --form-bg: #f8fafc;
+        --form-border: #e2e8f0;
+        --form-text: #334155;
+        --form-text-muted: #64748b;
+        --form-radius: 16px;
+    }
+
+    .form-page-container {
+        padding: 1rem 1.5rem 3rem; /* Reduced top padding to minimize header gap */
+        background-color: #f1f5f9;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-card {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: var(--form-radius);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--form-border);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #0d2b1e 0%, var(--form-primary) 100%);
+        padding: 25px 40px;
+        color: white;
+        position: relative;
+    }
+
+    .form-header h2 {
+        font-weight: 700;
+        font-size: 22px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header p {
+        margin: 6px 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .form-body {
+        padding: 35px 40px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--form-dark);
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--form-bg);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-title i {
+        color: var(--form-primary);
+        font-size: 14px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--form-text-muted);
+        letter-spacing: 0.5px;
+    }
+
+    .form-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--form-dark);
+        background: var(--form-bg);
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--form-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-value-desc {
+        font-size: 14px;
+        color: var(--form-text);
+        background: var(--form-bg);
+        padding: 18px;
+        border-radius: 8px;
+        border: 1px solid var(--form-border);
+        line-height: 1.6;
+        white-space: pre-line;
+        margin-bottom: 30px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    
+    .status-completed { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+    .status-in-progress { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa; }
+    .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+    .status-seen { background: #e2e8f0; color: #334155; border: 1px solid #94a3b8; }
+
+    /* Feedback Cards */
+    .feedback-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .feedback-card {
+        background: #fff;
+        border: 1px solid var(--form-border);
+        border-radius: 12px;
+        padding: 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feedback-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .feedback-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--form-border);
+    }
+
+    .fb-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .fb-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--form-primary-light) 0%, var(--form-primary) 100%);
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .fb-name { font-weight: 700; color: var(--form-dark); display: block; font-size: 14px; }
+    .fb-role { font-size: 11px; color: var(--form-text-muted); font-weight: 600; text-transform: uppercase; }
+    .fb-date { font-size: 12px; color: var(--form-text-muted); display: flex; align-items: center; gap: 6px; }
+    .fb-action {
+        font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: var(--form-bg); color: var(--form-dark);
+    }
+
+    .fb-content {
+        font-size: 14px;
+        color: var(--form-text);
+        line-height: 1.6;
+        margin-bottom: 12px;
+        white-space: pre-line;
+    }
+
+    .fb-attachments {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .attachment-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--form-bg);
+        border: 1px solid var(--form-border);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--form-dark);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .attachment-pill:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+    }
+
+    /* Modern Centered Back Button style placed at the bottom */
+    .back-action-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid var(--form-border);
+    }
+
+    .btn-back-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        background: linear-gradient(135deg, var(--form-dark) 0%, #1c4e38 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(13, 43, 30, 0.2);
+        transition: all 0.25s ease;
+    }
+
+    .btn-back-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 43, 30, 0.35);
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--form-primary) 0%, var(--form-primary-light) 100%);
+    }
+
+    @media (max-width: 768px) {
+        .form-header { padding: 20px; }
+        .form-body { padding: 25px 20px; }
+        .feedback-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-page-container">
+    
+    <div class="form-card">
+        <div class="form-header">
+            <h2><i class="fas fa-file-invoice"></i> Task Details & Feedback</h2>
+            <p>Complete overview of the assigned task and its feedback history</p>
+        </div>
+
+        <div class="form-body">
+            <!-- Task Info -->
+            <div class="section-title"><i class="fas fa-info-circle"></i> Task Information</div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <span class="form-label">Task Title</span>
+                    <div class="form-value">{{ task.title }}</div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label">Current Status</span>
+                    <div class="form-value" style="background: transparent; border: none; padding: 0;">
+                        <span class="status-badge status-{{ task.status|slugify }}">
+                            <i class="fas {% if task.status == 'Completed' %}fa-check-circle{% elif task.status == 'In Progress' %}fa-spinner{% else %}fa-clock{% endif %}"></i>
+                            {{ task.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label">Assigned By</span>
+                    <div class="form-value"><i class="fas fa-user-tie" style="color: #2563eb;"></i> {{ task.assigned_by.get_full_name|default:task.assigned_by.username }}</div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label">Assigned To</span>
+                    <div class="form-value"><i class="fas fa-user-circle" style="color: #059669;"></i> {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label">Created At</span>
+                    <div class="form-value"><i class="far fa-calendar-plus" style="color: #64748b;"></i> {{ task.created_at|date:"d M, Y h:i A" }}</div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label">Due Date</span>
+                    <div class="form-value"><i class="far fa-calendar-check" style="color: #dc2626;"></i> {{ task.due_date|date:"d M, Y"|default:"Not Set" }}</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-align-left"></i> Task Description</div>
+            <div class="form-value-desc">{{ task.description|default:"No description provided." }}</div>
+
+            <!-- Feedback Section -->
+            <div class="section-title"><i class="fas fa-comments"></i> Feedback History</div>
+            
+            {% if remarks %}
+                <div class="feedback-list">
+                    {% for remark in remarks %}
+                    <div class="feedback-card">
+                        <div class="feedback-card-header">
+                            <div class="fb-user">
+                                <div class="fb-avatar">{{ remark.manager.username|slice:":1"|upper }}</div>
+                                <div>
+                                    <span class="fb-name">{{ remark.manager.get_full_name|default:remark.manager.username }}</span>
+                                    <span class="fb-role">{{ remark.manager.profile.role|default:"Staff" }}</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                                <span class="fb-action">
+                                    {% if remark.action_taken == 'approve' %}
+                                        <i class="fas fa-check" style="color: #059669;"></i> Completed
+                                    {% else %}
+                                        <i class="fas fa-spinner" style="color: #2563eb;"></i> In Progress
+                                    {% endif %}
+                                </span>
+                                <span class="fb-date"><i class="far fa-clock"></i> {{ remark.get_formatted_time }}</span>
+                            </div>
+                        </div>
+
+                        <div class="fb-content">{{ remark.feedback }}</div>
+
+                        {% if remark.attachments.all %}
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--form-border);">
+                            <span class="form-label" style="display:block; margin-bottom: 10px;">Attachments</span>
+                            <div class="fb-attachments">
+                                {% for att in remark.attachments.all %}
+                                    <a href="{{ att.file.url }}" class="attachment-pill" target="_blank">
+                                        <i class="{{ att.file|file_icon }}"></i> {{ att.file|file_name }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% elif remark.attachment_1 or remark.attachment_2 or remark.attachment_3 %}
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--form-border);">
+                            <span class="form-label" style="display:block; margin-bottom: 10px;">Attachments</span>
+                            <div class="fb-attachments">
+                                {% if remark.attachment_1 %}
+                                    <a href="{{ remark.attachment_1.url }}" class="attachment-pill" target="_blank">
+                                        <i class="{{ remark.attachment_1|file_icon }}"></i> {{ remark.attachment_1|file_name }}
+                                    </a>
+                                {% endif %}
+                                {% if remark.attachment_2 %}
+                                    <a href="{{ remark.attachment_2.url }}" class="attachment-pill" target="_blank">
+                                        <i class="{{ remark.attachment_2|file_icon }}"></i> {{ remark.attachment_2|file_name }}
+                                    </a>
+                                {% endif %}
+                                {% if remark.attachment_3 %}
+                                    <a href="{{ remark.attachment_3.url }}" class="attachment-pill" target="_blank">
+                                        <i class="{{ remark.attachment_3|file_icon }}"></i> {{ remark.attachment_3|file_name }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align:center; padding: 40px; background: var(--form-bg); border-radius: 12px; color: var(--form-text-muted);">
+                    <i class="fas fa-comment-slash" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h4 style="margin:0; font-weight:600; color:var(--form-dark);">No Feedback Yet</h4>
+                    <p style="margin:5px 0 0;">No remarks or updates have been submitted for this task.</p>
+                </div>
+            {% endif %}
+
+            <!-- Centered Professional Back Button at the Bottom -->
+            <div class="back-action-container">
+                <a href="{% url 'all_tasks' %}" class="btn-back-modern">
+                    <i class="fas fa-arrow-left"></i> Back to Tasks
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Outer circle background -->
+  <circle cx="100" cy="85" r="75" fill="#f0f0f0"/>
+  
+  <!-- Blue water swirl 1 - top left -->
+  <path d="M100,20 C65,20 35,45 30,75 C50,55 80,55 95,75 C85,55 90,35 100,20Z" fill="#29ABE2"/>
+  
+  <!-- Blue water swirl 2 - top right -->
+  <path d="M100,20 C130,25 155,45 165,70 C145,60 125,65 115,85 C130,70 135,45 100,20Z" fill="#29ABE2"/>
+  
+  <!-- Blue water swirl 3 - bottom -->
+  <path d="M40,95 C35,120 50,145 70,155 C65,135 75,118 95,115 C72,115 50,108 40,95Z" fill="#29ABE2"/>
+  <path d="M160,95 C160,118 145,140 125,152 C128,132 118,116 100,113 C122,114 148,108 160,95Z" fill="#29ABE2"/>
+  
+  <!-- Orange center dot -->
+  <circle cx="100" cy="90" r="16" fill="#F7941D"/>
+  
+  <!-- Curved text "WATER AND SANITATION SERVICES PESHAWAR" -->
+  <path id="topArc" d="M 35,85 A 65,65 0 0,1 165,85" fill="none"/>
+  <text font-family="Arial, sans-serif" font-size="10.5" font-weight="600" fill="#555555" letter-spacing="1">
+    <textPath href="#topArc" startOffset="3%">WATER AND SANITATION SERVICES PESHAWAR</textPath>
+  </text>
+  
+  <!-- WSSP text bottom -->
+  <text x="100" y="178" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="900" fill="#555555" letter-spacing="2">WSSP</text>
+</svg>

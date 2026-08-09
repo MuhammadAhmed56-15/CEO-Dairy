@@ -1,20 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Dashboard{% endblock %} - Commitment Dairy Software</title>
+    <title>{% block title %}Dashboard{% endblock %} - Task</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --secondary-color: #1e40af;
-            --dark-bg: #1e293b;
-            --sidebar-bg: #0f172a;
-            --hover-bg: #334155;
-            --text-light: #94a3b8;
-            --border-color: #334155;
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --secondary-color: #1a4731;
+            --dark-bg: #0d2b1e;
+            --sidebar-bg: #0a2118;
+            --hover-bg: #1a4731;
+            --text-light: #8abda0;
+            --text-dark: #0d2b1e;
+            --border-color: #1a4731;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
         }
 
         * {
@@ -23,20 +46,26 @@
             box-sizing: border-box;
         }
 
+        /* Base font size scaled up ~20% */
+        html {
+            font-size: 19px;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #e8f0eb;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            font-size: 1rem;
         }
 
-        /* Header Styles */
+        /* ── Header ── */
         .main-header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #0a2118 0%, #1a4731 100%);
             color: white;
             padding: 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(10, 33, 24, 0.4);
             position: sticky;
             top: 0;
             z-index: 1030;
@@ -46,41 +75,65 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
+            padding: 10px 36px;
+            position: relative;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .header-content>* {
+            position: relative;
+            z-index: 1;
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 18px;
+            /* was 15px */
         }
 
         .logo-icon {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             background: white;
-            border-radius: 10px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
         }
 
-        .logo-icon i {
-            font-size: 24px;
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .logo-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: url(#gradient);
         }
 
         .logo-text h1 {
-            font-size: 22px;
+            font-size: 1.2rem;
             font-weight: 700;
             margin: 0;
+            letter-spacing: -0.5px;
         }
 
         .logo-text p {
-            font-size: 12px;
+            font-size: 0.95rem;
             opacity: 0.9;
             margin: 0;
         }
@@ -88,34 +141,42 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
+            /* was 20px */
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
+            gap: 8px;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .user-info:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
+            height: 34px;
+            padding: 0 12px;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #3b82f6;
+            font-size: 0.95rem;
+            color: #0d5c38;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
         }
 
         .user-details {
@@ -123,55 +184,72 @@
         }
 
         .user-name {
-            font-size: 14px;
+            font-size: 0.9rem;
+            /* was 14px */
             font-weight: 600;
             display: block;
+            line-height: 1.4;
         }
 
         .user-role {
-            font-size: 11px;
-            opacity: 0.8;
+            font-size: 0.72rem;
+            /* was 11px */
+            opacity: 0.85;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 2px;
         }
 
         .menu-toggle {
             display: none;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            font-size: 24px;
-            padding: 10px 15px;
-            border-radius: 8px;
+            font-size: 1.3rem;
+            /* was 20px */
+            padding: 12px 18px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Main Container */
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        /* ── Main Container ── */
         .main-container {
             display: flex;
             flex: 1;
             position: relative;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
+            /* was 70px */
         }
 
-        /* Sidebar Styles - FIXED WITH INTERNAL SCROLL */
+        /* ── Sidebar ── */
         .sidebar {
-            width: 260px;
+            width: 300px;
+            /* was 260px */
             background: var(--sidebar-bg);
             color: white;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
             position: fixed;
             left: 0;
-            top: 75px;
-            bottom: 70px;
+            top: 70px;
+            bottom: 80px;
             z-index: 1020;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
+            transition: all 0.3s ease;
         }
 
-        /* Custom Scrollbar for Sidebar */
         .sidebar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .sidebar::-webkit-scrollbar-track {
@@ -180,7 +258,7 @@
 
         .sidebar::-webkit-scrollbar-thumb {
             background: var(--hover-bg);
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .sidebar::-webkit-scrollbar-thumb:hover {
@@ -188,43 +266,74 @@
         }
 
         .sidebar-header {
-            padding: 20px 20px 15px;
+            padding: 24px 24px 18px;
+            /* was 20px 20px 15px */
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
         .sidebar-title {
-            font-size: 12px;
+            font-size: 0.72rem;
+            /* was 11px */
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--text-light);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .sidebar-nav {
             flex: 1;
-            padding: 15px 10px;
+            padding: 18px 12px;
+            /* was 15px 10px */
         }
 
         .nav-pills {
             padding: 0;
         }
 
+        .nav-link.collapsed .dropdown-icon {
+            transform: rotate(-90deg);
+        }
+
+        .dropdown-icon {
+            transition: transform 0.3s ease;
+        }
+
         .nav-pills .nav-link {
             color: var(--text-light);
-            border-radius: 10px;
-            padding: 12px 15px;
-            margin-bottom: 5px;
+            border-radius: 14px;
+            padding: 16px 20px;
+            /* was 13px 16px */
+            margin-bottom: 7px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            /* was 12px */
             transition: all 0.3s ease;
-            font-size: 15px;
+            font-size: 0.9rem;
+            /* was 14px */
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-pills .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
         }
 
         .nav-pills .nav-link i {
-            font-size: 18px;
-            width: 20px;
+            font-size: 1.15rem;
+            /* was 18px */
+            width: 24px;
+            transition: transform 0.3s ease;
         }
 
         .nav-pills .nav-link:hover {
@@ -233,100 +342,236 @@
             transform: translateX(5px);
         }
 
+        .nav-pills .nav-link:hover i {
+            transform: scale(1.1);
+        }
+
         .nav-pills .nav-link.active {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #0d5c38 0%, #10b981 100%);
             color: white;
-            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+            font-weight: 600;
+        }
+
+        .nav-pills .nav-link.active::before {
+            transform: scaleY(1);
+        }
+
+        .nav-pills .nav-link.active i {
+            transform: scale(1.1);
         }
 
         .sidebar-footer {
-            padding: 15px 10px;
+            padding: 18px 12px;
+            /* was 15px 10px */
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
         }
 
         .logout-btn {
             width: 100%;
-            padding: 12px 15px;
+            padding: 15px 20px;
+            /* was 13px 16px */
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
             border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 10px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            /* was 14px */
         }
 
         .logout-btn:hover {
             background: #ef4444;
             color: white;
             border-color: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
         }
 
-        /* Content Area */
+        /* ── Content Area ── */
         .content {
             flex: 1;
-            margin-left: 260px;
-            padding: 30px;
-            padding-bottom: 100px;
+            margin-left: 300px;
+            /* matches new sidebar width */
+            padding: 36px;
+            /* was 30px */
+            padding-bottom: 110px;
             overflow-y: auto;
             background-color: #f8fafc;
         }
 
-        /* KPI Cards */
+        /* ── KPI Cards ── */
         .kpi-card {
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 18px;
+            /* was 15px */
+            padding: 30px;
+            /* was 25px */
             color: white;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transition: transform 0.5s ease;
+        }
+
+        .kpi-card:hover::before {
+            transform: translate(-25%, -25%);
         }
 
         .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
         .kpi-card i {
-            font-size: 36px;
-            margin-bottom: 15px;
-            opacity: 0.9;
+            font-size: 2.6rem;
+            /* was 40px */
+            margin-bottom: 18px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
 
         .kpi-card h3 {
-            font-size: 32px;
+            font-size: 2.6rem;
+            /* was 36px */
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
         }
 
         .kpi-card p {
-            font-size: 14px;
+            font-size: 0.9rem;
+            /* was 14px */
             margin: 0;
-            opacity: 0.9;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
         }
 
-        .bg-total { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
-        .bg-pending { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
-        .bg-approved { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
-        .bg-rejected { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); }
-        .bg-inprogress { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
-        .bg-completed { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+        .bg-total {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            box-shadow: 0 8px 20px rgba(8, 145, 178, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
 
-        .status-pending { color: #f59e0b; font-weight: bold; }
-        .status-approved { color: #10b981; font-weight: bold; }
-        .status-rejected { color: #ef4444; font-weight: bold; }
+        .bg-pending {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
 
-        /* Footer Styles - FIXED */
+        .bg-approved {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .bg-rejected {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .bg-inprogress {
+            background: linear-gradient(135deg, #0d5c38 0%, #10b981 100%);
+            box-shadow: 0 8px 20px rgba(13, 92, 56, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .bg-completed {
+            background: linear-gradient(135deg, #059669 0%, #34d399 100%);
+            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.35), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .status-pending {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        /* ── Alerts ── */
+        .alert {
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 18px 24px;
+            /* was 16px 20px */
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideInDown 0.4s ease;
+            font-size: 0.95rem;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e3a8a;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* ── Footer ── */
         .main-footer {
-            background: var(--dark-bg);
-            color: var(--text-light);
-            padding: 25px 30px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            background: #0a2118;
+            color: #8abda0;
+            padding: 22px 36px;
+            box-shadow: 0 -4px 20px rgba(10, 33, 24, 0.3);
             position: fixed;
             bottom: 0;
             left: 0;
@@ -340,19 +585,22 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            margin-left: 260px;
+            margin-left: 300px;
+            /* matches sidebar */
         }
 
         .footer-links {
             display: flex;
-            gap: 25px;
+            gap: 28px;
         }
 
         .footer-links a {
             color: var(--text-light);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 0.82rem;
+            /* was 13px */
             transition: color 0.3s ease;
+            font-weight: 500;
         }
 
         .footer-links a:hover {
@@ -360,17 +608,11 @@
         }
 
         .footer-copyright {
-            font-size: 14px;
+            font-size: 0.82rem;
+            font-weight: 500;
         }
 
-        /* Alerts */
-        .alert {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Mobile Sidebar Overlay */
+        /* ── Sidebar Overlay ── */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -378,18 +620,38 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 1015;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Responsive Design */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ── Responsive ── */
         @media (max-width: 992px) {
+            html {
+                font-size: 17px;
+            }
+
             .menu-toggle {
                 display: block;
             }
 
             .sidebar {
-                left: -260px;
+                left: -300px;
                 top: 0;
                 bottom: 0;
                 height: 100vh;
@@ -397,15 +659,12 @@
 
             .sidebar.active {
                 left: 0;
-            }
-
-            .sidebar-overlay.active {
-                display: block;
+                box-shadow: 8px 0 20px rgba(0, 0, 0, 0.3);
             }
 
             .content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 24px;
             }
 
             .footer-content {
@@ -424,7 +683,7 @@
             }
 
             .logo-text h1 {
-                font-size: 18px;
+                font-size: 1.2rem;
             }
 
             .logo-text p {
@@ -433,6 +692,10 @@
         }
 
         @media (max-width: 576px) {
+            html {
+                font-size: 16px;
+            }
+
             .user-details {
                 display: none;
             }
@@ -446,170 +709,363 @@
             }
 
             .kpi-card {
-                padding: 20px;
+                padding: 22px;
             }
 
             .kpi-card h3 {
-                font-size: 24px;
+                font-size: 2rem;
+            }
+
+            .kpi-card i {
+                font-size: 2rem;
             }
 
             .logo-icon {
-                width: 35px;
-                height: 35px;
+                width: 46px;
+                height: 46px;
             }
 
-            .logo-icon i {
-                font-size: 18px;
+            .logo-icon svg {
+                width: 26px;
+                height: 26px;
             }
+
+            .logo-text h1 {
+                font-size: 1rem;
+            }
+        }
+
+        /* ── Loading Animation ── */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading {
+            animation: spin 1s linear infinite;
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
-    <!-- Header -->
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <button class="menu-toggle" id="menuToggle">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="logo-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M19,2H5A3,3,0,0,0,2,5V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V5A3,3,0,0,0,19,2ZM10,17H6V15h4Zm8,0H12V15h6Zm0-4H6V11H18Zm0-4H6V7H18Z"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Professional clipboard-check icon -->
+                        <path fill="url(#gradient)"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
                 </div>
                 <div class="logo-text">
-                    <h1>CEO Commitment Diary</h1>
-                    <p>CEO Commitment Diary Management System</p>
+                    <h1>Document Management System</h1>
                 </div>
             </div>
             <div class="header-actions">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        {{ user.first_name.0|upper|default:"U" }}{{ user.last_name.0|upper|default:"" }}
+                <!-- Notification Bell -->
+                <div class="notification-dropdown" style="position: relative; margin-right: 20px;">
+                    <button id="notificationBtn" style="background: transparent; border: none; color: white; position: relative; cursor: pointer; padding: 5px;">
+                        <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="badge rounded-pill bg-danger" style="position: absolute; top: -5px; right: -8px; font-size: 0.6rem; padding: 0.25em 0.4em;">
+                                {{ unread_notifications_count }}
+                            </span>
+                        {% endif %}
+                    </button>
+                    <div id="notificationMenu" style="display: none; position: absolute; right: 0; top: 100%; width: 320px; background: white; color: #333; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; margin-top: 10px;">
+                        <div style="background: #f8f9fa; padding: 12px 15px; border-bottom: 1px solid #e9ecef; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Notifications</span>
+                        </div>
+                        <div style="max-height: 350px; overflow-y: auto;">
+                            {% if unread_notifications %}
+                                {% for notif in unread_notifications %}
+                                    <a href="#" onclick="markAsRead({{ notif.id }}); return false;" style="display: block; padding: 12px 15px; border-bottom: 1px solid #f1f1f1; text-decoration: none; color: inherit; transition: background 0.2s;">
+                                        <div style="font-size: 0.85rem; font-weight: 600; color: #0d2b1e; margin-bottom: 3px;">{{ notif.title }}</div>
+                                        <div style="font-size: 0.75rem; color: #555; margin-bottom: 5px; line-height: 1.3;">{{ notif.message }}</div>
+                                        <div style="font-size: 0.65rem; color: #999;">{{ notif.created_at|timesince }} ago</div>
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <div style="padding: 20px; text-align: center; color: #888; font-size: 0.85rem;">No new notifications.</div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="user-details">
-                        <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
-                        <span class="user-role">{{ user.profile.role|default:"User" }}</span>
+                </div>
+
+                <div class="user-info">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div class="user-avatar">
+                            {{ user.get_full_name|default:user.username }}
+                        </div>
+                        <a href="{% url 'logout' %}" style="
+        color: white;
+        font-size: 0.72rem;
+        text-decoration: none;
+        background: rgba(239,68,68,0.7);
+        padding: 5px 18px;
+border-radius: 12px;
+font-size: 0.85rem;
+        transition: background 0.3s;
+    " onmouseover="this.style.background='#ef4444'" onmouseout="this.style.background='rgba(239,68,68,0.7)'">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
     </header>
 
-    <!-- Main Container -->
     <div class="main-container">
-        <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-       <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-title"></div>
-    </div>
-    
-    <div class="sidebar-nav">
-        <ul class="nav nav-pills flex-column">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">NAVIGATION</div>
+            </div>
+
+            <div class="sidebar-nav">
+                <ul class="nav nav-pills flex-column">
+
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        {% if user.profile.role == 'CEO' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'ceo_dashboard' %}active{% endif %}"
+                            href="{% url 'ceo_dashboard' %}">
+                            {% elif user.profile.role == 'GM' or user.profile.role == 'GM_HR' %}
+                            <a class="nav-link {% if request.resolver_match.url_name == 'gm_dashboard' %}active{% endif %}"
+                                href="{% url 'gm_dashboard' %}">
+                                {% elif user.profile.role == 'Manager' or user.profile.role == 'ZM' or user.profile.role == 'AM' or user.profile.role == 'IT' or user.profile.role == 'CFO' or 'Asis' in user.username or 'PMER' in user.username or 'Audit' in user.username %}
+                                <a class="nav-link {% if request.resolver_match.url_name == 'manager_dashboard' %}active{% endif %}"
+                                    href="{% url 'manager_dashboard' %}">
+                                    {% elif user.profile.role == 'PS' %}
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'ps_dashboard' %}active{% endif %}"
+                                        href="{% url 'ps_dashboard' %}">
+                                        {% else %}
+                                        <a class="nav-link" href="#">
+                                            {% endif %}
+                                            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+                                        </a>
+                    </li>
+
+                    <!-- Commitments Dropdown -->
+{% if user.profile.role == 'CEO' or user.profile.role == 'PS' %}
+<li class="nav-item">
+    <a class="nav-link {% if 'commitment' in request.resolver_match.url_name %}{% else %}collapsed{% endif %}"
+        data-bs-toggle="collapse" href="#commitmentCollapse" role="button"
+        aria-expanded="{% if 'commitment' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
+        aria-controls="commitmentCollapse">
+        <i class="fas fa-handshake"></i> <span>Commitments</span>
+        <i class="fas fa-chevron-down ms-auto dropdown-icon"
+            style="font-size: 0.8em; margin-top: 5px;"></i>
+    </a>
+    <div class="collapse {% if 'commitment' in request.resolver_match.url_name %}show{% endif %}"
+        id="commitmentCollapse">
+        <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+            
+            <!-- 1. NEW COMMITMENT -->
             <li class="nav-item">
-                {% if user.profile.role == 'CEO' %}
-                    <a class="nav-link {% if request.path == '/ceo/dashboard/' %}active{% endif %}" href="{% url 'ceo_dashboard' %}">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                {% elif user.profile.role == 'Manager' %}
-                    <a class="nav-link {% if request.path == '/manager/dashboard/' %}active{% endif %}" href="{% url 'manager_dashboard' %}">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                {% elif user.profile.role == 'PS' %}
-                    <a class="nav-link {% if request.path == '/ps/dashboard/' %}active{% endif %}" href="{% url 'ps_dashboard' %}">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                {% endif %}
+                <a class="nav-link {% if request.resolver_match.url_name == 'add_commitment' %}active{% endif %}"
+                    href="{% url 'add_commitment' %}">
+                    <i class="fas fa-plus-circle"></i> <span>New Commitment</span>
+                </a>
             </li>
 
-            {% if user.profile.role == 'Manager' %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/manager/tasks/' %}active{% endif %}" href="{% url 'manager_tasks' %}">
-                        <i class="fas fa-tasks"></i>
-                        <span>My Tasks</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/manager/add-remark/' %}active{% endif %}" href="{% url 'add_remark' %}">
-                        <i class="fas fa-comment-dots"></i>
-                        <span>Add Feedback</span>
-                    </a>
-                </li>
-            {% endif %}
+            <!-- 2. MY COMMITMENTS -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'commitment_list' %}active{% endif %}"
+                    href="{% url 'commitment_list' %}">
+                    <i class="fas fa-list-alt"></i> <span>My Commitments</span>
+                </a>
+            </li>
 
-            {% if user.profile.role == 'PS' or user.profile.role == 'CEO' %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/commitment/add/' %}active{% endif %}" href="{% url 'add_commitment' %}">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Add Commitment</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/commitments/' %}active{% endif %}" href="{% url 'commitment_list' %}">
-                        <i class="fas fa-list-alt"></i>
-                        <span>All Commitments</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/reports/' %}active{% endif %}" href="{% url 'commitment_report' %}">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reports</span>
-                    </a>
-                </li>
-            {% endif %}
+            <!-- 3. REPORTS -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'commitment_report' %}active{% endif %}"
+                    href="{% url 'commitment_report' %}">
+                    <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                </a>
+            </li>
 
-            {% if user.profile.role == 'CEO' %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/ceo/assign-task/' %}active{% endif %}" href="{% url 'ceo_assign_task' %}">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Assign New Task</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/all-tasks/' %}active{% endif %}" href="{% url 'all_tasks' %}">
-                        <i class="fas fa-list-ul"></i>
-                        <span>View All Tasks</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'ceo_view_feedbacks' %}" class="nav-link {% if request.resolver_match.url_name == 'ceo_view_feedbacks' %}active{% endif %}">
-                         <i class="fas fa-comments"></i>
-                         <span>Feedbacks</span>
-                    </a>
-                </li>
-            {% endif %}
         </ul>
     </div>
+</li>
+{% endif %}
 
-    <div class="sidebar-footer">
-        <a href="{% url 'logout' %}" class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
+                   <!-- Task Dropdown -->
+<li class="nav-item">
+    <a class="nav-link {% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}{% else %}collapsed{% endif %}"
+        data-bs-toggle="collapse" href="#taskCollapse" role="button"
+        aria-expanded="{% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
+        aria-controls="taskCollapse">
+        <i class="fas fa-tasks"></i> <span>Task</span>
+        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 0.8em; margin-top: 5px;"></i>
+    </a>
+    <div class="collapse {% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}show{% endif %}"
+        id="taskCollapse">
+        <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+            
+            <!-- Add / Assign Task -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'ceo_assign_task' or request.resolver_match.url_name == 'assign_task' %}active{% endif %}"
+                    href="{% url 'ceo_assign_task' %}">
+                    <i class="fas fa-plus-circle"></i> <span>Add Task</span>
+                </a>
+            </li>
+
+            <!-- My Tasks (Inbox - Assigned To Me) -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'manager_tasks' or request.resolver_match.url_name == 'my_tasks' %}active{% endif %}"
+                    href="{% url 'manager_tasks' %}">
+                    <i class="fas fa-inbox"></i> <span>My Tasks</span>
+                </a>
+            </li>
+
+            <!-- All Tasks / Sent Tasks -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'all_tasks' or request.resolver_match.url_name == 'sent_tasks' %}active{% endif %}"
+                    href="{% url 'all_tasks' %}">
+                    <i class="fas fa-clipboard-list"></i> <span>All Tasks</span>
+                </a>
+            </li>
+
+            
+
+        </ul>
     </div>
-</aside>
+</li>
 
-        <!-- Content Area -->
+                    <!-- Notesheet Dropdown -->
+<li class="nav-item">
+    <a class="nav-link {% if 'file' in request.resolver_match.url_name or 'notesheet' in request.resolver_match.url_name or request.resolver_match.url_name in 'inbox outbox' %}{% else %}collapsed{% endif %}"
+        data-bs-toggle="collapse" href="#notesheetCollapse" role="button"
+        aria-expanded="{% if 'file' in request.resolver_match.url_name or 'notesheet' in request.resolver_match.url_name or request.resolver_match.url_name in 'inbox outbox' %}true{% else %}false{% endif %}"
+        aria-controls="notesheetCollapse">
+        <i class="fas fa-folder me-2"></i> <span>Notesheet</span>
+        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 0.8em; margin-top: 5px;"></i>
+    </a>
+    
+    <div class="collapse {% if 'file' in request.resolver_match.url_name or 'notesheet' in request.resolver_match.url_name or request.resolver_match.url_name in 'inbox outbox' %}show{% endif %}"
+        id="notesheetCollapse">
+        <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+            
+            <!-- 1. Notesheet Title -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name in 'my_files create_file file_detail' %}active{% endif %}"
+                    href="{% url 'notesheet_files' %}">
+                    <i class="fas fa-folder-open me-2"></i> <span>Notesheet Title</span>
+                </a>
+            </li>
+
+            <!-- 2. New Notesheet -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'initiate_notesheet' %}active{% endif %}"
+                    href="{% url 'initiate_notesheet' %}">
+                    <i class="fas fa-plus-circle me-2"></i> <span>New Notesheet</span>
+                </a>
+            </li>
+
+            <!-- 3. Inbox -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'notesheet_inbox' %}active{% endif %}"
+                    href="{% url 'notesheet_inbox' %}">
+                    <i class="fas fa-inbox me-2"></i> <span>Inbox</span>
+                </a>
+            </li>
+
+            <!-- 4. Outbox -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'notesheet_outbox' %}active{% endif %}"
+                    href="{% url 'notesheet_outbox' %}">
+                    <i class="fas fa-paper-plane me-2"></i> <span>Outbox</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</li>
+
+                    <!-- Letters Dropdown Section -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'letter' in request.resolver_match.url_name or 'inbox' in request.resolver_match.url_name or 'outbox' in request.resolver_match.url_name %}{% else %}collapsed{% endif %}"
+                            data-bs-toggle="collapse" href="#lettersCollapse" role="button"
+                            aria-expanded="{% if 'letter' in request.resolver_match.url_name or 'inbox' in request.resolver_match.url_name or 'outbox' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
+                            aria-controls="lettersCollapse">
+                            <i class="fas fa-envelope-open-text"></i> <span>Letter</span>
+                            <i class="fas fa-chevron-down ms-auto dropdown-icon"
+                                style="font-size: 0.8em; margin-top: 5px;"></i>
+                        </a>
+                        <div class="collapse {% if 'letter' in request.resolver_match.url_name or 'inbox' in request.resolver_match.url_name or 'outbox' in request.resolver_match.url_name %}show{% endif %}"
+                            id="lettersCollapse">
+                            <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name in 'letter_files_list create_letter_file' %}active{% endif %}"
+                                        href="{% url 'letter_files_list' %}">
+                                        <i class="fas fa-folder-open"></i> <span>Letter Files</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'create_letter' %}active{% endif %}"
+                                        href="{% url 'create_letter' %}">
+                                        <i class="fas fa-pen-fancy"></i> <span>New Letter</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'letter_drafts' %}active{% endif %}"
+                                        href="{% url 'letter_drafts' %}">
+                                        <i class="fas fa-file-alt"></i> <span>Draft Letters</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'letter_inbox' %}active{% endif %}"
+                                        href="{% url 'letter_inbox' %}">
+                                        <i class="fas fa-inbox"></i> <span>Inbox</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'letter_outbox' %}active{% endif %}"
+                                        href="{% url 'letter_outbox' %}">
+                                        <i class="fas fa-paper-plane"></i> <span>Outbox</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
         <main class="content">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i
+                    class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
             {% endif %}
+
             {% block content %}
-            <!-- Default Content -->
             <div class="row mb-4">
                 <div class="col-12">
                     <h2 class="mb-3">Dashboard Overview</h2>
@@ -619,28 +1075,28 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="kpi-card bg-total">
                         <i class="fas fa-clipboard-list"></i>
-                        <h3>{{ total_tasks }}</h3>
+                        <h3>{{ total_tasks|default:0 }}</h3>
                         <p>Total Tasks</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3">
                     <div class="kpi-card bg-pending">
                         <i class="fas fa-clock"></i>
-                        <h3>{{ pending_tasks }}</h3>
+                        <h3>{{ pending_tasks|default:0 }}</h3>
                         <p>Pending</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3">
                     <div class="kpi-card bg-inprogress">
-                        <i class="fas fa-spinner"></i>
-                        <h3>{{ in_progress_tasks }}</h3>
+                        <i class="fas fa-spinner loading"></i>
+                        <h3>{{ in_progress_tasks|default:0 }}</h3>
                         <p>In Progress</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3">
                     <div class="kpi-card bg-completed">
                         <i class="fas fa-check-circle"></i>
-                        <h3>{{ completed_tasks }}</h3>
+                        <h3>{{ completed_tasks|default:0 }}</h3>
                         <p>Completed</p>
                     </div>
                 </div>
@@ -649,18 +1105,21 @@
         </main>
     </div>
 
-    <!-- Footer -->
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-copyright">
-                &copy; CEO Commitment Dairy Software.
+                <i class="far fa-copyright"></i> 2024 Document Management System Software. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-shield-alt me-1"></i> Privacy</a>
+                <a href="#"><i class="fas fa-file-contract me-1"></i> Terms</a>
+                <a href="#"><i class="fas fa-question-circle me-1"></i> Help</a>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Mobile Menu Toggle
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -668,21 +1127,143 @@
         function toggleSidebar() {
             sidebar.classList.toggle('active');
             sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
         }
 
-        menuToggle.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
+        if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
-        // Close sidebar when clicking a link on mobile
         if (window.innerWidth <= 992) {
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 link.addEventListener('click', () => {
                     sidebar.classList.remove('active');
                     sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
                 });
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            if (anchor.getAttribute('data-bs-toggle')) return; // Skip Bootstrap collapse/tab toggles
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
     </script>
     {% block extra_js %}{% endblock %}
+
+
+
+    <script>
+        (function () {
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+
+            if (window.jQuery) {
+                $.ajaxSetup({
+                    beforeSend: function (xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                        }
+                    }
+                });
+            }
+
+            window.csrfFetch = function (url, options = {}) {
+                options.headers = options.headers || {};
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(options.method || 'GET')) {
+                    options.headers['X-CSRFToken'] = csrftoken;
+                }
+                return fetch(url, options);
+            };
+        })();
+
+        // Notification Menu Toggle
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationMenu = document.getElementById('notificationMenu');
+        
+        if (notificationBtn && notificationMenu) {
+            notificationBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationMenu.style.display = notificationMenu.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!notificationMenu.contains(e.target) && !notificationBtn.contains(e.target)) {
+                    notificationMenu.style.display = 'none';
+                }
+            });
+        }
+
+        // Mark Notification as Read
+        function markAsRead(notificationId) {
+            fetch(`/notifications/read/${notificationId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => response.json()).then(data => {
+                if (data.status === 'success' && data.link) {
+                    window.location.href = data.link;
+                } else {
+                    window.location.reload();
+                }
+            }).catch(error => {
+                window.location.reload();
+            });
+        }
+    </script>
+
+    <!-- SweetAlert2 for Dashboard Notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% if unread_notifications_count > 0 %}
+                // Check if user is on a dashboard page
+                const path = window.location.pathname;
+                if (path.includes('dashboard') || path === '/core/ps/' || path === '/core/ceo/' || path === '/core/manager/' || path === '/core/gm/') {
+                    Swal.fire({
+                        title: 'New Notifications!',
+                        text: 'You have {{ unread_notifications_count }} unread notification(s).',
+                        icon: 'info',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        background: '#fff',
+                        color: '#0d2b1e',
+                        iconColor: '#10b981'
+                    });
+                }
+            {% endif %}
+        });
+    </script>
 </body>
+
 </html>

@@ -4,7 +4,7 @@
 {% block extra_css %}
 <style>
     .page-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
         padding: 30px;
         border-radius: 15px;
@@ -50,7 +50,7 @@
     }
 
     .filter-title i {
-        color: #3b82f6;
+        color: #10b981;
         font-size: 18px;
     }
 
@@ -77,7 +77,7 @@
     }
 
     .filter-label i {
-        color: #3b82f6;
+        color: #10b981;
         font-size: 12px;
     }
 
@@ -93,7 +93,7 @@
 
     .form-control:focus,
     .form-select:focus {
-        border-color: #3b82f6;
+        border-color: #10b981;
         box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
         outline: none;
     }
@@ -119,7 +119,7 @@
     }
 
     .btn-filter {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
     }
 
@@ -213,7 +213,7 @@
     }
 
     .data-table thead {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
     }
 
@@ -270,8 +270,8 @@
     }
 
     .status-badge.in-progress {
-        background: #dbeafe;
-        color: #1e40af;
+        background: #d1fae5;
+        color: #0d2b1e;
     }
 
     .status-badge.completed {
@@ -300,8 +300,8 @@
     }
 
     .priority-badge.low {
-        background: #dbeafe;
-        color: #1e40af;
+        background: #d1fae5;
+        color: #0d2b1e;
     }
 
     .category-badge {
@@ -412,13 +412,8 @@
                         <i class="fas fa-search"></i>
                         Search
                     </label>
-                    <input 
-                        type="text" 
-                        name="search" 
-                        class="form-control" 
-                        placeholder="Search commitments..." 
-                        value="{{ search_query }}"
-                    />
+                    <input type="text" name="search" class="form-control" placeholder="Search commitments..."
+                        value="{{ search_query }}" />
                 </div>
 
                 <div class="filter-group">
@@ -428,9 +423,9 @@
                     </label>
                     <select name="status" class="form-select">
                         {% for status in status_choices %}
-                            <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>
-                                {{ status }}
-                            </option>
+                        <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -442,9 +437,9 @@
                     </label>
                     <select name="category" class="form-select">
                         {% for cat in category_choices %}
-                            <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>
-                                {{ cat }}
-                            </option>
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>
+                            {{ cat }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -456,9 +451,9 @@
                     </label>
                     <select name="priority" class="form-select">
                         {% for p in priority_choices %}
-                            <option value="{{ p }}" {% if selected_priority == p %}selected{% endif %}>
-                                {{ p }}
-                            </option>
+                        <option value="{{ p }}" {% if selected_priority == p %}selected{% endif %}>
+                            {{ p }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -518,11 +513,11 @@
                     <td>
                         <span class="priority-badge {{ c.priority|lower }}">
                             {% if c.priority == 'High' %}
-                                <i class="fas fa-arrow-up"></i>
+                            <i class="fas fa-arrow-up"></i>
                             {% elif c.priority == 'Medium' %}
-                                <i class="fas fa-minus"></i>
+                            <i class="fas fa-minus"></i>
                             {% else %}
-                                <i class="fas fa-arrow-down"></i>
+                            <i class="fas fa-arrow-down"></i>
                             {% endif %}
                             {{ c.priority }}
                         </span>
@@ -530,13 +525,13 @@
                     <td>
                         <span class="status-badge {{ c.status|lower|cut:' ' }}">
                             {% if c.status == 'Approved' %}
-                                <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-check-circle"></i>
                             {% elif c.status == 'Pending' %}
-                                <i class="fas fa-clock"></i>
+                            <i class="fas fa-clock"></i>
                             {% elif c.status == 'In Progress' %}
-                                <i class="fas fa-spinner"></i>
+                            <i class="fas fa-spinner"></i>
                             {% elif c.status == 'Completed' %}
-                                <i class="fas fa-check-double"></i>
+                            <i class="fas fa-check-double"></i>
                             {% endif %}
                             {{ c.status }}
                         </span>
@@ -580,17 +575,17 @@
     function exportToExcel() {
         const table = document.getElementById('commitmentTable');
         const wb = XLSX.utils.book_new();
-        
+
         // Get table data
         const data = [];
         const headers = [];
-        
+
         // Get headers (without icons)
         table.querySelectorAll('thead th').forEach(th => {
             headers.push(th.innerText.replace(/\s+/g, ' ').trim());
         });
         data.push(headers);
-        
+
         // Get rows
         table.querySelectorAll('tbody tr').forEach(tr => {
             const row = [];
@@ -603,10 +598,10 @@
                 data.push(row);
             }
         });
-        
+
         // Create worksheet
         const ws = XLSX.utils.aoa_to_sheet(data);
-        
+
         // Set column widths
         ws['!cols'] = [
             { wch: 30 }, // Title
@@ -617,16 +612,16 @@
             { wch: 20 }, // Date
             { wch: 20 }  // Created By
         ];
-        
+
         XLSX.utils.book_append_sheet(wb, ws, 'Commitments');
-        
+
         // Generate filename with timestamp
         const timestamp = new Date().toISOString().slice(0, 10);
         const filename = `commitment_report_${timestamp}.xlsx`;
-        
+
         // Save file
         XLSX.writeFile(wb, filename);
-        
+
         // Show success message
         showNotification('Excel file downloaded successfully!', 'success');
     }
@@ -635,17 +630,17 @@
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
-        
+
         // Get table data
         const table = document.getElementById('commitmentTable');
         const headers = [];
         const data = [];
-        
+
         // Get headers (without icons)
         table.querySelectorAll('thead th').forEach(th => {
             headers.push(th.innerText.replace(/\s+/g, ' ').trim());
         });
-        
+
         // Get rows
         table.querySelectorAll('tbody tr').forEach(tr => {
             const row = [];
@@ -657,22 +652,22 @@
                 data.push(row);
             }
         });
-        
+
         // Add title
         doc.setFontSize(18);
         doc.setTextColor(30, 64, 175);
         doc.text('Commitment Report', 14, 15);
-        
+
         // Add generation date
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        const dateStr = new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+        const dateStr = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
         doc.text(`Generated on: ${dateStr}`, 14, 22);
-        
+
         // Add table
         doc.autoTable({
             head: [headers],
@@ -702,14 +697,14 @@
             },
             margin: { left: 14, right: 14 },
         });
-        
+
         // Generate filename with timestamp
         const timestamp = new Date().toISOString().slice(0, 10);
         const filename = `commitment_report_${timestamp}.pdf`;
-        
+
         // Save file
         doc.save(filename);
-        
+
         // Show success message
         showNotification('PDF file downloaded successfully!', 'success');
     }
@@ -732,9 +727,9 @@
             animation: slideIn 0.3s ease;
         `;
         notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}`;
-        
+
         document.body.appendChild(notification);
-        
+
         // Remove after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';

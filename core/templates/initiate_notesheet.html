@@ -1,0 +1,1900 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+{# Preload critical fonts #}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+  rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js" crossorigin="anonymous"
+  referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --color-primary-950: #05140f;
+    --color-primary-900: #0a2118;
+    --color-primary-800: #0d2b1e;
+    --color-primary-700: #1a4731;
+    --color-primary-600: #059669;
+    --color-primary-500: #10b981;
+    --color-primary-400: #34d399;
+    --color-primary-300: #a7f3d0;
+    --color-primary-200: #a7f3d0;
+    --color-primary-100: #d1fae5;
+    --color-primary-50: #f0fdf4;
+    --color-neutral-900: #111827;
+    --color-neutral-800: #1f2937;
+    --color-neutral-700: #374151;
+    --color-neutral-600: #4b5563;
+    --color-neutral-500: #6b7280;
+    --color-neutral-400: #9ca3af;
+    --color-neutral-300: #d1d5db;
+    --color-neutral-200: #e5e7eb;
+    --color-neutral-100: #f3f4f6;
+    --color-neutral-50: #f9fafb;
+    --color-success-600: #059669;
+    --color-danger-600: #dc2626;
+    --color-danger-100: #fee2e2;
+    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-3xl: 1.5rem;
+    --radius-full: 9999px;
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-glow: 0 0 0 3px var(--color-primary-100);
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --container-md: 820px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-800) 50%, var(--color-primary-700) 100%);
+    min-height: 100vh;
+    line-height: 1.6;
+    color: var(--color-neutral-900);
+  }
+
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    position: relative;
+    isolation: isolate;
+  }
+
+  .page-wrapper.col-lg-12 {
+    display: block;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .ambient-light {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .ambient-light__orb {
+    position: absolute;
+    border-radius: var(--radius-full);
+    filter: blur(100px);
+    opacity: 0.15;
+  }
+
+  .ambient-light__orb--primary {
+    width: 600px;
+    height: 600px;
+    background: var(--color-primary-500);
+    top: -200px;
+    right: -200px;
+  }
+
+  .ambient-light__orb--secondary {
+    width: 400px;
+    height: 400px;
+    background: var(--color-primary-400);
+    bottom: -100px;
+    left: -100px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .container.col-lg-12 {
+    max-width: 100%;
+  }
+
+  .card {
+    background: white;
+    border-radius: var(--radius-3xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+    padding: 0.6rem 1.5rem;
+  }
+
+  .card-header__badge {
+    display: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(8px);
+    color: var(--color-primary-300);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    margin-bottom: 0.4rem;
+  }
+
+  .card-header__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-header__subtitle {
+    font-size: 0.85rem;
+    color: var(--color-primary-300);
+  }
+
+  .card-body {
+    padding: 2.5rem 1rem;
+    background: var(--color-neutral-50);
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .field-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary-700);
+  }
+
+  .field-label__icon {
+    width: 20px;
+    height: 20px;
+    background: var(--color-primary-100);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary-600);
+    font-size: 0.75rem;
+  }
+
+  .field-label__required {
+    color: var(--color-danger-600);
+    margin-left: 0.25rem;
+  }
+
+  .btn-toggle-formatting {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-200);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    color: var(--color-primary-700);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-toggle-formatting:hover {
+    background: var(--color-primary-100);
+    border-color: var(--color-primary-300);
+  }
+
+  .btn-toggle-formatting.active {
+    background: var(--color-primary-600);
+    color: white;
+    border-color: var(--color-primary-700);
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .editor-wrapper-block {
+    width: 100%;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 1rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-neutral-900);
+    background: white;
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-xl);
+    outline: none;
+    transition: all var(--transition-fast);
+  }
+
+  .form-input:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .form-select {
+    padding-right: 3rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: white;
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-xl);
+    padding: 0.5rem 0.85rem;
+    animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-wrap: wrap;
+  }
+
+  /* Badge strip holding all three labels */
+  .attachment-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-md);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+    letter-spacing: 0.03em;
+  }
+
+  .badge--flag {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  }
+
+  .badge--annex {
+    background: #7c3aed;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+  }
+
+  .badge--puc {
+    background: #0369a1;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(3, 105, 161, 0.3);
+  }
+
+  /* Type selector dropdown */
+  .type-select {
+    padding: 0.35rem 2rem 0.35rem 0.7rem;
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-primary-800);
+    background: white;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 12px;
+    min-width: 120px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .type-select:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
+  }
+
+  .attachment-item__input {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+  }
+
+  .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: transparent;
+    color: var(--color-neutral-400);
+    cursor: pointer;
+  }
+
+  .btn-icon:hover {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border: 2px dashed var(--color-primary-300);
+    border-radius: var(--radius-xl);
+    color: var(--color-primary-700);
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .btn-add:hover {
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-600);
+  }
+
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-primary-200), transparent);
+    margin: 0.5rem 0;
+  }
+
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-600) 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    box-shadow: 0 4px 14px 0 rgb(5 150 105 / 0.35);
+  }
+
+  .field-help {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-neutral-500);
+  }
+
+  /* ============================================
+     DIGITAL SIGNATURE AUTO-STAMP (MODERN COMPACT)
+     ============================================ */
+  .signature-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .signature-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: #0f9d58;
+    color: white;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(15, 157, 88, 0.25);
+  }
+  
+  .signature-section-title {
+    color: #0d5c38;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .signature-stamp-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .signature-stamp-box__img-wrap {
+    background: #eef8f3;
+    border-radius: 12px;
+    padding: 0.8rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .signature-stamp-box__img {
+    max-height: 52px;
+    max-width: 160px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .signature-stamp-box__name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #111827;
+  }
+
+  .signature-stamp-box__role {
+    font-size: 0.85rem;
+    color: #4b5563;
+    margin-bottom: 0.2rem;
+  }
+
+  .signature-stamp-box__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.8rem;
+    background: #eef8f3;
+    color: #0f9d58;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+  }
+
+  .signature-missing-box {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #fffbeb;
+    border: 2px dashed #fcd34d;
+    border-radius: var(--radius-xl);
+    padding: 0.85rem 1.1rem;
+    color: #92400e;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .signature-missing-box svg {
+    flex-shrink: 0;
+  }
+
+  .signature-missing-box a {
+    color: #b45309;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .tox-tinymce {
+    border: 2px solid var(--color-primary-600) !important;
+    border-radius: var(--radius-xl) !important;
+    width: 100% !important;
+    font-family: var(--font-sans) !important;
+  }
+
+  .tox .tox-toolbar,
+  .tox .tox-toolbar__overflow,
+  .tox .tox-toolbar-overlord {
+    background: #f0f4ff !important;
+  }
+
+  .tox .tox-toolbar__primary {
+    border-bottom: 1px solid #c7d7fc !important;
+    background: #f0f4ff !important;
+  }
+
+  .tox .tox-toolbar__secondary {
+    background: #e8effd !important;
+    border-bottom: 1px solid #c7d7fc !important;
+  }
+
+  .tox .tox-tbtn:hover {
+    background: #dbe8fd !important;
+    border-radius: 4px !important;
+  }
+
+  .tox .tox-tbtn--enabled,
+  .tox .tox-tbtn--enabled:hover {
+    background: #bfd4fc !important;
+    border-radius: 4px !important;
+  }
+
+  .tox .tox-tbtn--select {
+    min-width: 80px !important;
+  }
+
+  .tox .tox-tbtn--select .tox-tbtn__select-label {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+  }
+
+  .tox.tox-tinymce {
+    border: 1px solid #c0c0c0 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .tox .tox-edit-area {
+    background: white !important;
+    align-items: flex-start !important;
+  }
+
+  .tox .tox-edit-area__iframe {
+    background: white !important;
+    margin-top: 0 !important;
+    vertical-align: top !important;
+  }
+
+  .tox .tox-toolbar-overlord,
+  .tox .tox-toolbar__primary {
+    background: #f3f3f3 !important;
+    border-bottom: 1px solid #d0d0d0 !important;
+  }
+
+  .tox .tox-menubar {
+    background: #f3f3f3 !important;
+    border-bottom: 1px solid #d0d0d0 !important;
+  }
+
+  .tox .tox-statusbar {
+    background: #f3f3f3 !important;
+    border-top: 1px solid #d0d0d0 !important;
+    color: #666 !important;
+  }
+
+
+
+  /* Preview Modal */
+  .preview-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .preview-modal-overlay.active {
+    display: flex;
+  }
+
+  .preview-modal {
+    background: white;
+    border-radius: var(--radius-3xl);
+    width: 100%;
+    max-width: 95vw;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .preview-modal-header {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .preview-modal-header h2 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .preview-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .preview-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .preview-modal-body {
+    padding: 2rem;
+    overflow-y: scroll;
+    overflow-x: auto;
+    flex: 1;
+    background: #e8e8e8;
+    display: block;
+  }
+
+  .preview-page-wrapper {
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .preview-section {
+    background: white;
+    width: 1000px;
+    max-width: 1000px;
+    min-height: 1414px;
+    height: auto;
+    padding: 0;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: block;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .preview-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-primary-600);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .preview-section-value {
+    font-size: 12pt;
+    color: #000000;
+    line-height: 1.6;
+    font-family: 'Calibri', Arial, sans-serif;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: normal;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
+
+  .preview-flag-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-neutral-100);
+  }
+
+  .preview-flag-row:last-child {
+    border-bottom: none;
+  }
+
+  .preview-modal-footer {
+    padding: 1rem 1.75rem;
+    background: white;
+    border-top: 1px solid var(--color-neutral-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .btn-close-preview {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-xl);
+    color: var(--color-neutral-700);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .btn-close-preview:hover {
+    background: var(--color-neutral-200);
+  }
+</style>
+
+<!-- Preview Modal -->
+<div class="preview-modal-overlay" id="previewModalOverlay">
+  <div class="preview-modal">
+    <div class="preview-modal-header">
+      <h2>📄 Notesheet Preview</h2>
+      <button class="preview-close-btn" id="previewCloseBtn">✕</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-page-wrapper">
+        <div class="preview-section">
+          <iframe id="preview-iframe" style="width:100%; height:100%; border:none; display:block;"
+            sandbox="allow-same-origin">
+          </iframe>
+        </div>
+      </div>
+    </div>
+    <div class="preview-modal-footer">
+      <button class="btn-print-preview" id="previewPrintBtn" style="
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
+        border: none;
+        border-radius: var(--radius-xl);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        transition: all 0.2s;
+      ">🖨️ Print / Save as PDF</button>
+      <button class="btn-close-preview" id="previewCloseBtnFooter">✕ Close Preview</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrapper col-lg-12 col-md-12">
+  <div class="ambient-light" aria-hidden="true">
+    <div class="ambient-light__orb ambient-light__orb--primary"></div>
+    <div class="ambient-light__orb ambient-light__orb--secondary"></div>
+  </div>
+
+  <main class="container col-lg-12">
+    <article class="card">
+      <header class="card-header col-lg-12">
+        <div class="card-header__badge">Official Document</div>
+        <h1 class="card-header__title">Initiate Notesheet</h1>
+        <p class="card-header__subtitle">Create and forward a new official notesheet</p>
+      </header>
+
+      <div class="card-body">
+        <form class="form" method="POST" action="{% url 'initiate_notesheet' %}" id="notesheet-form"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="field-group" style="background: white; border: 1px solid var(--color-neutral-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 1.5rem;">
+            <label for="file_id" class="field-label" style="color: var(--color-primary-700); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;">
+              <span class="field-label__icon" style="background: var(--color-primary-50); color: var(--color-primary-600); width: 24px; height: 24px; font-size: 0.75rem;">1</span> SELECT REGISTRY FILE
+            </label>
+            <div class="input-wrapper">
+              <select id="file_id" name="file_id" class="form-input" style="border: 2px solid var(--color-primary-400); color: var(--color-primary-900); background-color: white; font-weight: 500; cursor: pointer; transition: all 0.3s ease; padding-right: 2.5rem; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto;" required>
+                <option value="">-- Choose Registry File --</option>
+                {% for f in files %}
+                <option value="{{ f.id }}" {% if f.id|stringformat:"s" == file_id|stringformat:"s" %}selected{% endif %}>
+                  {{ f.file_number }} - {{ f.file_name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>          <div class="field-group">
+            <label for="title" class="field-label">
+              <span class="field-label__icon">T</span> Subject  <span class="field-label__required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="title" name="title" class="form-input"
+                placeholder="Enter a descriptive title for this notesheet..." required
+                style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();"
+                value="{{ form.title.value|default_if_none:'' }}">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label-container">
+              <label for="agenda_details" class="field-label">
+                <span class="field-label__icon">☰</span> Agenda Details <span class="field-label__required">*</span>
+              </label>
+              <button type="button" id="toggle-rich-editor" class="btn-toggle-formatting">
+                ✏️ Formatting Tools
+              </button>
+              <button type="button" id="preview-btn" class="btn-toggle-formatting"
+                style="margin-left: 0.5rem; background: var(--color-primary-600); color: white; border-color: var(--color-primary-700);">
+                👁️ Preview
+              </button>
+            </div>
+            <div class="input-wrapper editor-wrapper-block" style="width: 100%; max-width: 100%;">
+              <textarea id="agenda_details" name="agenda_title[]" class="form-input"
+                placeholder="Enter agenda details here..." required rows="14"
+                style="resize: vertical; min-height: 460px; font-family: Calibri, sans-serif; font-size: 1rem; line-height: 1.8;"></textarea>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              <span class="field-label__icon">📎</span> Supporting Attachments
+            </label>
+
+            <div class="attachment-list" id="attachment-list-container">
+              <!-- First row injected by JS on DOMContentLoaded -->
+            </div>
+
+            <button type="button" class="btn-add" id="add-attachment-btn"><span>+ Add More File</span></button>
+          </div>
+
+          <!-- Digital Signature Section -->
+          <div class="field-group" style="margin-top: 1.5rem;">
+            <div class="signature-section-header">
+              <div class="signature-section-icon">✒️</div>
+              <div class="signature-section-title">Digital Signature</div>
+            </div>
+
+            {% if user.profile.signature %}
+            <div class="signature-stamp-box">
+              <div class="signature-stamp-box__img-wrap">
+                <img src="{{ user.profile.signature.url }}" alt="Digital Signature" class="signature-stamp-box__img">
+              </div>
+              <span class="signature-stamp-box__name">{{ user.get_full_name|default:user.username }}</span>
+              <span class="signature-stamp-box__role">{{ user.profile.role }} · Signed Digitally</span>
+              <!-- Date/time shown below — reflects notesheet initiation date -->
+              <span style="
+                display: inline-flex; align-items: center; gap: 0.4rem;
+                font-size: 0.82rem; color: #374151; font-weight: 600;
+                margin-top: 0.35rem;
+                background: #f3f4f6; border: 1px solid #e5e7eb;
+                border-radius: 6px; padding: 3px 10px;
+                letter-spacing: 0.01em;
+              ">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {% now "d M Y" %}
+                &nbsp;·&nbsp;
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {% now "h:i A" %}
+              </span>
+            </div>
+            {% else %}
+            <div class="signature-missing-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>No saved signature found on your profile. <a href="{% url 'edit_profile_signature' %}?next=initiate_notesheet">Add your digital signature</a> once to have it auto-stamped on every notesheet.</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <hr class="divider">
+
+          <div class="field-group">
+            <label for="forward_to_user" class="field-label">
+              <span class="field-label__icon">→</span> Forward To <span class="field-label__required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <select id="forward_to_user" name="forward_to_user" class="form-input form-select" required
+                style="width: max-content; max-width: 100%;">
+                <option value="" disabled selected>Select recipient...</option>
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }} -- {{ user.profile.role }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <footer class="form-footer">
+            <div class="field-help"><span>All fields are required to proceed</span></div>
+            <button type="submit" class="btn-submit" id="submit-btn"><span>Initiate Notesheet</span></button>
+          </footer>
+        </form>
+      </div>
+    </article>
+  </main>
+</div>
+
+<script>
+  /* 
+     AUTO-SEQUENCE ATTACHMENT SYSTEM  (type-dropdown + gap-filling)
+     User selects type: Flag / Annexure / PUC
+     System auto-assigns the next sequential value FOR THAT TYPE:
+       Flag    → A, B, C … Z, AA, AB … (unlimited)
+       Annexure→ I, II, III … (Roman numerals, unlimited)
+       PUC     → 1, 2, 3 … (unlimited)
+     Each type has its own independent counter.
+     Add / delete / type-change → full recalculation so gaps fill.
+  */
+
+  /* Index-to-value helpers (0-based) */
+  function indexToFlag(idx) {
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '', n = idx + 1;
+    while (n > 0) { n--; result = alpha[n % 26] + result; n = Math.floor(n / 26); }
+    return result;
+  }
+
+  function indexToRoman(idx) {
+    const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+    const syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+    let n = idx + 1, r = '';
+    for (let i = 0; i < vals.length; i++) { while (n >= vals[i]) { r += syms[i]; n -= vals[i]; } }
+    return r;
+  }
+
+  function indexToPUC(idx) { return idx + 1; }
+
+  /* Type → badge colour map */
+  const TYPE_CLASS = { flag: 'badge--flag', annexure: 'badge--annex', puc: 'badge--puc' };
+
+  /* Full recalculation -- walks DOM, assigns per-type counters */
+  function recalculateAllBadges() {
+    const rows = document.getElementById('attachment-list-container')
+      .querySelectorAll('.attachment-item');
+    const counters = { flag: 0, annexure: 0, puc: 0 };
+
+    rows.forEach(function (row) {
+      const type = row.querySelector('.type-select').value;   // 'flag' | 'annexure' | 'puc'
+      const idx = counters[type]++;
+      const badge = row.querySelector('.auto-badge');
+
+      let label = '';
+      if (type === 'flag') label = 'Flag ' + indexToFlag(idx);
+      else if (type === 'annexure') label = 'Annexure ' + indexToRoman(idx);
+      else label = 'PUC ' + indexToPUC(idx);
+
+      /* Refresh badge text + colour */
+      badge.textContent = label;
+      badge.className = 'badge auto-badge ' + TYPE_CLASS[type];
+
+      /* Refresh hidden inputs */
+      row.querySelector('input[name="attachment_flag[]"]').value = type === 'flag' ? label : '';
+      row.querySelector('input[name="attachment_annexure[]"]').value = type === 'annexure' ? label : '';
+      row.querySelector('input[name="attachment_puc[]"]').value = type === 'puc' ? label : '';
+      row.querySelector('input[name="attachment_labels[]"]').value = label;
+    });
+  }
+
+  /* Build one attachment row */
+  function buildAttachmentRow(isFirst) {
+    const item = document.createElement('div');
+    item.className = 'attachment-item';
+
+    const delBtn = isFirst
+      ? `<div style="width:36px;"></div>`
+      : `<button type="button" class="btn-icon remove-attachment-btn" title="Remove">&#x2715;</button>`;
+
+    item.innerHTML = `
+      <select class="type-select">
+        <option value="flag">🚩 Flag</option>
+        <option value="annexure">📎 Annexure</option>
+        <option value="puc">📄 PUC</option>
+      </select>
+      <span class="badge auto-badge badge--flag"></span>
+      <input type="hidden" name="attachment_flag[]"     value="">
+      <input type="hidden" name="attachment_annexure[]" value="">
+      <input type="hidden" name="attachment_puc[]"      value="">
+      <input type="hidden" name="attachment_labels[]"   value="">
+      <input type="file"   name="attachments" class="attachment-item__input" style="flex:1;">
+      ${delBtn}
+    `;
+
+    /* Re-run recalculate whenever user changes the type */
+    item.querySelector('.type-select').addEventListener('change', recalculateAllBadges);
+
+    if (!isFirst) {
+      item.querySelector('.remove-attachment-btn').addEventListener('click', function () {
+        item.remove();
+        recalculateAllBadges();
+      });
+    }
+
+    return item;
+  }
+
+  /* ── Initialise first row on page load ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('attachment-list-container');
+    container.appendChild(buildAttachmentRow(true));
+    recalculateAllBadges();
+  });
+
+  /* ── Add More File button ── */
+  document.getElementById('add-attachment-btn').addEventListener('click', function () {
+    const container = document.getElementById('attachment-list-container');
+    const isFirst = container.querySelectorAll('.attachment-item').length === 0;
+    container.appendChild(buildAttachmentRow(isFirst));
+    recalculateAllBadges();
+  });
+
+  /* ── Submit sync ── */
+  document.getElementById('notesheet-form').addEventListener('submit', function () {
+    if (typeof tinymce !== 'undefined' && tinymce.get('agenda_details')) {
+      tinymce.get('agenda_details').save();
+    }
+  });
+
+  /* ── Rich editor toggle ── */
+  let richEditorActive = false;
+
+  function initializeTinyMCE(btn, textarea) {
+    if (!richEditorActive) {
+
+      tinymce.init({
+        selector: '#agenda_details',
+        menubar: true,
+        menu: {
+          file: { title: 'File', items: 'newdocument restoredraft | preview | importword exportpdf exportword | print | deleteallconversations' },
+          edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+          view: { title: 'View', items: 'code revisionhistory | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments' },
+          insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+          format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+          tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
+          table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+        },
+        height: 460,
+        min_height: 600,
+        autoresize_bottom_margin: 50,
+        resize: true,
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+          'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'wordcount', 'codesample',
+          'emoticons', 'nonbreaking', 'pagebreak', 'quickbars', 'autoresize', 'noneditable'
+        ],
+        noneditable_class: 'mceNonEditable',
+        relative_urls: false,
+        remove_script_host: true,
+        toolbar_mode: 'wrap',
+        paste_data_images: true,
+        paste_as_text: false,
+        /* ── ✂️ AUTO-CLEAN WORD PASTE ── */
+        paste_postprocess: function (plugin, args) {
+          var node = args.node;
+
+          /* 1 ▸ Strip all mso-* / Word-only CSS properties */
+          node.querySelectorAll('[style]').forEach(function (el) {
+            var raw = el.getAttribute('style') || '';
+            var cleaned = raw.split(';')
+              .map(function (s) { return s.trim(); })
+              .filter(function (s) {
+                if (!s) return false;
+                var prop = s.split(':')[0].trim().toLowerCase();
+                return !prop.startsWith('mso-')
+                  && prop !== 'tab-stops'
+                  && prop !== 'layout-grid-mode'
+                  && prop !== 'punctuation-wrap'
+                  && prop !== 'text-autospace';
+              })
+              .join('; ');
+            if (cleaned) { el.setAttribute('style', cleaned); }
+            else { el.removeAttribute('style'); }
+          });
+
+          /* 2 ▸ Remove Word-generated class attributes */
+          node.querySelectorAll('[class]').forEach(function (el) {
+            el.removeAttribute('class');
+          });
+
+          /* 3 ▸ Normalise paragraphs → Calibri 12pt, line-height 1.8 */
+          node.querySelectorAll('p').forEach(function (p) {
+            p.style.fontFamily = 'Calibri, Arial, sans-serif';
+            p.style.fontSize = '12pt';
+            p.style.lineHeight = '1.8';
+            if (!p.style.margin) p.style.margin = '0 0 6pt 0';
+          });
+
+          /* 4 ▸ Normalise headings */
+          var headingSizes = { H1: '22pt', H2: '18pt', H3: '14pt', H4: '13pt' };
+          Object.keys(headingSizes).forEach(function (tag) {
+            node.querySelectorAll(tag).forEach(function (h) {
+              h.style.fontFamily = 'Calibri, Arial, sans-serif';
+              h.style.fontSize = headingSizes[tag];
+              h.style.lineHeight = '1.4';
+              h.style.fontWeight = 'bold';
+            });
+          });
+
+          /* 5 ▸ Normalise inline spans */
+          node.querySelectorAll('span').forEach(function (span) {
+            if (!span.style.fontFamily)
+              span.style.fontFamily = 'Calibri, Arial, sans-serif';
+            if (!span.style.fontSize)
+              span.style.fontSize = '12pt';
+          });
+
+          /* 6 ▸ Fix tables → professional notesheet style */
+          node.querySelectorAll('table').forEach(function (tbl) {
+            tbl.style.borderCollapse = 'collapse';
+            tbl.style.width = '100%';
+            tbl.style.margin = '8pt 0';
+            tbl.removeAttribute('width');
+            tbl.removeAttribute('border');
+            tbl.removeAttribute('cellspacing');
+            tbl.removeAttribute('cellpadding');
+          });
+          node.querySelectorAll('td, th').forEach(function (cell) {
+            cell.style.border = '1px solid #d1d5db';
+            cell.style.padding = '6px 10px';
+            cell.style.fontFamily = 'Calibri, Arial, sans-serif';
+            cell.style.fontSize = '12pt';
+            cell.style.lineHeight = '1.6';
+          });
+          node.querySelectorAll('th').forEach(function (th) {
+            th.style.background = '#d1fae5';
+            th.style.fontWeight = '600';
+          });
+
+          /* 7 ▸ Collapse consecutive empty paragraphs (max 1 blank line) */
+          var paras = Array.from(node.querySelectorAll('p'));
+          var lastEmpty = false;
+          paras.forEach(function (p) {
+            var isEmpty = p.textContent.trim() === '' ||
+              p.innerHTML.trim() === '&nbsp;' ||
+              p.innerHTML.trim() === '<br>';
+            if (isEmpty && lastEmpty) {
+              p.parentNode && p.parentNode.removeChild(p);
+            } else {
+              lastEmpty = isEmpty;
+            }
+          });
+
+          /* 8 ▸ Remove Word conditional-comment leftovers (w:, o:, v: tags) */
+          ['w\\:*', 'o\\:*', 'v\\:*'].forEach(function (sel) {
+            try {
+              node.querySelectorAll(sel).forEach(function (el) { el.remove(); });
+            } catch (e) { }
+          });
+        },
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '+body[style]',
+
+        // CUSTOM FLAGS BUTTON ADDED HERE IN TOOLBAR
+        toolbar: [
+          'undo redo | styles | fontfamily | fontsize',
+          'bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat | fullscreen'
+        ].join(' | '),
+
+        font_family_formats:
+          'Calibri=Calibri,sans-serif;' +
+          'Arial=arial,helvetica,sans-serif;' +
+          'Times New Roman=times new roman,times,serif;' +
+          'Courier New=courier new,courier,monospace;' +
+          'Georgia=georgia,palatino,serif;' +
+          'Verdana=verdana,geneva,sans-serif;' +
+          'Plus Jakarta Sans=Plus Jakarta Sans,system-ui,sans-serif;',
+
+        font_size_formats: '8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
+
+        style_formats: [
+          { title: 'Heading 1', block: 'h1', styles: { 'font-size': '26pt', 'font-weight': 'bold' } },
+          { title: 'Heading 2', block: 'h2', styles: { 'font-size': '20pt', 'font-weight': 'bold' } },
+          { title: 'Heading 3', block: 'h3', styles: { 'font-size': '16pt', 'font-weight': 'bold' } },
+          { title: 'Heading 4', block: 'h4', styles: { 'font-size': '14pt', 'font-weight': 'bold' } },
+          { title: 'Normal', block: 'p', styles: { 'font-size': '12pt', 'font-weight': 'normal' } },
+          { title: 'Block Quote', block: 'blockquote' },
+          { title: 'Code', inline: 'code' },
+        ],
+
+        content_style: `
+          html {
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 13pt;
+            line-height: 1.8;
+            color: #000000;
+            background: white;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 8px 16px;
+            box-sizing: border-box;
+          }
+
+          .mce-content-body {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+          }
+          h1 { font-size: 26pt; font-weight: bold; margin-bottom: 8px; }
+          h2 { font-size: 20pt; font-weight: bold; margin-bottom: 6px; }
+          h3 { font-size: 16pt; font-weight: bold; margin-bottom: 4px; }
+          h4 { font-size: 14pt; font-weight: bold; }
+          p  { margin: 0 0 8px; }
+          blockquote { border-left: 4px solid #059669; padding-left: 12px; color: #4b5563; }
+          table { border-collapse: collapse; width: 100%; }
+          td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
+          th { background: #d1fae5; font-weight: 600; }
+          /* 🔒 Letterhead fully non-interactive */
+          div.mceNonEditable,
+          div[contenteditable="false"] {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            pointer-events: none !important;
+            cursor: default !important;
+            caret-color: transparent !important;
+          }
+          hr { pointer-events: none !important; user-select: none !important; }
+        `,
+
+        branding: false,
+        elementpath: true,
+        statusbar: true,
+        wordcount_countregex: /[\w\u2019\x27-]+/g,
+
+        quickbars_selection_toolbar: 'bold italic underline | formatselect | forecolor | bullist numlist',
+        quickbars_insert_toolbar: false,
+
+        setup: function (editor) {
+          editor.on('init', function () {
+            textarea.style.display = 'none';
+            richEditorActive = true;
+            btn.style.display = 'none';
+
+            // ╔═══════════════════════════════════════════════════════════════╗
+            // ║ PROFESSIONAL LETTERHEAD - AUTOMATIC INJECTION                 ║
+            // ╚═══════════════════════════════════════════════════════════════╝
+            const currentContent = editor.getContent({ format: 'text' }).trim();
+            if (!currentContent) {
+              const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
+              const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+
+              editor.setContent(
+                '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
+                '<table style="width:100%;border-collapse:collapse;margin-bottom:4pt;padding:0;border:none;">' +
+                '<tr>' +
+                /* 🌟 WSSP LOGO SIZE INCREASED TO 135px FOR PERFECT BALANCE 🌟 */
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 10pt 12pt 0;border:none !important;">' +
+                '<img src="' + wsspLogo + '" alt="WSSP Logo" style="width:135px;height:135px;object-fit:contain;" />' +
+                '</td>' +
+
+                '<td style="text-align:center;vertical-align:middle;padding:12pt 8pt;border:none !important;">' +
+                /* 🌟 HEADERS ARE BOLD AND CRISP 🌟 */
+                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES,</p>' +
+                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 10pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">PESHAWAR, LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>' +
+
+                /* 🌟 ADDRESS LINE FULLY BOLDED AND LARGE 🌟 */
+                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>' +
+
+                /* 🌟 EMAIL LINK CHANGED TO BLUE COLOR (#1d4ed8) 🌟 */
+                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;"><strong>E mail: </strong><u style="color:#1d4ed8 !important;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219074</p>' +
+                '</td>' +
+
+                /* 🌟 KPK EMBLEM SIZE INCREASED TO 135px FOR PERFECT BALANCE 🌟 */
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 0 12pt 10pt;border:none !important;">' +
+                '<img src="' + kpkLogo + '" alt="KPK Emblem" style="width:135px;height:135px;object-fit:contain;" />' +
+                '</td>' +
+                '</tr>' +
+                '</table>' +
+                '</div>' +
+                '<hr style="border:none;border-top:1px solid #e5e7eb;margin:2pt 0 8pt 0;padding:0;" />' +
+                '<ol style="margin:8pt 0 0 24pt;padding:0;font-family:Calibri,Arial,sans-serif;font-size:13pt;line-height:1.8;"><li style="margin-bottom:4pt;"></li></ol>'
+              );
+              // Place cursor inside the first list item
+              const ol = editor.getBody().querySelector('ol');
+              if (ol && ol.firstElementChild) {
+                const range = editor.dom.createRng();
+                range.setStart(ol.firstElementChild, 0);
+                range.collapse(true);
+                editor.selection.setRng(range);
+                editor.focus();
+              }
+            }
+          });
+          editor.on('change input keyup', function () {
+            editor.save();
+          });
+
+          /* ── 🔒 CTRL+A: Select only content below letterhead ── */
+          editor.on('keydown', function (e) {
+            const body = editor.getBody();
+            const boundary = body.querySelector('hr') || body.querySelector('.mceNonEditable');
+
+            /* —— CTRL+A: only select user content —— */
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
+              if (boundary) {
+                e.preventDefault();
+                e.stopPropagation();
+                const range = editor.dom.createRng();
+                range.setStartAfter(boundary);
+                range.setEndAfter(body.lastChild);
+                editor.selection.setRng(range);
+                return false;
+              }
+            }
+
+            /* —— BACKSPACE/DELETE: protect letterhead from deletion —— */
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+              if (!boundary) return;
+              const sel = editor.selection.getRng();
+
+              // 🔒 LAYER 1: If user has a SELECTION, check if it touches the letterhead
+              if (!sel.collapsed) {
+                try {
+                  const frag = sel.cloneContents();
+                  if (frag.querySelector && (
+                      frag.querySelector('.mceNonEditable') ||
+                      frag.querySelector('[contenteditable="false"]')
+                    )) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                  }
+                } catch (ex) { /* safety: block on error */ }
+                return; // allow deletion of user’s own selected text
+              }
+
+              // 🔒 LAYER 2: Collapsed cursor — check if we are at very start of editable content
+              try {
+                const checkRng = editor.dom.createRng();
+                checkRng.setStartAfter(boundary);
+                checkRng.setEnd(sel.startContainer, sel.startOffset);
+                // Strip all whitespace / NBSP to get truly empty check
+                const content = checkRng.toString().replace(/[\u00a0\u0020\n\r\t]/g, '').trim();
+                if (content === '') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return false;
+                }
+              } catch (ex) {
+                // Cursor is before/inside boundary — always block
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }
+            }
+          });
+
+          /* —— CLICK/MOUSEDOWN: redirect cursor away from letterhead —— */
+          editor.on('mousedown click', function (e) {
+            const body = editor.getBody();
+            const letterhead = body.querySelector('.mceNonEditable');
+            if (!letterhead) return;
+            const target = e.target;
+            if (letterhead === target || letterhead.contains(target)) {
+              e.preventDefault();
+              e.stopPropagation();
+              // Move cursor to first content paragraph after hr
+              const hr = body.querySelector('hr');
+              const anchor = hr || letterhead;
+              const range = editor.dom.createRng();
+              range.setStartAfter(anchor);
+              range.collapse(true);
+              editor.selection.setRng(range);
+              editor.focus();
+              return false;
+            }
+          });
+
+          /* ── 🔒 LAYER 3: NodeChange RESTORATION ──
+             Last-resort safety net: if letterhead ever disappears (any method),
+             auto-undo the last action to restore it instantly. */
+          let _lhUndoing = false;
+          editor.on('NodeChange', function () {
+            if (_lhUndoing) return;
+            const bd = editor.getBody();
+            const hasLetterhead = bd.querySelector('.mceNonEditable') ||
+                                  bd.querySelector('[contenteditable="false"]');
+            if (!hasLetterhead) {
+              _lhUndoing = true;
+              setTimeout(function () {
+                editor.execCommand('Undo');
+                _lhUndoing = false;
+              }, 10);
+            }
+          });
+
+          /* ── 📌 DYNAMIC FLAGS MENU BUTTON LOGIC ── */
+          editor.ui.registry.addMenuButton('insertflag', {
+            text: '📌 Insert Flag Link',
+            fetch: function (callback) {
+              var items = [];
+
+              // DOM se live attached rows uthate hain
+              var container = document.getElementById('attachment-list-container');
+              var currentRowsCount = container ? container.getElementsByClassName('attachment-item').length : 0;
+
+              if (currentRowsCount > 0) {
+                for (var i = 0; i < currentRowsCount; i++) {
+                  (function (index) {
+                    var letter = flagLetters[index];
+                    items.push({
+                      type: 'menuitem',
+                      text: 'Link to Flag ' + letter,
+                      onAction: function () {
+                        editor.insertContent(
+                          '<a href="#flag-' + letter + '" class="badge-flag-link" ' +
+                          'style="background-color: #ef4444; color: white; padding: 2px 6px; ' +
+                          'font-weight: 700; font-size: 0.8rem; border-radius: 4px; ' +
+                          'text-decoration: none; display: inline-block; margin: 0 2px;">' +
+                          'FLAG ' + letter + '</a>&nbsp;'
+                        );
+                      }
+                    });
+                  })(i);
+                }
+              } else {
+                items.push({
+                  type: 'menuitem',
+                  text: '⚠️ No Uploaded Files Found',
+                  onAction: function () {
+                    alert('Please add an attachment first to link its flag!');
+                  }
+                });
+              }
+              callback(items);
+            }
+          });
+        }
+      });
+
+    } else {
+      const editor = tinymce.get('agenda_details');
+      if (editor) {
+        editor.save();
+        const saved = textarea.value;
+        editor.remove();
+        textarea.value = saved;
+      }
+      textarea.style.display = 'block';
+      textarea.style.visibility = 'visible';
+      textarea.style.opacity = '1';
+      textarea.style.height = 'auto';
+      textarea.style.minHeight = '150px';
+      textarea.removeAttribute('hidden');
+
+      richEditorActive = false;
+      btn.innerHTML = '✏️ Formatting Tools';
+      btn.classList.remove('active');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('toggle-rich-editor');
+    const textarea = document.getElementById('agenda_details');
+    if (typeof tinymce === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.5/tinymce.min.js';
+      s.onload = () => initializeTinyMCE(btn, textarea);
+      s.onerror = () => alert('TinyMCE load failed. Please check your internet or proxy settings.');
+      document.head.appendChild(s);
+    } else {
+      initializeTinyMCE(btn, textarea);
+    }
+  });
+
+  document.getElementById('toggle-rich-editor').addEventListener('click', function () {
+    const btn = this;
+    const textarea = document.getElementById('agenda_details');
+
+    if (typeof tinymce === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.5/tinymce.min.js';
+      s.onload = () => initializeTinyMCE(btn, textarea);
+      s.onerror = () => alert('TinyMCE load failed. Please check your internet or proxy settings.');
+      document.head.appendChild(s);
+    } else {
+      initializeTinyMCE(btn, textarea);
+    }
+  });
+
+  // Strip TinyMCE-injected letterhead from content to avoid duplicates in preview/print
+  function cleanAgendaContent(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Handle mceNonEditable wrapper div (new format)
+    const nonEditDiv = tmp.querySelector('div.mceNonEditable, div[contenteditable="false"]');
+    if (nonEditDiv && (nonEditDiv.querySelector('img') || (nonEditDiv.textContent || '').indexOf('CHIEF EXECUTIVE OFFICER') !== -1)) {
+      let next = nonEditDiv.nextElementSibling;
+      nonEditDiv.remove();
+      if (next && next.tagName === 'HR') next.remove();
+    } else {
+      // Fallback: handle bare table (old format)
+      const tables = tmp.querySelectorAll('table');
+      if (tables.length > 0) {
+        const firstTable = tables[0];
+        const text = firstTable.innerText || firstTable.textContent || '';
+        if (text.indexOf('CHIEF EXECUTIVE OFFICER') !== -1 ||
+          text.indexOf('WATER') !== -1 ||
+          text.indexOf('SANITATION') !== -1 ||
+          firstTable.querySelector('img') !== null) {
+          let next = firstTable.nextElementSibling;
+          firstTable.remove();
+          if (next && next.tagName === 'HR') next.remove();
+        }
+      }
+    }
+    // Remove any leading empty paragraphs
+    while (tmp.firstElementChild &&
+      tmp.firstElementChild.tagName === 'P' &&
+      (tmp.firstElementChild.innerHTML.trim() === '' ||
+        tmp.firstElementChild.innerHTML.trim() === '&nbsp;')) {
+      tmp.firstElementChild.remove();
+    }
+    return tmp.innerHTML;
+  }
+
+  function openPreview() {
+    let agendaContent = '';
+
+    if (typeof tinymce !== 'undefined' && tinymce.get('agenda_details')) {
+      agendaContent = cleanAgendaContent(tinymce.get('agenda_details').getContent());
+    } else {
+      const plain = document.getElementById('agenda_details').value;
+      agendaContent = plain.trim()
+        ? plain.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>')
+        : '';
+    }
+
+    // ── Read Subject ──
+    const subjectVal = (document.getElementById('title') || {}).value || '';
+    const subjectBlock = subjectVal.trim()
+      ? `<div style="margin: 0 0 16pt 0; padding-top: 6pt; font-family:Calibri,Arial,sans-serif; font-size:16pt; font-weight:bold;">
+          Subject: ${subjectVal.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        </div>`
+      : '';
+
+    // Build full A4 HTML document for iframe
+    const letterhead = `
+<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
+  <tr>
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="/static/images/wssp_logo_new.png"
+           onerror="this.style.display='none'"
+           alt="WSSP" style="width:95px;height:95px;max-width:100%;object-fit:contain;">
+    </td>
+    <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
+      <h4 style="font-weight:700;font-size:24px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR</h4>
+      
+      <p style="font-size:20px;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
+      <p style="font-size:19px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+      <p style="font-size:11pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
+        <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
+        &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219074
+      </p>
+    </td>
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="/static/images/kpk_emblem.png"
+           onerror="this.style.display='none'"
+           alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+    </td>
+  </tr>
+</table>
+<div style="border-top:3px solid #7a2e2e;margin:6pt 0 14pt 0;"></div>
+${subjectBlock}`;
+
+    const iframeDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Calibri&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    font-family: Arial, Calibri, sans-serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    background: white;
+  }
+  body {
+    padding: 20mm 22mm 30mm 22mm;
+  }
+  p { margin: 0 0 6pt 0; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 4pt 6pt; }
+  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }
+  h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }
+  ul, ol { margin-left: 20pt; margin-bottom: 6pt; }
+  blockquote { border-left: 3pt solid #059669; padding-left: 10pt; color: #4b5563; }
+  a { color: #059669; }
+  strong, b { font-weight: bold; }
+  em, i { font-style: italic; }
+  u { text-decoration: underline; }
+  img { max-width: 100%; }
+</style>
+</head>
+<body>
+${letterhead}
+${agendaContent || '<p style="color:#9ca3af;">(No agenda entered)</p>'}
+</body>
+</html>`;
+
+    // Iframe mein inject karo
+    const iframe = document.getElementById('preview-iframe');
+
+    // Show modal first
+    document.getElementById('previewModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Iframe load hone ke baad height adjust karo
+    setTimeout(() => {
+      const iframeWin = iframe.contentWindow || iframe.contentDocument;
+      const doc = iframe.contentDocument || iframeWin.document;
+      doc.open();
+      doc.write(iframeDoc);
+      doc.close();
+
+      // Content ki height ke mutabiq iframe resize karo
+      setTimeout(() => {
+        try {
+          const body = doc.body;
+          const html = doc.documentElement;
+          const height = Math.max(
+            body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight
+          );
+          iframe.style.height = Math.max(height, 1414) + 'px'; // min 1414px for 1000px A4 ratio
+          // preview-section bhi same height
+          iframe.parentElement.style.minHeight = iframe.style.height;
+        } catch (e) { }
+      }, 100);
+    }, 50);
+  }
+
+  function closePreview() {
+    document.getElementById('previewModalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('preview-btn').addEventListener('click', openPreview);
+  document.getElementById('previewCloseBtn').addEventListener('click', closePreview);
+  document.getElementById('previewCloseBtnFooter').addEventListener('click', closePreview);
+  document.getElementById('previewModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closePreview();
+  });
+
+
+  document.getElementById('previewPrintBtn').addEventListener('click', function () {
+    // TinyMCE content directly lo
+    let agendaContent = '';
+    if (typeof tinymce !== 'undefined' && tinymce.get('agenda_details')) {
+      agendaContent = cleanAgendaContent(tinymce.get('agenda_details').getContent());
+    } else {
+      const plain = document.getElementById('agenda_details').value;
+      agendaContent = plain.trim()
+        ? plain.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+        : '';
+    }
+
+    if (!agendaContent.trim()) {
+      alert('Please enter some agenda content!');
+      return;
+    }
+
+    // ── Read Subject for print ──
+    const printSubjectVal = (document.getElementById('title') || {}).value || '';
+    const printSubjectBlock = printSubjectVal.trim()
+      ? `<div style="margin:0 0 16pt 0;padding-top:6pt;">
+          <table style="width:100%; border-collapse:collapse; border:none;">
+            <tr>
+              <td style="width:100px; vertical-align:top; font-size:14pt; font-weight:bold; color:#000; font-family:Calibri,Arial,sans-serif;"><u>Subject:</u></td>
+              <td style="vertical-align:top; font-size:14pt; font-weight:bold; color:#000; font-family:Calibri,Arial,sans-serif;">${printSubjectVal.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>
+            </tr>
+          </table>
+         </div>`
+      : '';
+
+    // Naya popup window banao print ke liye
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notesheet Print</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page {
+    size: A4;
+    margin: 25mm 20mm;
+  }
+  html, body {
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    background: white;
+  }
+  body { padding: 20mm; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none !important; }
+  }
+  p { margin: 0 0 6pt; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 4pt 6pt; }
+  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }
+  h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }
+  ul, ol { margin-left: 20pt; margin-bottom: 6pt; }
+  blockquote { border-left: 3pt solid #059669; padding-left: 10pt; color: #4b5563; }
+  strong, b { font-weight: bold; }
+  em, i { font-style: italic; }
+  u { text-decoration: underline; }
+
+  /* Print button - screen only */
+  .print-toolbar {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 9999;
+  }
+  .btn-do-print {
+    padding: 10px 20px;
+    background: #0d2b1e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-do-print:hover { background: #0a2118; }
+  .btn-do-close {
+    padding: 10px 20px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="print-toolbar no-print">
+    <button class="btn-do-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn-do-close" onclick="window.close()">✕ Close</button>
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14pt;padding:0;border:none;">
+    <tr>
+      <td style="width:90px;text-align:center;vertical-align:middle;padding:8pt 6pt 8pt 0;">
+        <img src="/static/images/wssp_logo_new.png" onerror="this.style.display='none'"
+             alt="WSSP" style="width:85px;height:85px;object-fit:contain;">
+      </td>
+      <td style="text-align:center;vertical-align:middle;padding:8pt 4pt;">
+        <p style="font-weight:bold;font-size:14pt;margin:0 0 3pt;font-family:Calibri,Arial,sans-serif;color:#4a5568;letter-spacing:0;white-space:nowrap;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES,</p>
+        <p style="font-weight:bold;font-size:14pt;margin:0 0 5pt;font-family:Calibri,Arial,sans-serif;color:#4a5568;letter-spacing:0;">PESHAWAR, LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+        <p style="font-size:11pt;margin:0 0 2pt;font-family:Calibri,Arial,sans-serif;color:#6b7280;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
+        <p style="font-size:11pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;"><strong>E mail: </strong><u style="color:#059669;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219074</p>
+      </td>
+      <td style="width:90px;text-align:center;vertical-align:middle;padding:8pt 0 8pt 6pt;">
+        <img src="/static/images/kpk_emblem.png" onerror="this.style.display='none'"
+             alt="KPK Emblem" style="width:72px;height:72px;object-fit:contain;">
+      </td>
+    </tr>
+  </table>
+  <hr style="border:none;border-top:3px solid #9a3a3a;margin:6pt 0 12pt 0;padding:0;" />
+  ${printSubjectBlock}
+  <div class="letter-content">
+    ${agendaContent}
+  </div>
+  <script>
+    // Auto print dialog open karo
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  <\/script>
+</body>
+</html>`);
+
+    printWindow.document.close();
+  });
+
+
+</script>
+{% endblock %}

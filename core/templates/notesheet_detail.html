@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm border-0" style="border-radius: 15px;">
+        <div class="card-header bg-success text-white py-3" style="border-radius: 15px 15px 0 0;">
+            <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Notesheet Detail & Action</h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <h2 class="fw-bold text-dark">{{ notesheet.title }}</h2>
+                <div class="text-muted small">
+                    <span class="me-3"><i class="fas fa-user me-1"></i> From: <b>{{ notesheet.assigned_by.username }}</b></span>
+                    <span><i class="fas fa-calendar-alt me-1"></i> Date: {{ notesheet.created_at|date:"d M, Y | h:i A" }}</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="mb-5">
+                <h5 class="fw-bold text-primary mb-3"><i class="fas fa-align-left me-2"></i> Notesheet Content</h5>
+                {% for remark in notesheet.remarks.all %}
+                    {% if forloop.first or remark.action_taken == 'save' %}
+                    <div class="p-3 mb-3 bg-light border-start border-4 border-primary rounded shadow-sm">
+                        <p class="mb-0 fs-5 text-dark">{{ remark.feedback }}</p>
+                        <small class="text-muted d-block mt-2" style="font-size: 0.7rem;">Added by {{ remark.user.username }}</small>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="mb-5">
+                <h5 class="fw-bold text-success mb-3"><i class="fas fa-history me-2"></i> Processing History</h5>
+                <div class="list-group list-group-flush">
+                    {% for remark in notesheet.remarks.all %}
+                        {% if remark.action_taken != 'save' %}
+                        <div class="list-group-item border-0 border-bottom bg-transparent px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark">{{ remark.user.username }}</span>
+                                <small class="text-muted bg-light px-2 rounded">{{ remark.created_at|date:"d-m-Y | h:i A" }}</small>
+                            </div>
+                            <p class="mt-2 mb-1 text-secondary italic">"{{ remark.feedback }}"</p>
+                        </div>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-muted small ps-2">No additional remarks found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="bg-light p-4 rounded border">
+                <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-pen-nib me-2"></i> Your Review & Action</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary">Your Remarks <span class="text-danger">*</span></label>
+                        <textarea name="remarks" class="form-control border-0 shadow-sm" rows="4" placeholder="Enter your feedback here..." required></textarea>
+                    </div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-7 mb-3">
+                            <label class="form-label fw-bold text-secondary">Forward To Officer</label>
+                            <select name="forward_to" class="form-select shadow-sm">
+                                <option value="" selected>-- Finish / Don't Forward --</option>
+                                {% for officer in officers %}
+                                    <option value="{{ officer.id }}">{{ officer.get_full_name|default:officer.username }} - {{ officer.profile.role|default:"--" }} ({{ officer.profile.department|default:"--" }})</option>
+                                {% empty %}
+                                    <option disabled>No officers available</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Keep empty to mark as processed without forwarding.</small>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg fw-bold shadow">
+                                    <i class="fas fa-paper-plane me-2"></i> Submit Action
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>  
+    </div>
+</div>
+
+<style>
+    .border-primary { border-color: #0d6efd !important; }
+    .bg-light { background-color: #fcfcfc !important; }
+    .form-control:focus, .form-select:focus { 
+        box-shadow: 0 0 10px rgba(13, 110, 253, 0.1); 
+        border: 1px solid #0d6efd; 
+    }
+    .italic { font-style: italic; }
+</style>
+{% endblock %}

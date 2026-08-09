@@ -1,6 +1,4 @@
-# Add this to your urls.py file
-
-from django.urls import path
+from django.urls import path, include
 from . import views
 from .views import approve_commitment, reject_commitment
 
@@ -13,10 +11,12 @@ urlpatterns = [
     path('ps/', views.ps_dashboard, name='ps_dashboard'),
     path('ceo/', views.ceo_dashboard, name='ceo_dashboard'),
     path('manager/', views.manager_dashboard, name='manager_dashboard'),
+    path('gm/', views.gm_dashboard, name='gm_dashboard'),
 
     # Chart Data API Endpoints
-    path('api/chart-data/', views.get_chart_data, name='get_chart_data'),  # CEO Chart API
-    path('api/ps-chart-data/', views.get_ps_chart_data, name='get_ps_chart_data'),  # PS Chart API
+    path('api/chart-data/', views.get_chart_data, name='get_chart_data'),
+    path('api/ps-chart-data/', views.get_ps_chart_data, name='get_ps_chart_data'),
+    path('gm-chart-data/', views.gm_chart_data, name='gm_chart_data'),
     
     # Commitments
     path('commitment/add/', views.add_commitment, name='add_commitment'),
@@ -33,12 +33,59 @@ urlpatterns = [
     # Manager Tasks
     path('manager/tasks/', views.manager_task_view, name='manager_tasks'),
     path('manager/add-remark/', views.add_remark_view, name='add_remark'),
+    path('task/feedbacks/<int:task_id>/', views.task_feedback_detail_view, name='task_feedback_detail'),
     
     # Task Assignment
     path('assign-task/', views.assign_task_view, name='ceo_assign_task'),
     path('all-tasks/', views.all_tasks_view, name='all_tasks'),
     
-    # CEO Feedbacks
-    path('ceo/view-feedbacks/', views.ceo_view_feedbacks, name='ceo_view_feedbacks'),
-    path('ceo/feedbacks/', views.ceo_view_feedbacks, name='ceo_view_feedbacks'),
+    # Feedbacks
+    path('ceo/view-feedbacks/', views.view_feedbacks, name='ceo_view_feedbacks'),
+    path('view-feedbacks/', views.view_feedbacks, name='view_feedbacks'),
+
+    # =========================================================
+    # FILE SYSTEM URLs
+    # =========================================================
+    path('notesheet-files/', views.notesheet_files, name='notesheet_files'),
+    path('create-file/', views.create_file, name='create_file'),
+    path('file/<int:file_id>/', views.file_detail, name='file_detail'),
+
+    # =========================================================
+    # NOTESHEET SYSTEM URLs
+    # =========================================================
+    path('notesheet/initiate/', views.initiate_notesheet, name='initiate_notesheet'),
+    path('notesheet/my/', views.my_notesheets, name='my_notesheets'),
+    path('notesheet/inbox/', views.notesheet_inbox, name='notesheet_inbox'),
+    path('notesheet/outbox/', views.notesheet_outbox, name='notesheet_outbox'),
+    path('notesheet/view/<int:task_id>/', views.view_notesheet, name='view_notesheet'),
+    path('notesheet-detail/<int:task_id>/', views.notesheet_detail, name='view_notesheet_detail'), 
+    
+    # Forward and Return Workflow
+    path('notesheet/forward/<int:pk>/', views.forward_notesheet, name='forward_notesheet'),
+    path('notesheet/return/<int:pk>/', views.return_notesheet, name='return_notesheet'),
+
+    # =========================================================
+    # LETTER SYSTEM URLs
+    # =========================================================
+    path('letters/files/', views.letter_files_list, name='letter_files_list'),
+    path('letters/files/create/', views.create_letter_file, name='create_letter_file'),
+    path('letters/new/', views.create_letter, name='create_letter'),
+    path('letters/inbox/', views.letter_inbox, name='letter_inbox'),
+    path('letters/outbox/', views.letter_outbox, name='letter_outbox'),
+    path('letters/drafts/', views.letter_drafts, name='letter_drafts'),
+    path('letters/send-draft/<int:letter_id>/', views.send_draft_letter, name='send_draft_letter'),
+    path('letters/detail/<int:letter_id>/', views.letter_detail, name='letter_detail'),
+    path('letters/reply/<int:letter_id>/', views.reply_letter, name='reply_letter'),
+    path('letters/view-reply/<int:letter_id>/', views.view_letter_reply, name='view_letter_reply'),
+    path('profile/signature/', views.edit_profile_signature, name='edit_profile_signature'),
+
+    # =========================================================
+    # NOTIFICATIONS URL
+    # =========================================================
+    path('notifications/read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
+
+    # =========================================================
+    # TINYMCE RICH TEXT EDITOR URL
+    # =========================================================
+    path('tinymce/', include('tinymce.urls')),
 ]

@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ── Small gap between header and card ── */
+    .sig-wrapper {
+        padding: 1.5rem 0 3rem;
+    }
+
+    /* ── Card ── */
+    .sig-card {
+        border-radius: 0 0 16px 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(15, 57, 43, 0.12);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .sig-card__header {
+        background: linear-gradient(135deg, #0f392b 0%, #1a5c45 100%);
+        padding: 1.6rem 1.5rem 1.4rem;
+        border-radius: 0;
+    }
+
+    .sig-card__header h5 {
+        font-size: 1.15rem;
+        margin-bottom: 0.2rem;
+    }
+
+    /* ── Saved signature preview ── */
+    .sig-preview-box {
+        background: #f6f8f7;
+        border: 1px solid #e2e8e5;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    /* ── Segmented tab switcher ── */
+    .sig-tab-switcher {
+        display: flex;
+        background: #e8efec;
+        border-radius: 12px;
+        padding: 5px;
+        gap: 5px;
+        margin-bottom: 1.25rem;
+    }
+
+    .sig-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0.7rem 1rem;
+        border: none;
+        border-radius: 9px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: transparent;
+        color: #3d6b58;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .sig-tab-btn.active {
+        background: linear-gradient(135deg, #0f392b 0%, #1a5c45 100%);
+        color: #ffffff;
+        box-shadow: 0 3px 10px rgba(15, 57, 43, 0.25);
+    }
+
+    .sig-tab-btn:not(.active):hover {
+        background: rgba(15, 57, 43, 0.1);
+        color: #0f392b;
+    }
+
+    .sig-tab-btn i {
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Tab panels ── */
+    .sig-tab-panel {
+        display: none;
+    }
+
+    .sig-tab-panel.active {
+        display: block;
+    }
+
+    /* ── Canvas drawing panel ── */
+    .sig-draw-panel {
+        background: #f6f8f7;
+        border: 1px solid #e2e8e5;
+        border-radius: 12px;
+        padding: 0.75rem;
+    }
+
+    #signature-pad {
+        display: block;
+        width: 100%;
+        height: 180px;
+        background: #ffffff;
+        border: 2px dashed #b7c8c0;
+        border-radius: 10px;
+        cursor: crosshair;
+        touch-action: none;
+        transition: border-color 0.2s ease;
+    }
+
+    #signature-pad.is-active {
+        border-color: #0f392b;
+    }
+
+    .sig-pad-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.65rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* ── Upload panel ── */
+    .sig-upload-panel {
+        background: #f6f8f7;
+        border: 2px dashed #b7c8c0;
+        border-radius: 12px;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .sig-upload-panel:hover,
+    .sig-upload-panel.is-dragover {
+        border-color: #0f392b;
+        background: #eef4f1;
+    }
+
+    .sig-upload-panel .upload-icon {
+        font-size: 2.5rem;
+        color: #b7c8c0;
+        margin-bottom: 0.75rem;
+        transition: color 0.2s ease;
+    }
+
+    .sig-upload-panel:hover .upload-icon,
+    .sig-upload-panel.is-dragover .upload-icon {
+        color: #0f392b;
+    }
+
+    .sig-upload-filename {
+        font-size: 0.85rem;
+        color: #0f392b;
+        font-weight: 600;
+        margin-top: 0.75rem;
+        word-break: break-all;
+        display: none;
+    }
+
+    /* ── Save button ── */
+    .sig-save-btn {
+        background: linear-gradient(135deg, #0f392b 0%, #1a5c45 100%);
+        border: none;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        border-radius: 50px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sig-save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(15, 57, 43, 0.3);
+    }
+
+    /* ── Back button ── */
+    .sig-back-btn {
+        padding: 0.85rem 1.5rem;
+        font-size: 1rem;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    .sig-back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        background: #f1f5f9 !important;
+        color: #0f392b !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sig-save-btn,
+        .sig-back-btn,
+        .sig-tab-btn { transition: none; }
+        .sig-save-btn:hover,
+        .sig-back-btn:hover { transform: none; }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 576px) {
+        .sig-card__header h5 { font-size: 1rem; }
+        .sig-card__header small { font-size: 0.75rem; }
+        .sig-tab-btn { font-size: 0.82rem; padding: 0.6rem 0.5rem; gap: 5px; }
+        .sig-tab-btn i { font-size: 0.8rem; }
+        #signature-pad { height: 150px; }
+        .sig-pad-controls { justify-content: center; text-align: center; }
+        .sig-pad-controls small { width: 100%; order: 2; }
+        .sig-pad-controls #clear-btn { order: 1; width: 100%; }
+        .sig-upload-panel { padding: 1.5rem 1rem; }
+        .sig-wrapper { padding: 1rem 0 2rem; }
+    }
+</style>
+
+<div class="sig-wrapper px-3">
+    <div class="card border-0 sig-card">
+
+        <!-- Header -->
+        <div class="card-header text-white text-center border-0 sig-card__header">
+            <h5 class="fw-bold mb-1">
+                <i class="fas fa-signature me-2"></i> Digital Signature Settings
+            </h5>
+            <small class="text-white-50">Draw on screen or upload a signature image file</small>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form method="POST" enctype="multipart/form-data" id="signature-form">
+                {% csrf_token %}
+                {% if next_name %}
+                <input type="hidden" name="next" value="{{ next_name }}">
+                {% endif %}
+
+                <!-- Current Saved Signature Preview -->
+                {% if user.profile.signature %}
+                <div class="sig-preview-box">
+                    <label class="form-label text-muted d-block small fw-bold text-uppercase mb-2" style="letter-spacing: 0.05em;">
+                        Current Saved Signature
+                    </label>
+                    <img src="{{ user.profile.signature.url }}" alt="Current saved signature"
+                         style="max-height: 80px; width: auto;"
+                         class="border p-2 bg-white rounded-3 shadow-sm">
+                </div>
+                {% endif %}
+
+                <!-- Tab Switcher -->
+                <div class="sig-tab-switcher" role="tablist">
+                    <button type="button" class="sig-tab-btn active" id="draw-tab" role="tab" aria-selected="true" aria-controls="draw-panel">
+                        <i class="fas fa-pen"></i> Draw on Screen
+                    </button>
+                    <button type="button" class="sig-tab-btn" id="upload-tab" role="tab" aria-selected="false" aria-controls="upload-panel">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                </div>
+
+                <!-- Draw Panel -->
+                <div class="sig-tab-panel active mb-4" id="draw-panel" role="tabpanel">
+                    <div class="sig-draw-panel">
+                        <canvas id="signature-pad" aria-label="Signature drawing area"></canvas>
+                        <div class="sig-pad-controls">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Sign inside the box above
+                            </small>
+                            <button type="button" id="clear-btn" class="btn btn-sm btn-outline-danger fw-semibold rounded-pill px-3">
+                                <i class="fas fa-eraser me-1"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Panel -->
+                <div class="sig-tab-panel mb-4" id="upload-panel" role="tabpanel">
+                    <label for="signature_file" class="sig-upload-panel d-block mb-0" id="upload-drop-zone">
+                        <i class="fas fa-file-image upload-icon d-block mx-auto"></i>
+                        <span class="d-block fw-bold text-dark mb-1">Click to select a signature image</span>
+                        <small class="text-muted d-block">Supported: PNG, JPG · Recommended: transparent PNG</small>
+                        <div class="sig-upload-filename" id="upload-filename"></div>
+                    </label>
+                    <input type="file" name="signature_file" id="signature_file" class="visually-hidden"
+                           accept="image/png, image/jpeg, image/jpg">
+                </div>
+
+                <!-- Hidden base64 field for drawn signature -->
+                <input type="hidden" name="signature_data" id="signature_data">
+
+                <!-- Form Actions -->
+                <div class="d-flex align-items-center flex-column flex-sm-row gap-3 mt-2">
+                    <a href="{{ next_url|default:'javascript:history.back()' }}" class="btn btn-light fw-semibold text-secondary sig-back-btn rounded-pill border shadow-sm w-100 w-sm-auto text-nowrap">
+                        <i class="fas fa-arrow-left me-2"></i> Go Back
+                    </a>
+                    <button type="submit" class="btn btn-success fw-bold sig-save-btn w-100 flex-grow-1">
+                        <i class="fas fa-save me-2"></i> Save Digital Signature
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Signature Pad Library -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // ── Elements ──
+        const canvas          = document.getElementById('signature-pad');
+        const hiddenDataField = document.getElementById('signature_data');
+        const fileInput       = document.getElementById('signature_file');
+        const fileNameLabel   = document.getElementById('upload-filename');
+        const dropZone        = document.getElementById('upload-drop-zone');
+        const drawTabBtn      = document.getElementById('draw-tab');
+        const uploadTabBtn    = document.getElementById('upload-tab');
+        const drawPanel       = document.getElementById('draw-panel');
+        const uploadPanel     = document.getElementById('upload-panel');
+
+        // ── SignaturePad init ──
+        const signaturePad = new SignaturePad(canvas, {
+            penColor: "rgb(15, 57, 43)",
+            minWidth: 1,
+            maxWidth: 2.5
+        });
+
+        // ── Resize canvas to match display DPI ──
+        let resizeTimeout;
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const data  = signaturePad.isEmpty() ? null : signaturePad.toData();
+            canvas.width  = canvas.offsetWidth  * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+            if (data) signaturePad.fromData(data);
+        }
+        resizeCanvas();
+        window.addEventListener("resize", function () {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(resizeCanvas, 150);
+        });
+        window.addEventListener("orientationchange", function () {
+            setTimeout(resizeCanvas, 200);
+        });
+
+        // ── Active border when drawing ──
+        canvas.addEventListener('pointerdown', () => canvas.classList.add('is-active'));
+        document.addEventListener('pointerup',  () => canvas.classList.remove('is-active'));
+
+        // ── Clear button ──
+        document.getElementById('clear-btn').addEventListener('click', function () {
+            signaturePad.clear();
+            hiddenDataField.value = "";
+        });
+
+        // ── Tab switching (custom, no Bootstrap dependency needed) ──
+        function activateTab(activeBtn, activePanel, inactiveBtn, inactivePanel) {
+            activeBtn.classList.add('active');
+            activeBtn.setAttribute('aria-selected', 'true');
+            inactiveBtn.classList.remove('active');
+            inactiveBtn.setAttribute('aria-selected', 'false');
+
+            activePanel.classList.add('active');
+            inactivePanel.classList.remove('active');
+        }
+
+        drawTabBtn.addEventListener('click', function () {
+            activateTab(drawTabBtn, drawPanel, uploadTabBtn, uploadPanel);
+            // Clear file input when switching back to draw
+            fileInput.value = "";
+            fileNameLabel.textContent = "";
+            fileNameLabel.style.display = "none";
+        });
+
+        uploadTabBtn.addEventListener('click', function () {
+            activateTab(uploadTabBtn, uploadPanel, drawTabBtn, drawPanel);
+            // Clear drawing when switching to upload
+            signaturePad.clear();
+            hiddenDataField.value = "";
+        });
+
+        // ── File input: show chosen filename ──
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                fileNameLabel.textContent = "✓ " + fileInput.files[0].name;
+                fileNameLabel.style.display = "block";
+            } else {
+                fileNameLabel.textContent = "";
+                fileNameLabel.style.display = "none";
+            }
+        });
+
+        // ── Drag & drop on upload zone ──
+        dropZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            dropZone.classList.add('is-dragover');
+        });
+        dropZone.addEventListener('dragleave', function () {
+            dropZone.classList.remove('is-dragover');
+        });
+        dropZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            dropZone.classList.remove('is-dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileNameLabel.textContent = "✓ " + e.dataTransfer.files[0].name;
+                fileNameLabel.style.display = "block";
+            }
+        });
+
+        // ── Form submission ──
+        document.getElementById('signature-form').addEventListener('submit', function (e) {
+            const isDrawActive = drawTabBtn.classList.contains('active');
+
+            if (isDrawActive) {
+                if (signaturePad.isEmpty()) {
+                    e.preventDefault();
+                    alert("Please draw your signature before saving.");
+                    return;
+                }
+                hiddenDataField.value = signaturePad.toDataURL("image/png");
+            } else {
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    alert("Please choose a signature image file before saving.");
+                    return;
+                }
+                hiddenDataField.value = "";
+            }
+        });
+
+    });
+</script>
+{% endblock %}

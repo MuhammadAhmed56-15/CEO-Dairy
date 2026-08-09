@@ -1,0 +1,682 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* =========================================================
+       WSSP Official Letter — Detail / Print View
+       Design tokens
+       ========================================================= */
+    .letter-scope {
+        --ink: #0d2b1e;
+        --accent: #059669;
+        --accent-light: #10b981;
+        --tint: #ecfdf5;
+        --tint-border: #bfe0d3;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --paper: #ffffff;
+        --canvas: #eef1f5;
+        --radius-lg: 20px;
+        --radius-md: 12px;
+    }
+
+    /* ---------- Document toolbar (chrome around the letter, hidden on print) ---------- */
+    .doc-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px 22px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, .05);
+    }
+
+    .doc-toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .btn-doc-back {
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: #fff;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        padding: 9px 16px;
+        font-size: .85rem;
+        transition: border-color .15s ease, color .15s ease, background .15s ease;
+    }
+
+    .btn-doc-back:hover {
+        border-color: var(--accent-light);
+        color: var(--ink);
+        background: var(--tint);
+    }
+
+    .doc-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--tint);
+        border: 1px solid var(--tint-border);
+        border-radius: 999px;
+        padding: 6px 14px 6px 10px;
+        font-family: Calibri, Arial, sans-serif;
+    }
+
+    .doc-meta .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .doc-meta-text {
+        font-size: .78rem;
+        color: var(--ink);
+        line-height: 1.2;
+    }
+
+    .doc-meta-text strong {
+        font-weight: 700;
+    }
+
+    .doc-meta-label {
+        display: block;
+        font-size: .62rem;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .btn-doc-print {
+        background: var(--ink);
+        color: #fff;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        padding: 10px 22px;
+        border: none;
+        font-size: .88rem;
+        box-shadow: 0 8px 18px rgba(13, 43, 30, .2);
+        transition: background .15s ease, transform .15s ease;
+    }
+
+    .btn-doc-print:hover {
+        background: var(--accent);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    /* ---------- A4 letter page wrapper ---------- */
+    .letter-wrap {
+        background: var(--canvas);
+        border-radius: var(--radius-lg);
+        padding: 34px 18px;
+        margin-top: 20px;
+    }
+
+    .letter-page {
+        background: var(--paper);
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 50px 65px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, .14);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        min-height: 297mm;
+        /* A4 height reference */
+        animation: letter-rise .35s ease-out;
+    }
+
+    @keyframes letter-rise {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .letter-page {
+            animation: none;
+        }
+    }
+
+    /* ---------- Letterhead ---------- */
+    .letterhead-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 18px;
+        padding: 0;
+        border: none;
+        border-bottom: 3px double var(--ink);
+        padding-bottom: 16px;
+    }
+
+    .letterhead-logo-cell {
+        width: 145px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 10px;
+    }
+
+    .letterhead-logo-cell img {
+        width: 135px;
+        height: 135px;
+        object-fit: contain;
+    }
+
+    .letterhead-center {
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 20px;
+        border-left: 1px solid #d8dee5;
+        border-right: 1px solid #d8dee5;
+    }
+
+    .letterhead-title {
+        font-weight: 900;
+        font-size: 15pt;
+        margin: 0 0 4px;
+        font-family: Calibri, Arial, sans-serif;
+        color: #2d3748;
+        letter-spacing: .4px;
+        line-height: 1.4;
+    }
+
+    .letterhead-address {
+        font-size: 12pt;
+        font-weight: bold;
+        margin: 0 0 4px;
+        font-family: Calibri, Arial, sans-serif;
+        color: #1a202c;
+        line-height: 1.4;
+    }
+
+    .letterhead-contact {
+        font-size: 12pt;
+        font-weight: bold;
+        margin: 0;
+        font-family: Calibri, Arial, sans-serif;
+        color: #1a202c;
+        line-height: 1.4;
+    }
+
+    .letterhead-contact u {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    /* ---------- Dotted-line value fields (match form styling) ---------- */
+    .letter-value-display {
+        border-bottom: 1px dashed #94a3b8;
+        padding: 3px 6px;
+        font-family: inherit;
+        display: inline-block;
+        flex-grow: 1;
+        font-weight: normal;
+    }
+
+    .letter-section-label {
+        font-weight: 700;
+        color: #111827;
+        font-size: 17px;
+    }
+
+    /* ---------- Letter body ---------- */
+    .letter-body-content {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14.5px;
+        line-height: 1.7;
+        padding: 10px 0;
+        min-height: 300px;
+        color: #000;
+    }
+
+    /* Auto-numbering for nested list items: 1. / (i) (ii) (iii) */
+    .letter-body-content ol {
+        list-style-type: decimal;
+        padding-left: 26px;
+        margin: 0 0 8px;
+    }
+
+    .letter-body-content ol ol {
+        list-style: none;
+        counter-reset: subitem;
+        padding-left: 30px;
+        margin: 4px 0;
+    }
+
+    .letter-body-content ol ol>li {
+        counter-increment: subitem;
+        position: relative;
+    }
+
+    .letter-body-content ol ol>li::marker {
+        content: "";
+    }
+
+    .letter-body-content ol ol>li::before {
+        content: "(" counter(subitem, lower-roman) ") ";
+        position: absolute;
+        left: -30px;
+    }
+
+    /* Styles inside TinyMCE / Office-generated markup */
+    .letter-body-content p {
+        font-family: Calibri, Arial, sans-serif;
+        font-size: 12pt;
+        line-height: 1.8;
+        margin: 0 0 6pt 0;
+    }
+
+    .letter-body-content h1,
+    .letter-body-content h2,
+    .letter-body-content h3,
+    .letter-body-content h4 {
+        font-family: Calibri, Arial, sans-serif;
+        font-weight: bold;
+        line-height: 1.4;
+    }
+
+    .letter-body-content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 8pt 0;
+    }
+
+    .letter-body-content td,
+    .letter-body-content th {
+        border: 1px solid #d1d5db;
+        padding: 6px 10px;
+        font-family: Calibri, Arial, sans-serif;
+        font-size: 12pt;
+        line-height: 1.6;
+    }
+
+    .letter-body-content th {
+        background: var(--tint);
+        font-weight: 600;
+    }
+
+    /* ---------- Signature block (plain official letter style) ---------- */
+    .signature-block {
+        font-size: 15px;
+        line-height: 1.6;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .signature-space {
+        height: 60px;
+    }
+
+    .signature-name {
+        font-weight: 700;
+        font-size: 16px;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .signature-designation {
+        font-weight: 700;
+        font-size: 15px;
+        color: #000;
+        margin-top: 2px;
+    }
+
+    .signature-org {
+        font-weight: 700;
+        font-size: 15px;
+        color: #000;
+        margin-top: 2px;
+    }
+
+    /* ---------- CC / Copy-forwarded block ---------- */
+    .cc-box {
+        font-size: 16px;
+    }
+
+    .cc-list-card {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin-top: 0;
+        white-space: pre-line;
+        line-height: 1.6;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+    }
+
+    /* ---------- Attachment card ---------- */
+    .attachment-box {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: .82rem;
+    }
+
+    /* ---------- Footer ---------- */
+    .letter-footer-note {
+        font-size: 10.5px;
+        color: #6b7280;
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 14px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    /* ---------- Responsive (mobile) ---------- */
+    @media screen and (max-width:768px) {
+        .doc-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .doc-toolbar-left {
+            justify-content: space-between;
+        }
+
+        .btn-doc-print {
+            width: 100%;
+        }
+
+        .letter-page {
+            padding: 28px 22px;
+        }
+
+        .letterhead-table,
+        .letterhead-table tbody,
+        .letterhead-table tr,
+        .letterhead-table td {
+            display: block;
+            width: 100% !important;
+        }
+
+        .letterhead-logo-cell img {
+            width: 90px;
+            height: 90px;
+        }
+
+        .letterhead-title {
+            font-size: 12pt;
+        }
+
+        .letterhead-address,
+        .letterhead-contact {
+            font-size: 10pt;
+        }
+    }
+
+    /* ---------- Print styles ---------- */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+        }
+
+        body,
+        .main-container,
+        .content,
+        html {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .main-header,
+        .sidebar,
+        .main-footer,
+        .doc-toolbar,
+        .alert {
+            display: none !important;
+        }
+
+        .content {
+            margin-left: 0 !important;
+            padding: 0 !important;
+        }
+
+        .letter-wrap {
+            background: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .letter-page {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            animation: none !important;
+        }
+
+        /* Prevent letterhead text wrapping on narrower A4 paper */
+        .letterhead-logo-cell {
+            width: 110px !important;
+            padding: 5px !important;
+        }
+        .letterhead-logo-cell img {
+            width: 100px !important;
+            height: 100px !important;
+        }
+        .letterhead-center {
+            padding: 5px 10px !important;
+        }
+        .letterhead-title {
+            font-size: 13pt !important;
+        }
+        .letterhead-address, .letterhead-contact {
+            font-size: 10.5pt !important;
+        }
+
+        /* Keep dotted lines crisp on paper, no faded colors */
+        .letter-value-display {
+            border-bottom: 1px dashed #000 !important;
+        }
+
+        .signature-field {
+            background: none !important;
+            border: 1px dashed #000 !important;
+        }
+
+        .cc-list-card {
+            background: none !important;
+            border: 1px solid #000 !important;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4 px-4 letter-scope">
+
+    <!-- Document toolbar (hidden in print mode) -->
+    <div class="doc-toolbar">
+        <div class="doc-toolbar-left">
+            <a href="javascript:history.back()" class="btn btn-doc-back">
+                <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+
+
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            {% if not letter.is_draft and not letter.reply_text and request.user == letter.receiver %}
+            <a href="{% url 'reply_letter' letter.id %}" class="btn btn-doc-print" style="background: var(--accent); box-shadow: 0 8px 18px rgba(5, 150, 105, 0.2);">
+                <i class="fas fa-reply me-1"></i> Reply
+            </a>
+            {% endif %}
+            
+            <button onclick="window.print()" class="btn btn-doc-print">
+                <i class="fas fa-print me-1"></i> Print Letter
+            </button>
+        </div>
+    </div>
+
+    <!-- OFFICIAL A4 LETTERPAD -->
+    <div class="letter-wrap">
+        <div class="letter-page">
+
+            <!-- Letterhead -->
+            <table class="letterhead-table">
+                <tr>
+                    <td class="letterhead-logo-cell">
+                        <img src="{% static 'images/wssp_logo.png' %}" alt="WSSP Logo"
+                            onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
+                    </td>
+
+                    <td class="letterhead-center">
+                        <p class="letterhead-title">WATER &amp; SANITATION SERVICES PESHAWAR,</p>
+                        <p class="letterhead-title">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+                        <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
+                        <p class="letterhead-contact">
+                            <strong>Email: </strong><u>wsspeshawar@gmail.com</u>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <strong>Phone #</strong> 091-9219621-23
+                        </p>
+                    </td>
+
+                    <td class="letterhead-logo-cell">
+                        <img src="{% static 'images/kp_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
+                            onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
+                            style="width: 135px; height: 135px; object-fit: contain;">
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Reference No & Date -->
+            <table style="width: 100%; border-collapse: collapse; margin: 18px 0 12px; font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+                <tr>
+                    <td style="text-align: left; padding: 0; white-space: nowrap; width: 50%;">
+                        <strong style="font-weight: 700;">Reference No.</strong>&nbsp;&nbsp;
+                        <span style="border-bottom: 1px solid #000; padding-bottom: 1px; font-weight: 600; letter-spacing: 0.3px;">{{ letter.ref_no|default:"_______________" }}</span>
+                    </td>
+                    <td style="text-align: right; padding: 0; white-space: nowrap; width: 50%;">
+                        <strong style="font-weight: 700;">Dated:</strong>&nbsp;&nbsp;
+                        <span style="border-bottom: 1px solid #000; padding-bottom: 1px; font-weight: 600; letter-spacing: 0.3px;">{% if letter.letter_date %}{{ letter.letter_date|date:"d/m/Y" }}{% else %}{{ letter.created_at|date:"d/m/Y" }}{% endif %}</span>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Receiver Address -->
+            <div class="my-4" style="font-size: 17px; line-height: 1.6;">
+                <span class="letter-section-label d-block mb-1">To,</span>
+                <div class="ms-4" style="white-space: pre-line; font-size: 16px;">
+                    {{ letter.recipient_address|default:"___________________________________" }}
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div class="my-3 d-flex align-items-start" style="font-size: 17px; line-height: 1.5;">
+                <span class="letter-section-label me-2 text-nowrap">Subject:</span>
+                <span class="letter-value-display fw-bold text-uppercase"
+                    style="border-bottom: 2px solid #000; padding-bottom: 2px;">
+                    {{ letter.subject }}
+                </span>
+            </div>
+
+            <!-- Body -->
+            <div class="letter-body-content my-4">
+                {{ letter.body|safe }}
+            </div>
+
+            <!-- Main Signatory -->
+            <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                <div class="signature-block" style="text-align: center; min-width: 320px;">
+                    <div class="signature-space"></div>
+                    <div class="signature-name">{{ letter.signer_name|default:"____________________" }}</div>
+                    <div class="signature-designation">{{ letter.signer_designation|default:"Designation" }}</div>
+                    <div class="signature-org">Water and Sanitation Services Peshawar</div>
+                </div>
+            </div>
+
+            <!-- CC / Copy Forwarded -->
+            {% if letter.cc_list %}
+            <div class="mt-5 cc-box">
+                <strong style="font-family: 'Times New Roman', Times, serif; color: #000; font-size: 16px;">Copy forwarded for information to the:</strong>
+                <div class="cc-list-card">{{ letter.cc_list }}</div>
+            </div>
+
+            <!-- CC Signatory: uses the dedicated cc_signer_name / cc_signer_designation
+                 fields captured on the create form. Falls back to the main signatory
+                 only if the CC-specific fields were never filled in. -->
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <div class="signature-block" style="text-align: center; min-width: 320px;">
+                    <div class="signature-space"></div>
+                    <div class="signature-name">{{ letter.cc_signer_name|default:letter.signer_name|default:"____________________" }}</div>
+                    <div class="signature-designation">{{ letter.cc_signer_designation|default:letter.signer_designation|default:"Designation" }}</div>
+                    <div class="signature-org">Water and Sanitation Services Peshawar</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Attachment -->
+            {% if letter.attachment %}
+            <div class="mt-4 attachment-box">
+                <span class="fw-bold text-success mb-1 d-block">
+                    <i class="fas fa-paperclip me-1"></i> Attached Document:
+                </span>
+                <a href="{{ letter.attachment.url }}" target="_blank"
+                    class="btn btn-sm btn-light border text-dark fw-semibold mt-1">
+                    <i class="fas fa-file-download me-1"></i> View / Download Attachment
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Footer -->
+            <div class="letter-footer-note">
+                A company incorporated u/s 42 of the Companies Act-2017 by the Government of Khyber Pakhtunkhwa
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Step 2: Send To + Issue (For Draft Letters) -->
+    {% if letter.is_draft and request.user == letter.sender %}
+    <div id="issueDraftSection" class="doc-toolbar mt-3" style="padding: 20px 24px;">
+        <form method="POST" action="{% url 'send_draft_letter' letter.id %}" class="w-100">
+            {% csrf_token %}
+            <div class="row align-items-end g-3">
+                <div class="col-md-7">
+                    <div style="font-weight: 700; font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="width: 20px; height: 20px; border-radius: 50%; background: #ecfdf5; color: #059669; font-size: .7rem; display: inline-flex; align-items: center; justify-content: center; font-weight: 800;">2</span>
+                        SEND TO (SYSTEM USER INBOX)
+                    </div>
+                    <select name="receiver" class="form-select" required style="border: 1px solid #dbe3ec; border-radius: 10px; padding: 11px 14px; font-size: .9rem; background-color: #fbfcfe;">
+                        <option value="">-- Select System Recipient --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.username }} ({% if u.profile %}{{ u.profile.role }}{% endif %})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-5 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-doc-print" style="background: #0d2b1e; padding: 11px 24px;">
+                        <i class="fas fa-paper-plane me-2"></i>Issue Letter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

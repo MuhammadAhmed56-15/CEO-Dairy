@@ -2,26 +2,56 @@
 {% block title %}Manager Dashboard{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 <style>
+    /* ══════════════════════════════════════
+       AeuxGlobal Style — Dark Green Theme
+       3D depth + clean card design
+    ══════════════════════════════════════ */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Page background */
+    .content {
+        background: #e8f0eb !important;
+    }
+
+    /* ── Welcome Header (More Compact) ── */
     .welcome-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 50%, #0f3d28 100%);
         color: white;
-        padding: 40px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+        padding: 20px 28px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        box-shadow:
+            0 10px 40px rgba(13, 43, 30, 0.45),
+            0 2px 0 rgba(255, 255, 255, 0.08) inset,
+            0 -4px 0 rgba(0, 0, 0, 0.25) inset;
         position: relative;
         overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .welcome-header::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(255, 255, 255, 0.1);
+        top: -60%;
+        right: -8%;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(52, 211, 153, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .welcome-header::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: 10%;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
         border-radius: 50%;
     }
 
@@ -31,55 +61,62 @@
     }
 
     .welcome-content h2 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 10px;
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .welcome-content p {
-        font-size: 16px;
-        opacity: 0.9;
+        font-size: 14px;
+        opacity: 0.8;
         margin: 0;
+        font-weight: 500;
     }
 
     .welcome-meta {
         display: flex;
-        gap: 30px;
-        margin-top: 20px;
+        gap: 14px;
+        margin-top: 10px;
         flex-wrap: wrap;
     }
 
     .meta-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 5px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
-    .meta-item i {
-        font-size: 16px;
-    }
-
+    /* ── KPI Grid (Slightly Larger & Premium Cards) ── */
     .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 26px;
     }
 
     .kpi-card {
         background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
+        border-radius: 18px;
+        padding: 26px 28px;
+        box-shadow:
+            0 8px 24px rgba(13, 43, 30, 0.10),
+            0 2px 0 rgba(255, 255, 255, 0.9) inset,
+            0 -3px 0 rgba(0, 0, 0, 0.06) inset;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         position: relative;
         overflow: hidden;
         cursor: pointer;
-        border: 2px solid transparent;
+        border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
     .kpi-card::before {
@@ -89,205 +126,627 @@
         left: 0;
         right: 0;
         height: 4px;
+        border-radius: 18px 18px 0 0;
+    }
+
+    /* Coloured shine overlay for 3D glass look */
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 100%);
+        border-radius: 18px 18px 0 0;
+        pointer-events: none;
     }
 
     .kpi-card.bg-total::before {
-        background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+        background: linear-gradient(90deg, #0891b2, #06b6d4);
     }
 
     .kpi-card.bg-pending::before {
-        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        background: linear-gradient(90deg, #d97706, #f59e0b);
     }
 
-    .kpi-card.bg-progress::before {
-        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    .kpi-card.bg-approved::before {
+        background: linear-gradient(90deg, #059669, #10b981);
     }
 
-    .kpi-card.bg-completed::before {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    .kpi-card.bg-rejected::before {
+        background: linear-gradient(90deg, #dc2626, #ef4444);
     }
 
     .kpi-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow:
+            0 20px 40px rgba(13, 43, 30, 0.18),
+            0 2px 0 rgba(255, 255, 255, 0.9) inset,
+            0 -3px 0 rgba(0, 0, 0, 0.08) inset;
     }
 
     .kpi-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 15px;
     }
 
     .kpi-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 24px;
         color: white;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
     }
 
     .kpi-card.bg-total .kpi-icon {
-        background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+        background: linear-gradient(135deg, #0891b2, #06b6d4);
     }
 
     .kpi-card.bg-pending .kpi-icon {
-        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        background: linear-gradient(135deg, #d97706, #f59e0b);
     }
 
-    .kpi-card.bg-progress .kpi-icon {
-        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    .kpi-card.bg-approved .kpi-icon {
+        background: linear-gradient(135deg, #059669, #10b981);
     }
 
-    .kpi-card.bg-completed .kpi-icon {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    .kpi-card.bg-rejected .kpi-icon {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
     }
 
     .kpi-value {
-        font-size: 36px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 5px;
+        font-size: 52px;
+        font-weight: 800;
+        color: #0d2b1e;
+        margin-bottom: 4px;
+        line-height: 1;
+        letter-spacing: -1px;
     }
 
     .kpi-label {
         font-size: 14px;
-        color: #64748b;
-        font-weight: 500;
+        color: #4b7a62;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
 
-    .charts-section {
-        margin-bottom: 30px;
+    /* ── Custom Modal ── */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
     }
 
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
+    .custom-modal.show {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
     }
 
-    .chart-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    .custom-modal-content {
+        background: #fff;
+        width: 90%;
+        max-width: 700px;
+        max-height: 80vh;
+        border-radius: 20px;
+        box-shadow:
+            0 30px 80px rgba(13, 43, 30, 0.35),
+            0 2px 0 rgba(255, 255, 255, 0.5) inset;
+        overflow: hidden;
+        animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    .chart-header {
+    .custom-modal-header {
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);
+        color: white;
+        padding: 20px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+    }
+
+    .custom-modal-close {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 22px;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f1f5f9;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        line-height: 1;
     }
 
-    .chart-header i {
-        font-size: 24px;
-        color: #3b82f6;
+    .custom-modal-close:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(90deg);
     }
 
-    .chart-header h3 {
-        font-size: 18px;
+    .custom-modal-body {
+        padding: 28px;
+        max-height: calc(80vh - 76px);
+        overflow-y: auto;
+        background: #f4f8f5;
+    }
+
+    .modal-item {
+        padding: 18px 20px;
+        border: 1px solid #d4e8db;
+        border-radius: 14px;
+        margin-bottom: 14px;
+        transition: all 0.25s ease;
+        background: white;
+        box-shadow: 0 2px 8px rgba(13, 43, 30, 0.06);
+    }
+
+    .modal-item:hover {
+        background: #f0faf4;
+        box-shadow: 0 6px 20px rgba(13, 43, 30, 0.12);
+        transform: translateY(-2px);
+        border-color: #a7d4b8;
+    }
+
+    .modal-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .modal-item-title {
         font-weight: 700;
-        color: #1e293b;
-        margin: 0;
+        font-size: 15px;
+        color: #0d2b1e;
+        flex: 1;
+        margin-bottom: 6px;
     }
 
-    .chart-container {
-        position: relative;
-        height: 300px;
+    .modal-item-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
+    .modal-item-status.pending, .modal-item-status.files {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        color: white;
+    }
+
+    .modal-item-status.approved, .modal-item-status.completed, .modal-item-status.outbox {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+    }
+
+    .modal-item-status.rejected, .modal-item-status.overdue {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white;
+    }
+
+    .modal-item-status.inbox, .modal-item-status.total {
+        background: linear-gradient(135deg, #0891b2, #06b6d4);
+        color: white;
+    }
+
+    .modal-item-description {
+        color: #4b7a62;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .modal-item-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e2f0e8;
+    }
+
+    .modal-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: #4b7a62;
+    }
+
+    .modal-detail-item i {
+        color: #10b981;
+        width: 14px;
+    }
+
+    .modal-detail-item strong {
+        color: #0d2b1e;
+    }
+
+    .modal-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #4b7a62;
+    }
+
+    .modal-empty i {
+        font-size: 60px;
+        margin-bottom: 18px;
+        color: #a7d4b8;
+    }
+
+    .modal-empty h4 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1a4731;
+        margin-bottom: 6px;
+    }
+
+    .modal-empty p {
+        font-size: 13px;
+        color: #6b9e80;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(40px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ── Section Headers ── */
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin: 26px 0 16px;
         flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .section-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
         gap: 12px;
     }
 
+    .section-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0d2b1e;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.3px;
+    }
+
     .section-title i {
-        color: #3b82f6;
-        font-size: 24px;
+        color: #10b981;
+        font-size: 20px;
     }
 
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    /* ── Chart Containers ── */
+    .chart-container {
+        background: white;
+        border-radius: 18px;
+        padding: 22px 24px;
+        box-shadow:
+            0 8px 24px rgba(13, 43, 30, 0.09),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset,
+            0 -2px 0 rgba(0, 0, 0, 0.04) inset;
+        margin-bottom: 18px;
+        height: 350px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(212, 232, 219, 0.8);
+        transition: box-shadow 0.3s ease;
     }
 
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    .chart-container:hover {
+        box-shadow:
+            0 14px 36px rgba(13, 43, 30, 0.14),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset;
     }
 
-    .bg-gradient-secondary {
-        background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+    .chart-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d2b1e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-        transition: background-color 0.2s ease;
+    .chart-title i {
+        color: #10b981;
     }
 
-    .badge {
-        font-weight: 500;
-        font-size: 0.85rem;
-        letter-spacing: 0.3px;
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
     }
 
-    .btn-outline-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
+    .chart-nav-buttons {
+        display: flex;
+        gap: 6px;
+        align-items: center;
     }
 
-    .card {
+    .chart-nav-btn {
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);
+        color: white;
         border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    thead th {
+        border-radius: 10px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 13px;
         font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #495057;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 3px 8px rgba(13, 43, 30, 0.25), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
     }
 
+    .chart-nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(13, 43, 30, 0.35);
+        background: linear-gradient(135deg, #1a4731 0%, #245c3f 100%);
+    }
+
+    .chart-nav-btn:disabled {
+        background: #c8ddd0;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .chart-period-text {
+        font-size: 12px;
+        color: #1a4731;
+        font-weight: 700;
+        padding: 6px 12px;
+        background: #e2f4ea;
+        border-radius: 10px;
+        border: 1px solid #b8dfc7;
+    }
+
+    .chart-wrapper {
+        flex: 1;
+        position: relative;
+        max-height: 280px;
+    }
+
+    /* ── Calendar ── */
+    .calendar-container {
+        background: white;
+        border-radius: 18px;
+        padding: 26px 28px;
+        box-shadow:
+            0 8px 24px rgba(13, 43, 30, 0.09),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset;
+        margin-bottom: 26px;
+        border: 1px solid rgba(212, 232, 219, 0.8);
+    }
+
+    .fc-toolbar-title {
+        font-size: 18px !important;
+        font-weight: 800 !important;
+        color: #0d2b1e !important;
+    }
+
+    .fc-button {
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 7px 14px !important;
+        box-shadow: 0 3px 8px rgba(13, 43, 30, 0.25) !important;
+        font-weight: 600 !important;
+    }
+
+    .fc-button:hover {
+        background: linear-gradient(135deg, #1a4731 0%, #245c3f 100%) !important;
+    }
+
+    .fc-daygrid-event-harness {
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .fc-daygrid-event {
+        white-space: normal !important;
+        align-items: normal !important;
+        word-wrap: break-word !important;
+        max-width: 100% !important;
+        margin: 1px 2px !important;
+    }
+
+    .fc-event {
+        border-radius: 6px;
+        overflow: hidden !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
+    
+    .fc-event-main {
+        overflow: hidden !important;
+        max-width: 100% !important;
+    }
+
+    /* ── Table ── */
+    .table-container {
+        background: white;
+        border-radius: 18px;
+        box-shadow:
+            0 8px 24px rgba(13, 43, 30, 0.09),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset;
+        overflow: hidden;
+        border: 1px solid rgba(212, 232, 219, 0.8);
+    }
+
+    .custom-table {
+        margin: 0;
+        width: 100%;
+    }
+
+    .custom-table thead {
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);
+        color: white;
+    }
+
+    .custom-table thead th {
+        padding: 15px 16px;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        border: none;
+    }
+
+    .custom-table tbody td {
+        padding: 15px 16px;
+        font-size: 14px;
+        border-bottom: 1px solid #e8f4ec;
+        color: #1a3528;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #f0faf4;
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        color: white;
+    }
+
+    .status-approved, .status-completed {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+    }
+
+    .status-rejected {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white;
+    }
+
+    /* ── Action Buttons ── */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 6px 13px;
+        font-size: 12px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: none;
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ── Overdue highlight ── */
+    .overdue-date {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .overdue-row {
+        border-left: 4px solid #ef4444 !important;
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 768px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .custom-modal-content {
+            width: 95%;
+        }
+
+        .chart-nav-buttons {
+            flex-wrap: wrap;
+        }
+
         .welcome-header {
-            padding: 25px;
+            padding: 22px 20px;
         }
 
         .welcome-content h2 {
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .welcome-meta {
-            gap: 15px;
+            gap: 10px;
         }
 
-        .kpi-grid {
+        .modal-item-details {
             grid-template-columns: 1fr;
         }
+    }
 
-        .charts-grid {
+    @media (max-width: 480px) {
+        .kpi-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -295,11 +754,11 @@
 {% endblock %}
 
 {% block content %}
-<!-- Welcome Header -->
 <div class="welcome-header">
     <div class="welcome-content">
-        <h2>👔 Task Assign Dashboard</h2>
-        <p>Monitor and manage your team's tasks and progress</p>
+        <h2>📊 Manager Dashboard Overview</h2>
+        <p>Monitor commitments, track progress, and review organizational performance.</p>
+        <p id="welcome-subtext">Here's your Notesheet overview for today</p>
         <div class="welcome-meta">
             <div class="meta-item">
                 <i class="fas fa-calendar-day"></i>
@@ -310,307 +769,806 @@
 </div>
 
 <!-- KPI Cards -->
-<div class="kpi-grid">
-    <a href="{% url 'manager_tasks' %}" style="text-decoration: none; color: inherit;">
-        <div class="kpi-card bg-total">
-            <div class="kpi-header">
-                <div>
-                    <div class="kpi-value">{{ total_tasks }}</div>
-                    <div class="kpi-label">Total Assigned Tasks</div>
-                </div>
-                <div class="kpi-icon"><i class="fas fa-clipboard-list"></i></div>
-            </div>
-        </div>
-    </a>
-
-    <a href="{% url 'manager_tasks' %}?status=Pending" style="text-decoration: none; color: inherit;">
-        <div class="kpi-card bg-pending">
-            <div class="kpi-header">
-                <div>
-                    <div class="kpi-value">{{ pending_tasks }}</div>
-                    <div class="kpi-label">Pending Tasks</div>
-                </div>
-                <div class="kpi-icon"><i class="fas fa-clock"></i></div>
-            </div>
-        </div>
-    </a>
-
-    <a href="{% url 'manager_tasks' %}?status=In Progress" style="text-decoration: none; color: inherit;">
-        <div class="kpi-card bg-progress">
-            <div class="kpi-header">
-                <div>
-                    <div class="kpi-value">{{ in_progress_tasks }}</div>
-                    <div class="kpi-label">In Progress</div>
-                </div>
-                <div class="kpi-icon"><i class="fas fa-spinner"></i></div>
-            </div>
-        </div>
-    </a>
-
-    <a href="{% url 'manager_tasks' %}?status=Completed" style="text-decoration: none; color: inherit;">
-        <div class="kpi-card bg-completed">
-            <div class="kpi-header">
-                <div>
-                    <div class="kpi-value">{{ completed_tasks }}</div>
-                    <div class="kpi-label">Completed Tasks</div>
-                </div>
-                <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
-            </div>
-        </div>
-    </a>
+<div class="kpi-grid" id="kpi-grid-container">
+    <!-- Will be dynamically populated via Javascript -->
 </div>
 
-<!-- Analytics & Insights Section -->
-<div class="charts-section">
-    <div class="section-header">
-        <div class="section-title">
-            <i class="fas fa-chart-pie"></i>
-            Analytics & Insights
+<!-- Dynamic Modal -->
+<div id="itemModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <div class="custom-modal-header">
+            <h2 id="modalTitle"><i class="fas fa-list"></i> Items List</h2>
+            <button class="custom-modal-close" onclick="closeCustomModal('itemModal')">&times;</button>
         </div>
-    </div>
-
-    <div class="charts-grid">
-        <!-- Doughnut Chart -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <i class="fas fa-chart-pie"></i>
-                <h3>Tasks by Status</h3>
-            </div>
-            <div class="chart-container">
-                <canvas id="statusDoughnutChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Bar Chart -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <i class="fas fa-chart-bar"></i>
-                <h3>Tasks per Day (Next 7 Days)</h3>
-            </div>
-            <div class="chart-container">
-                <canvas id="tasksBarChart"></canvas>
-            </div>
+        <div class="custom-modal-body" id="modalItemsList">
+            <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 </div>
 
-<!-- Upcoming Tasks Table -->
-<div class="card shadow-sm">
-    <div class="card-header bg-gradient-primary text-white py-3">
-        <h5 class="mb-0 d-flex align-items-center">
-            <i class="fas fa-calendar-day me-2"></i>
-            <span>Upcoming Tasks</span>
-            <span class="badge bg-white text-primary ms-2">Next 7 Days</span>
-        </h5>
+<!-- Charts Header & Section Selector -->
+<div class="section-header d-flex justify-content-between align-items-center flex-wrap">
+    <div class="section-title"><i class="fas fa-chart-pie"></i>Analytics & Insights</div>
+    <div class="d-flex align-items-center gap-2">
+        <label for="dashboardSectionSelector" class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">View Section:</label>
+        <select id="dashboardSectionSelector" class="form-select shadow-sm" style="width: 200px; border-radius: 10px; border: 2px solid #0d2b1e; font-weight: 700; color:#0d2b1e;" onchange="onSectionChange(this.value)">
+            <option value="notesheet" selected>Notesheet</option>
+            <option value="task">Tasks</option>
+            <option value="letter">Letters</option>
+        </select>
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="px-4 py-3">Task Title</th>
-                        <th class="px-4 py-3">Description</th>
-                        <th class="px-4 py-3 text-center">Status</th>
-                        <th class="px-4 py-3">Due Date</th>
-                        <th class="px-4 py-3 text-center">Assigned By</th>
-                        <th class="px-4 py-3 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for task in upcoming_tasks %}
-                    <tr class="border-bottom">
-                        <td class="px-4 py-3">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-tasks text-primary me-2"></i>
-                                <strong class="text-dark">{{ task.title }}</strong>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-muted">
-                            {{ task.description|truncatechars:50 }}
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            {% if task.status == 'Pending' %}
-                            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
-                                <i class="fas fa-clock me-1"></i>{{ task.status }}
-                            </span>
-                            {% elif task.status == 'In Progress' %}
-                            <span class="badge rounded-pill bg-info text-white px-3 py-2">
-                                <i class="fas fa-spinner me-1"></i>{{ task.status }}
-                            </span>
-                            {% else %}
-                            <span class="badge rounded-pill bg-success text-white px-3 py-2">
-                                <i class="fas fa-check-circle me-1"></i>{{ task.status }}
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="d-flex align-items-center">
-                                <i class="far fa-calendar text-secondary me-2"></i>
-                                <span class="text-dark">{{ task.due_date|date:"M d, Y" }}</span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <span class="badge bg-gradient-secondary px-3 py-2">
-                                <i class="fas fa-user-tie me-1"></i>CEO
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <a href="{% url 'add_remark' %}?task_id={{ task.id }}"
-                                class="btn btn-sm btn-outline-primary px-3 py-2">
-                                <i class="fas fa-comment-dots me-1"></i>Add Remark
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="chart-container">
+            <div class="chart-title" id="pieChartTitle"><i class="fas fa-pie-chart"></i>Notesheets by Status</div>
+            <div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title" id="barChartTitle"><i class="fas fa-chart-bar"></i>Notesheets Initiated Analysis</div>
+                <div class="chart-nav-buttons">
+                    <button class="chart-nav-btn" id="prevPeriod" onclick="navigatePeriod(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="chart-period-text" id="periodLabel">Next 7 Days</span>
+                    <button class="chart-nav-btn" id="nextPeriod" onclick="navigatePeriod(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="chart-nav-btn" onclick="resetToToday()">
+                        <i class="fas fa-calendar-day"></i> Today
+                    </button>
+                </div>
+            </div>
+            <div class="chart-wrapper"><canvas id="dailyChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar -->
+<div class="section-header">
+    <div class="section-title"><i class="fas fa-calendar-alt"></i><span id="calendarTitleText">Notesheet Calendar</span></div>
+</div>
+<div class="calendar-container">
+    <div id="calendar"></div>
+</div>
+
+<!-- Event Details Modals -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                    <strong style="color: #64748b; font-size: 13px; text-transform: uppercase;">Title</strong>
+                    <div id="modalEventTitle" style="color: #0f172a; font-weight: 600; font-size: 15px; margin-top: 4px;"></div>
+                </div>
+                <div id="modalEventDynamicFields" class="row mb-3 g-4 mt-2">
+                    <!-- Dynamically injected fields go here -->
+                </div>
+                <div class="mt-4 pt-3" style="border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: #64748b; font-size: 13px; text-transform: uppercase;">Status</strong>
+                    <span id="modalEventStatus" class="badge bg-success" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dateCommitmentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white;">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-day me-2"></i>
+                    Events on <span id="clickedDateText"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dateCommitmentsList" style="background: #f8fafc; max-height: 450px; overflow-y: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Commitments Section -->
+<div id="upcomingCommitmentsSection" style="display: none;">
+    <div class="section-header" style="margin-top: 25px; margin-bottom: 15px;">
+        <div class="section-title" style="font-weight: 700; color: #1e293b;">
+            <i class="fas fa-calendar-week"></i> Upcoming Commitments (Next 7 Days)
+        </div>
+    </div>
+    <div class="table-container shadow-sm" style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">
+        <table class="table custom-table mb-0">
+            <thead style="background-color: #f8fafc;">
+                <tr>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Title</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Description</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Location</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Date</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Status</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Created By</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in upcoming %}
+                <tr style="border-bottom: 1px solid #f1f5f9; vertical-align: middle;">
+                    <td style="padding: 15px;"><strong>{{ c.title }}</strong></td>
+                    <td style="padding: 15px;">{{ c.description|truncatewords:8 }}</td>
+                    <td style="padding: 15px;"><i class="fas fa-map-marker-alt text-muted me-1 small"></i>{{ c.location }}</td>
+                    <td style="padding: 15px; font-size: 0.9rem;">{{ c.commitment_date|date:"M d, Y H:i" }}</td>
+                    <td style="padding: 15px;">
+                        <span class="status-badge status-{{ c.status|lower }}">
+                            <i class="fas fa-{% if c.status == 'Pending' %}clock{% elif c.status == 'Approved' %}check-circle{% else %}times-circle{% endif %} me-1"></i>
+                            {{ c.status }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px;">
+                        <span class="fw-bold" style="color: #3b82f6;">{{ c.created_by.user.username }}</span>
+                    </td>
+                    <td style="padding: 15px;">
+                        <div class="action-buttons d-flex justify-content-center gap-2">
+                            {% if c.status == 'Pending' %}
+                            <a href="{% url 'update_status' c.pk 'Approved' %}" class="btn btn-sm btn-success px-3" style="border-radius: 6px; font-weight: 600;">
+                                <i class="fas fa-check me-1"></i> Approve
                             </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
-                                <p class="mb-0 fs-5">No upcoming tasks found for the next 7 days</p>
-                                <small class="text-secondary">Check back later for new assignments</small>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            <a href="{% url 'update_status' c.pk 'Rejected' %}" class="btn btn-sm btn-danger px-3" style="border-radius: 6px; font-weight: 600;">
+                                <i class="fas fa-times me-1"></i> Reject
+                            </a>
+                            {% else %}
+                            <span class="text-muted small" style="font-style: italic;"><i class="fas fa-lock me-1"></i> Finalized</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">No Upcoming Commitments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Meetings Invitation Table -->
-<div class="card shadow-sm">
-    <div class="card-header bg-gradient-success text-white py-3">
-        <h5 class="mb-0 d-flex align-items-center">
-            <i class="fas fa-calendar-check me-2"></i>
-            <span>Meetings You Are Invited To</span>
-        </h5>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="px-4 py-3">Meeting Title</th>
-                        <th class="px-4 py-3">Date & Time</th>
-                        <th class="px-4 py-3">Location</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for meeting in invited_commitments %}
-                    <tr class="border-bottom">
-                        <td class="px-4 py-3">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-handshake text-success me-2"></i>
-                                <strong class="text-dark">{{ meeting.title }}</strong>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3 text-muted">
-                            <div class="d-flex align-items-center">
-                                <i class="far fa-clock text-secondary me-2"></i>
-                                <span>{{ meeting.commitment_date|date:"M d, Y" }}</span>
-                            </div>
-                        </td>
-                        <td class="px-4 py-3">
-                            <span class="badge bg-light text-dark border px-3 py-2">
-                                <i class="fas fa-map-marker-alt text-danger me-1"></i>{{ meeting.location }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="fas fa-bell-slash fa-3x mb-3 opacity-50"></i>
-                                <p class="mb-0 fs-5">No meeting invitations found</p>
-                                <small class="text-secondary">You will be notified when invited to meetings</small>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- Upcoming Tasks Section -->
+<div id="upcomingTasksSection" style="display: none;">
+    <div class="section-header" style="margin-top: 25px; margin-bottom: 15px;">
+        <div class="section-title" style="font-weight: 700; color: #1e293b;">
+            <i class="fas fa-tasks"></i> Upcoming Tasks (Next 7 Days)
         </div>
     </div>
+    <div class="table-container shadow-sm" style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">
+        <table class="table custom-table mb-0">
+            <thead style="background-color: #f8fafc;">
+                <tr>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Task Title</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Description</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Assign To</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Due Date</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Status</th>
+                    <th style="padding: 15px; font-size: 0.85rem; color: #64748b; text-transform: uppercase; text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in upcoming_tasks %}
+                <tr style="border-bottom: 1px solid #f1f5f9; vertical-align: middle;">
+                    <td style="padding: 15px;"><strong>{{ t.title }}</strong></td>
+                    <td style="padding: 15px;">{{ t.description|truncatewords:8 }}</td>
+                    <td style="padding: 15px;"><span class="fw-bold" style="color: #3b82f6;">{{ t.assigned_to.username }}</span></td>
+                    <td style="padding: 15px; font-size: 0.9rem;">{{ t.due_date|date:"M d, Y" }}</td>
+                    <td style="padding: 15px;">
+                        <span class="status-badge status-{{ t.status|lower|cut:' ' }}">
+                            {{ t.status }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        <a href="{% url 'task_feedback_detail' t.id %}" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 6px; font-weight: 600;">
+                            <i class="fas fa-eye me-1"></i> View Task
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">No Upcoming Tasks.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        initializeCharts();
-        animateKPICards();
+    // ================= DATA DECLARATION =================
+    const sectionData = {
+        notesheet: {
+            title: 'Notesheet Overview',
+            subtext: "Here's your Notesheet overview for today",
+            cards: [
+                { value: '{{ ns_files_count }}', label: 'Notesheet Files', icon: 'fa-folder-open', color: 'total', type: 'files' },
+                { value: '{{ ns_inbox_count }}', label: 'Notesheet Inbox', icon: 'fa-inbox', color: 'pending', type: 'inbox' },
+                { value: '{{ ns_outbox_count }}', label: 'Notesheet Outbox', icon: 'fa-paper-plane', color: 'approved', type: 'outbox' },
+                { value: '{{ ns_total_count }}', label: 'Total Notesheets', icon: 'fa-clipboard-list', color: 'rejected', type: 'total' }
+            ],
+            pie: {
+                labels: {{ ns_category_labels|safe }},
+                data: {{ ns_category_data|safe }}
+            },
+            calendarEvents: [
+                {% for ns in ns_inbox_list %}
+                {
+                    title: 'Notesheet (Inbox): {{ ns.title|escapejs }}',
+                    start: '{{ ns.created_at|date:"Y-m-d" }}T{{ ns.created_at|date:"H:i:s" }}',
+                    allDay: false,
+                    color: '#6366f1',
+                    extendedProps: {
+                        initiated_by: '{{ ns.created_by.username|escapejs }}',
+                        current_holder: 'You',
+                        registry_file: '{% if ns.file %}{{ ns.file.file_name|escapejs }}{% else %}-{% endif %}',
+                        file_no: '{% if ns.file %}{{ ns.file.file_number|escapejs }}{% else %}-{% endif %}',
+                        status: '{{ ns.status|escapejs }}',
+                        time: '{{ ns.created_at|date:"H:i" }}',
+                        description: 'Currently with you.',
+                        location: 'Initiated by: {{ ns.created_by.username|escapejs }}',
+                        details: [
+                            { label: 'Initiated By', value: '{{ ns.created_by.username|escapejs }}' },
+                            { label: 'Current Holder', value: 'You' },
+                            { label: 'Registry File', value: '{% if ns.file %}{{ ns.file.file_name|escapejs }}{% else %}-{% endif %}' },
+                            { label: 'File No', value: '{% if ns.file %}{{ ns.file.file_number|escapejs }}{% else %}-{% endif %}' }
+                        ]
+                    }
+                },
+                {% endfor %}
+                {% for ns in ns_outbox_list %}
+                {
+                    title: 'Notesheet (Outbox): {{ ns.title|escapejs }}',
+                    start: '{{ ns.created_at|date:"Y-m-d" }}T{{ ns.created_at|date:"H:i:s" }}',
+                    allDay: false,
+                    color: '#10b981',
+                    extendedProps: {
+                        initiated_by: '{{ ns.created_by.username|escapejs }}',
+                        current_holder: '{{ ns.current_holder.username|escapejs }}',
+                        registry_file: '{% if ns.file %}{{ ns.file.file_name|escapejs }}{% else %}-{% endif %}',
+                        file_no: '{% if ns.file %}{{ ns.file.file_number|escapejs }}{% else %}-{% endif %}',
+                        status: '{{ ns.status|escapejs }}',
+                        time: '{{ ns.created_at|date:"H:i" }}',
+                        description: 'Currently with: {{ ns.current_holder.username|escapejs }}',
+                        location: 'Initiated by: {{ ns.created_by.username|escapejs }}',
+                        details: [
+                            { label: 'Initiated By', value: '{{ ns.created_by.username|escapejs }}' },
+                            { label: 'Current Holder', value: '{{ ns.current_holder.username|escapejs }}' },
+                            { label: 'Registry File', value: '{% if ns.file %}{{ ns.file.file_name|escapejs }}{% else %}-{% endif %}' },
+                            { label: 'File No', value: '{% if ns.file %}{{ ns.file.file_number|escapejs }}{% else %}-{% endif %}' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ],
+            lists: {
+                files: [
+                    {% for f in ns_files_list %}
+                    { title: '{{ f.file_name|escapejs }}', description: 'File Number: {{ f.file_number|escapejs }}', date: '{{ f.created_at|date:"M d, Y" }}', status: 'Active', creator: '{{ f.created_by.username|escapejs }}', location: '' },
+                    {% endfor %}
+                ],
+                inbox: [
+                    {% for ns in ns_inbox_list %}
+                    { title: '{{ ns.title|escapejs }}', description: 'Currently with you.', date: '{{ ns.created_at|date:"M d, Y" }}', status: '{{ ns.status }}', creator: '{{ ns.created_by.username|escapejs }}', location: '' },
+                    {% endfor %}
+                ],
+                outbox: [
+                    {% for ns in ns_outbox_list %}
+                    { title: '{{ ns.title|escapejs }}', description: 'Currently with: {{ ns.current_holder.username|escapejs }}', date: '{{ ns.created_at|date:"M d, Y" }}', status: '{{ ns.status }}', creator: '{{ ns.created_by.username|escapejs }}', location: '' },
+                    {% endfor %}
+                ],
+                total: [
+                    {% for ns in ns_inbox_list %}
+                    { title: '{{ ns.title|escapejs }}', description: 'In Hand. Status: {{ ns.status }}', date: '{{ ns.created_at|date:"M d, Y" }}', status: '{{ ns.status }}', creator: '{{ ns.created_by.username|escapejs }}', location: '' },
+                    {% endfor %}
+                    {% for ns in ns_outbox_list %}
+                    { title: '{{ ns.title|escapejs }}', description: 'Outbox. Status: {{ ns.status }}', date: '{{ ns.created_at|date:"M d, Y" }}', status: '{{ ns.status }}', creator: '{{ ns.created_by.username|escapejs }}', location: '' },
+                    {% endfor %}
+                ]
+            }
+        },
+        task: {
+            title: 'Task Overview',
+            subtext: "Here's your Task overview for today",
+            cards: [
+                { value: '{{ tasks_total_count }}', label: 'Total Tasks', icon: 'fa-tasks', color: 'total', type: 'total' },
+                { value: '{{ tasks_pending_count }}', label: 'Pending Tasks', icon: 'fa-spinner', color: 'pending', type: 'pending' },
+                { value: '{{ tasks_completed_count }}', label: 'Completed Tasks', icon: 'fa-check-circle', color: 'approved', type: 'completed' }
+            ],
+            pie: {
+                labels: {{ task_category_labels|safe }},
+                data: {{ task_category_data|safe }}
+            },
+            calendarEvents: [
+                {% for t in tasks_total_list %}
+                {
+                    title: 'Task: {{ t.title|escapejs }}',
+                    start: '{{ t.created_at|date:"Y-m-d" }}T{{ t.created_at|date:"H:i:s" }}',
+                    allDay: false,
+                    color: '#3b82f6',
+                    extendedProps: {
+                        description: '{{ t.description|escapejs }}',
+                        location: 'Assigned To: {{ t.assigned_to.username|escapejs }}',
+                        status: '{{ t.status|escapejs }}',
+                        time: 'Due Date: {{ t.due_date|date:"Y-m-d" }}',
+                        details: [
+                            { label: 'Description', value: '{{ t.description|escapejs }}' },
+                            { label: 'Assigned To', value: '{{ t.assigned_to.username|escapejs }}' },
+                            { label: 'Assigned By', value: '{{ t.assigned_by.username|escapejs }}' },
+                            { label: 'Due Date', value: '{{ t.due_date|date:"M d, Y" }}' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ],
+            lists: {
+                total: [
+                    {% for t in tasks_total_list %}
+                    { title: '{{ t.title|escapejs }}', description: '{{ t.description|escapejs }}', date: '{{ t.due_date|date:"M d, Y" }}', status: '{{ t.status }}', creator: '{{ t.assigned_by.username|escapejs }}', location: 'Assigned To: {{ t.assigned_to.username|escapejs }}' },
+                    {% endfor %}
+                ],
+                pending: [
+                    {% for t in tasks_pending_list %}
+                    { title: '{{ t.title|escapejs }}', description: '{{ t.description|escapejs }}', date: '{{ t.due_date|date:"M d, Y" }}', status: '{{ t.status }}', creator: '{{ t.assigned_by.username|escapejs }}', location: 'Assigned To: {{ t.assigned_to.username|escapejs }}' },
+                    {% endfor %}
+                ],
+                completed: [
+                    {% for t in tasks_completed_list %}
+                    { title: '{{ t.title|escapejs }}', description: '{{ t.description|escapejs }}', date: '{{ t.due_date|date:"M d, Y" }}', status: '{{ t.status }}', creator: '{{ t.assigned_by.username|escapejs }}', location: 'Assigned To: {{ t.assigned_to.username|escapejs }}' },
+                    {% endfor %}
+                ],
+                overdue: [
+                    {% for t in tasks_overdue_list %}
+                    { title: '{{ t.title|escapejs }}', description: '{{ t.description|escapejs }}', date: '{{ t.due_date|date:"M d, Y" }}', status: '{{ t.status }}', creator: '{{ t.assigned_by.username|escapejs }}', location: 'Assigned To: {{ t.assigned_to.username|escapejs }}' },
+                    {% endfor %}
+                ]
+            }
+        },
+        letter: {
+            title: 'Letter Overview',
+            subtext: "Here's your Letter overview for today",
+            cards: [
+                { value: '{{ letters_total_count }}', label: 'Total Letters', icon: 'fa-envelope', color: 'total', type: 'total' },
+                { value: '{{ letters_drafts_count }}', label: 'Draft Letters', icon: 'fa-edit', color: 'pending', type: 'draft' },
+                { value: '{{ letters_outbox_count }}', label: 'Letter Outbox', icon: 'fa-paper-plane', color: 'approved', type: 'outbox' },
+                { value: '{{ letters_inbox_count }}', label: 'Letter Inbox', icon: 'fa-inbox', color: 'rejected', type: 'inbox' }
+            ],
+            pie: {
+                labels: {{ letter_category_labels|safe }},
+                data: {{ letter_category_data|safe }}
+            },
+            calendarEvents: [
+                {% for l in letters_total_list %}
+                {
+                    title: 'Letter: {{ l.subject|escapejs }}',
+                    start: '{{ l.created_at|date:"Y-m-d H:i" }}',
+                    color: '#8b5cf6',
+                    extendedProps: {
+                        description: 'Ref No: {{ l.ref_no|escapejs }}',
+                        location: 'From: {{ l.sender.username|escapejs }} → To: {{ l.receiver.username|escapejs }}',
+                        status: '{% if l.is_read %}Read{% else %}Unread{% endif %}',
+                        time: '{{ l.created_at|date:"H:i" }}',
+                        details: [
+                            { label: 'Subject', value: '{{ l.subject|escapejs }}' },
+                            { label: 'Sender', value: '{{ l.sender.username|escapejs }}' },
+                            { label: 'Receiver', value: '{{ l.receiver.username|escapejs }}' },
+                            { label: 'Reference No', value: '{{ l.ref_no|escapejs }}' },
+                            { label: 'Date', value: '{{ l.created_at|date:"M d, Y H:i" }}' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ],
+            lists: {
+                total: [
+                    {% for l in letters_total_list %}
+                    { title: '{{ l.subject|escapejs }}', description: 'Ref No: {{ l.ref_no|escapejs }}', date: '{{ l.created_at|date:"M d, Y" }}', status: '{% if l.is_read %}Read{% else %}Unread{% endif %}', creator: '{{ l.sender.username|escapejs }}', location: 'To: {{ l.receiver.username|escapejs }}' },
+                    {% endfor %}
+                ],
+                draft: [
+                    {% for l in letters_drafts_list %}
+                    { title: '{{ l.subject|escapejs }}', description: 'Ref No: {{ l.ref_no|escapejs }}', date: '{{ l.created_at|date:"M d, Y" }}', status: 'DRAFT', creator: '', location: '' },
+                    {% endfor %}
+                ],
+                outbox: [
+                    {% for l in letters_outbox_list %}
+                    { title: '{{ l.subject|escapejs }}', description: 'Ref No: {{ l.ref_no|escapejs }}', date: '{{ l.created_at|date:"M d, Y" }}', status: '{% if l.is_read %}Read{% else %}Unread{% endif %}', creator: '{{ l.sender.username|escapejs }}', location: 'To: {{ l.receiver.username|escapejs }}' },
+                    {% endfor %}
+                ],
+                inbox: [
+                    {% for l in letters_inbox_list %}
+                    { title: '{{ l.subject|escapejs }}', description: 'Ref No: {{ l.ref_no|escapejs }}', date: '{{ l.created_at|date:"M d, Y" }}', status: '{% if l.is_read %}Read{% else %}Unread{% endif %}', creator: '{{ l.sender.username|escapejs }}', location: 'To: {{ l.receiver.username|escapejs }}' },
+                    {% endfor %}
+                ]
+            }
+        }
+    };
+
+    let activeSection = 'notesheet';
+    let pieChartInstance;
+    let dailyChartInstance;
+    let currentOffset = 0;
+    let fcCalendar;
+
+    // ================= MODAL CONTROLS =================
+    function openCustomModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeCustomModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function openCardModal(cardType) {
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalItemsList');
+        
+        const data = sectionData[activeSection];
+        const listItems = data.lists[cardType] || [];
+        const activeCard = data.cards.find(c => c.type === cardType) || { label: 'Items' };
+
+        modalTitle.innerHTML = `<i class="fas ${activeCard.icon || 'fa-list'}"></i> ${activeCard.label} List (${listItems.length})`;
+
+        if (listItems.length === 0) {
+            modalBody.innerHTML = `
+                <div class="modal-empty">
+                    <i class="fas fa-inbox"></i>
+                    <h4>No items found</h4>
+                    <p>There are no items in this category yet.</p>
+                </div>
+            `;
+        } else {
+            modalBody.innerHTML = listItems.map(item => {
+                const statusClass = (item.status || 'pending').toLowerCase().replace(' ', '');
+                return `
+                    <div class="modal-item">
+                        <div class="modal-item-header">
+                            <div class="modal-item-title">${item.title}</div>
+                            <span class="modal-item-status ${statusClass}">
+                                ${item.status}
+                            </span>
+                        </div>
+                        <div class="modal-item-description">${item.description}</div>
+                        <div class="modal-item-details">
+                            <div class="modal-detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span><strong>Date:</strong> ${item.date}</span>
+                            </div>
+                            ${item.location ? `
+                            <div class="modal-detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span><strong>Info:</strong> ${item.location}</span>
+                            </div>` : ''}
+                            ${item.creator ? `
+                            <div class="modal-detail-item">
+                                <i class="fas fa-user"></i>
+                                <span><strong>${activeSection === 'notesheet' ? 'Initiated by' : 'Owner/Sender'}:</strong> ${item.creator}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        openCustomModal('itemModal');
+    }
+
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('custom-modal')) {
+            closeCustomModal(e.target.id);
+        }
     });
 
-    function initializeCharts() {
-        // Doughnut Chart - Tasks by Status
-        const doughnutCtx = document.getElementById('statusDoughnutChart');
-        if (doughnutCtx) {
-            new Chart(doughnutCtx.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pending', 'In Progress', 'Completed'],
-                    datasets: [{
-                        data: [{{ pending_tasks }}, {{ in_progress_tasks }}, {{ completed_tasks }}],
-                        backgroundColor: ['#fbbf24', '#3b82f6', '#10b981'],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    cutout: '65%'
-                }
-            });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.custom-modal.show').forEach(m => closeCustomModal(m.id));
         }
+    });
 
-        // Bar Chart - Tasks per Day (Next 7 Days)
-        const barCtx = document.getElementById('tasksBarChart');
-        if (barCtx) {
-            new Chart(barCtx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: JSON.parse('{{ day_labels|safe }}'),
-                    datasets: [{
-                        label: 'Tasks',
-                        data: JSON.parse('{{ day_counts|safe }}'),
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-    }
-
-    function animateKPICards() {
-        const kpiCards = document.querySelectorAll('.kpi-card');
-        kpiCards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                card.style.transition = 'all 0.5s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
+    // ================= INITIALIZE CHARTS =================
+    function initCharts() {
+        const pieCtx = document.getElementById('categoryChart').getContext('2d');
+        pieChartInstance = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: sectionData.notesheet.pie.labels,
+                datasets: [{
+                    data: sectionData.notesheet.pie.data,
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                cutout: '65%'
+            }
         });
     }
-</script>
 
+    // ================= SECTION CHANGE HANDLER =================
+    function onSectionChange(section) {
+        activeSection = section;
+        currentOffset = 0;
+
+        const data = sectionData[section];
+
+        // 1. Update Welcome Subtext
+        document.getElementById('welcome-subtext').textContent = data.subtext;
+
+        // 2. Render Cards
+        const cardContainer = document.getElementById('kpi-grid-container');
+        cardContainer.style.gridTemplateColumns = `repeat(${data.cards.length}, 1fr)`;
+        cardContainer.innerHTML = data.cards.map(c => `
+            <div class="kpi-card bg-${c.color}" onclick="openCardModal('${c.type}')">
+                <div class="kpi-header">
+                    <div>
+                        <div class="kpi-value">${c.value}</div>
+                        <div class="kpi-label">${c.label}</div>
+                    </div>
+                    <div class="kpi-icon"><i class="fas ${c.icon}"></i></div>
+                </div>
+            </div>
+        `).join('');
+
+        // 3. Update Pie Chart
+        document.getElementById('pieChartTitle').innerHTML = `<i class="fas fa-pie-chart"></i>${section.charAt(0).toUpperCase() + section.slice(1)} Breakdown`;
+        pieChartInstance.data.labels = data.pie.labels;
+        pieChartInstance.data.datasets[0].data = data.pie.data;
+        pieChartInstance.update();
+
+        // 4. Update Bar Chart
+        document.getElementById('barChartTitle').innerHTML = `<i class="fas fa-chart-bar"></i>${section.charAt(0).toUpperCase() + section.slice(1)} Analysis`;
+        updateDailyChart(0);
+
+        // 5. Update Calendar Title & Events
+        document.getElementById('calendarTitleText').textContent = `${section.charAt(0).toUpperCase() + section.slice(1)} Calendar`;
+        if (fcCalendar) {
+            fcCalendar.removeAllEvents();
+            fcCalendar.addEventSource(data.calendarEvents);
+        }
+
+        // 6. Update Upcoming Tables Visibility
+        document.getElementById('upcomingCommitmentsSection').style.display = (section === 'commitment') ? 'block' : 'none';
+        document.getElementById('upcomingTasksSection').style.display = (section === 'task') ? 'block' : 'none';
+    }
+
+    // ================= DAILY CHART BAR =================
+    function updateDailyChart(offset) {
+        const today = new Date();
+        const labels = [];
+        const data = [];
+
+        const startDate = new Date(today);
+        startDate.setDate(startDate.getDate() + (offset * 7));
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            labels.push(date.toISOString().split('T')[0]);
+            data.push(0);
+        }
+
+        const periodLabel = document.getElementById('periodLabel');
+        if (offset === 0) {
+            periodLabel.textContent = 'Next 7 Days';
+        } else if (offset < 0) {
+            const weeksAgo = Math.abs(offset);
+            periodLabel.textContent = weeksAgo === 1 ? 'Previous Week' : `${weeksAgo} Weeks Ago`;
+        } else {
+            periodLabel.textContent = `${offset} Week${offset > 1 ? 's' : ''} Ahead`;
+        }
+
+        if (dailyChartInstance) {
+            dailyChartInstance.destroy();
+        }
+
+        const barCtx = document.getElementById('dailyChart').getContext('2d');
+        dailyChartInstance = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: labels.map(d => {
+                    const date = new Date(d);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }),
+                datasets: [{
+                    label: activeSection.charAt(0).toUpperCase() + activeSection.slice(1),
+                    data: data,
+                    backgroundColor: '#10b981',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        fetchChartData(labels).then(chartData => {
+            dailyChartInstance.data.datasets[0].data = chartData;
+            dailyChartInstance.update();
+        });
+    }
+
+    function navigatePeriod(direction) {
+        currentOffset += direction;
+        updateDailyChart(currentOffset);
+    }
+
+    function resetToToday() {
+        currentOffset = 0;
+        updateDailyChart(0);
+    }
+
+    async function fetchChartData(labels) {
+        try {
+            const response = await fetch(`/api/chart-data/?dates=${labels.join(',')}&section=${activeSection}`);
+            if (!response.ok) throw new Error('Network error');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
+            return labels.map(() => 0);
+        }
+    }
+
+    // ================= INITIAL RUN =================
+    document.addEventListener('DOMContentLoaded', function () {
+        initCharts();
+        
+        // Trigger initial Notesheet view rendering
+        onSectionChange('notesheet');
+
+        // Initialize FullCalendar
+        const calendarEl = document.getElementById('calendar');
+        fcCalendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek,listWeek'
+            },
+            eventContent: function (arg) {
+                let desc = arg.event.extendedProps.description || '';
+                let loc = arg.event.extendedProps.location || '';
+                let status = arg.event.extendedProps.status || '';
+                let bgColor = arg.event.backgroundColor || '#10b981';
+
+                let container = document.createElement('div');
+                container.style = `
+                    display: block;
+                    width: 100%;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    white-space: normal;
+                    padding: 4px 6px;
+                    cursor: pointer;
+                    border-radius: 6px;
+                    background: ${bgColor}18;
+                    border-left: 3px solid ${bgColor};
+                    margin: 1px 0;
+                `;
+                container.innerHTML = `
+                    <div style="font-size:11px; font-weight:800; color:#0d2b1e; line-height:1.3; margin-bottom:2px; word-break:break-word;">
+                        ${arg.event.title}
+                    </div>
+                    ${desc ? `<div style="font-size:9px; color:#374151; margin-bottom:2px; font-weight:600;">
+                        📋 ${desc}
+                    </div>` : ''}
+                    ${loc ? `<div style="font-size:9px; color:#475569; margin-bottom:3px;">
+                        👤 ${loc}
+                    </div>` : ''}
+                    ${status ? `<span style="
+                        display:inline-block;
+                        font-size:8px;
+                        font-weight:700;
+                        background:${bgColor};
+                        color:white;
+                        padding:1px 7px;
+                        border-radius:20px;
+                        letter-spacing:0.3px;
+                        text-transform:uppercase;
+                    ">${status}</span>` : ''}
+                `;
+                return { domNodes: [container] };
+            },
+            events: sectionData.notesheet.calendarEvents,
+            eventClick: function (info) {
+                info.jsEvent.stopPropagation();
+                info.jsEvent.preventDefault();
+
+                document.getElementById('modalEventTitle').innerText = info.event.title;
+                
+                const dynamicContainer = document.getElementById('modalEventDynamicFields');
+                dynamicContainer.innerHTML = '';
+                
+                if (info.event.extendedProps.details && info.event.extendedProps.details.length > 0) {
+                    info.event.extendedProps.details.forEach(detail => {
+                        dynamicContainer.innerHTML += `
+                            <div class="col-6">
+                                <strong style="color: #64748b; font-size: 13px; text-transform: uppercase;">${detail.label}</strong>
+                                <div style="color: #0f172a; font-weight: 500; margin-top: 4px;">${detail.value || '-'}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('modalEventStatus').innerText = info.event.extendedProps.status || '-';
+                
+                // Colorize the status badge
+                let statusBadge = document.getElementById('modalEventStatus');
+                statusBadge.style.backgroundColor = info.event.backgroundColor || '#10b981';
+                statusBadge.className = 'badge';
+
+                var myModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                myModal.show();
+            },
+            dateClick: function (info) {
+                const events = fcCalendar.getEvents().filter(e => e.startStr.startsWith(info.dateStr));
+                document.getElementById('clickedDateText').innerText = info.dateStr;
+                const listBox = document.getElementById('dateCommitmentsList');
+                listBox.innerHTML = '';
+
+                if (events.length === 0) {
+                    listBox.innerHTML = '<div class="text-center p-5 text-muted">No entries on this date.</div>';
+                } else {
+                    events.forEach(e => {
+                        const time = e.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        listBox.innerHTML += `
+                            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid #10b981; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <h5 style="margin: 0; font-weight: 800; color: #1e293b; font-size: 16px;">${e.title}</h5>
+                                        <p style="margin: 5px 0 15px 0; color: #64748b; font-size: 13px;">${e.extendedProps.description}</p>
+                                    </div>
+                                    <span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;">${e.extendedProps.status}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="color: #10b981; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="far fa-clock"></i> ${time}
+                                    </div>
+                                    <div style="color: #64748b; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fas fa-info-circle text-muted"></i> ${e.extendedProps.location}
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+                }
+                new bootstrap.Modal(document.getElementById('dateCommitmentsModal')).show();
+            }
+        });
+        fcCalendar.render();
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,93 @@
+tinymce.init({
+        selector: '#remark',
+        menubar: true,
+        menu: {
+          file: { title: 'File', items: 'newdocument restoredraft | preview | print' },
+          edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+          view: { title: 'View', items: 'code | visualaid visualchars visualblocks | preview fullscreen' },
+          insert: { title: 'Insert', items: 'image link media pageembed template codesample inserttable | charmap emoticons hr | pagebreak anchor' },
+          format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat' },
+          tools: { title: 'Tools', items: 'code wordcount' },
+          table: { title: 'Table', items: 'inserttable | cell row column | tableprops deletetable' },
+        },
+        height: 1050,
+        min_height: 1050,
+        autoresize_bottom_margin: 50,
+        resize: true,
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+          'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'wordcount', 'codesample',
+          'emoticons', 'nonbreaking', 'pagebreak', 'quickbars', 'autoresize'
+        ],
+        toolbar_mode: 'wrap',
+        paste_data_images: true,
+        paste_as_text: false,
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '+body[style]',
+        toolbar: [
+          'undo redo | styles | fontfamily | fontsize',
+          'bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat | fullscreen'
+        ].join(' | '),
+        font_family_formats:
+          'Calibri=Calibri,sans-serif;' +
+          'Arial=arial,helvetica,sans-serif;' +
+          'Times New Roman=times new roman,times,serif;' +
+          'Courier New=courier new,courier,monospace;' +
+          'Georgia=georgia,palatino,serif;' +
+          'Verdana=verdana,geneva,sans-serif;' +
+          'Inter=Inter,system-ui,sans-serif;',
+        font_size_formats: '8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
+        style_formats: [
+          { title: 'Heading 1', block: 'h1', styles: { 'font-size': '26pt', 'font-weight': 'bold' } },
+          { title: 'Heading 2', block: 'h2', styles: { 'font-size': '20pt', 'font-weight': 'bold' } },
+          { title: 'Heading 3', block: 'h3', styles: { 'font-size': '16pt', 'font-weight': 'bold' } },
+          { title: 'Heading 4', block: 'h4', styles: { 'font-size': '14pt', 'font-weight': 'bold' } },
+          { title: 'Normal', block: 'p', styles: { 'font-size': '12pt', 'font-weight': 'normal' } },
+          { title: 'Block Quote', block: 'blockquote' },
+          { title: 'Code', inline: 'code' },
+        ],
+        content_style: `
+          html {
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 13pt;
+            line-height: 1.8;
+            color: #000000;
+            background: white;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 8px 16px;
+            box-sizing: border-box;
+          }
+
+          .mce-content-body {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+          }
+          h1 { font-size: 26pt; font-weight: bold; margin-bottom: 8px; }
+          h2 { font-size: 20pt; font-weight: bold; margin-bottom: 6px; }
+          h3 { font-size: 16pt; font-weight: bold; margin-bottom: 4px; }
+          h4 { font-size: 14pt; font-weight: bold; }
+          p  { margin: 0 0 8px; }
+          blockquote { border-left: 4px solid #059669; padding-left: 12px; color: #4b5563; }
+          table { border-collapse: collapse; width: 100%; }
+          td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
+          th { background: #d1fae5; font-weight: 600; }
+        `,
+
+        branding: false,
+        elementpath: true,
+        statusbar: true,
+        wordcount_countregex: /[\w\u2019\x27-]+/g,
+        quickbars_selection_toolbar: 'bold italic underline | formatselect | forecolor | bullist numlist',
+        quickbars_insert_toolbar: false,
+
+        

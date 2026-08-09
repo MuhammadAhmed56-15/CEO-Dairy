@@ -4,7 +4,7 @@
 <div class="feedback-dashboard">
     <!-- Header Section -->
 <div class="container-fluid mb-4">
-    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 15px; overflow: hidden;">
+    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%); border-radius: 15px; overflow: hidden;">
         <div class="card-body p-4">
             <div class="text-white">
                 <h2 class="fw-bold mb-2" style="font-size: 1.8rem; letter-spacing: 0.5px;">
@@ -51,47 +51,94 @@
 {% endif %}
 
     <!-- Feedback Table (Desktop) -->
-    <div class="table-container">
-        {% if feedbacks %}
-        <table class="feedback-table">
+<div class="table-container">
+    {% if feedbacks %}
+        <table class="feedback-table d-none d-md-table">
             <thead>
                 <tr>
                     <th>Task Name</th>
                     <th>Staff Member</th>
                     <th>Feedback</th>
+                    <th class="text-center">Attachment</th>
                     <th>Due Date</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody id="feedbackTableBody">
                 {% for task in feedbacks %}
+                {% with last=task.remarks.last %}
                 <tr class="feedback-row" data-status="{{ task.status|lower }}" data-search="{{ task.title|lower }} {{ task.assigned_to.username|lower }}">
                     <td>
                         <div class="task-cell">
-                            <div class="task-icon">
-                                <i class="fas fa-clipboard-check"></i>
-                            </div>
+                            <div class="task-icon"><i class="fas fa-clipboard-check"></i></div>
                             <span class="task-title">{{ task.title }}</span>
                         </div>
                     </td>
                     <td>
                         <div class="staff-cell">
-                            <div class="staff-avatar">
-                                {{ task.assigned_to.username|first|upper }}
-                            </div>
+                            <div class="staff-avatar">{{ task.assigned_to.username|first|upper }}</div>
                             <span class="staff-name">{{ task.assigned_to.username }}</span>
                         </div>
                     </td>
                     <td>
                         <div class="feedback-cell">
-                            <p class="feedback-text">{{ task.remarks.last.feedback }}</p>
-                            {% if task.remarks.last.feedback|length > 100 %}
-                            <button class="expand-btn" onclick="toggleFeedback(this)">
+                            <p class="feedback-text">{{ last.feedback }}</p>
+                            {% if last %}
+                                {% if last.feedback|length > 100 %}
+                                    <button class="expand-btn" onclick="toggleFeedback(this)">
                                 <span class="expand-text">Show more</span>
                                 <i class="fas fa-chevron-down"></i>
                             </button>
+                                {% endif %}
                             {% endif %}
                         </div>
+                    </td>
+                    <td class="text-center">
+                        {% if last %}
+                            {% if last.attachments.all %}
+                                <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                                    {% for att in last.attachments.all %}
+                                        <a href="{{ att.file.url }}" target="_blank" class="attachment-link" title="View attachment {{ forloop.counter }}">
+                                            <div class="file-icon-box">
+                                                <i class="fas fa-file-alt"></i>
+                                                <span class="view-text">{{ forloop.counter }}</span>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% elif last.attachment_1 or last.attachment_2 or last.attachment_3 %}
+                                <div style="display:flex; gap:8px; justify-content:center;">
+                                    {% if last.attachment_1 %}
+                                        <a href="{{ last.attachment_1.url }}" target="_blank" class="attachment-link" title="View attachment 1">
+                                            <div class="file-icon-box">
+                                                <i class="fas fa-file-alt"></i>
+                                                <span class="view-text">1</span>
+                                            </div>
+                                        </a>
+                                    {% endif %}
+                                    {% if last.attachment_2 %}
+                                        <a href="{{ last.attachment_2.url }}" target="_blank" class="attachment-link" title="View attachment 2">
+                                            <div class="file-icon-box">
+                                                <i class="fas fa-file-alt"></i>
+                                                <span class="view-text">2</span>
+                                            </div>
+                                        </a>
+                                    {% endif %}
+                                    {% if last.attachment_3 %}
+                                        <a href="{{ last.attachment_3.url }}" target="_blank" class="attachment-link" title="View attachment 3">
+                                            <div class="file-icon-box">
+                                                <i class="fas fa-file-alt"></i>
+                                                <span class="view-text">3</span>
+                                            </div>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="no-file text-muted">—</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="no-file text-muted">—</span>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="date-cell">
@@ -106,19 +153,18 @@
                         </span>
                     </td>
                 </tr>
+                {% endwith %}
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- Mobile Cards -->
-        <div class="feedback-cards" id="feedbackCards">
+        <div class="feedback-cards d-md-none" id="feedbackCards">
             {% for task in feedbacks %}
+            {% with last=task.remarks.last %}
             <div class="feedback-card" data-status="{{ task.status|lower }}" data-search="{{ task.title|lower }} {{ task.assigned_to.username|lower }}">
                 <div class="card-header">
                     <div class="task-info">
-                        <div class="task-icon-mobile">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
+                        <div class="task-icon-mobile"><i class="fas fa-clipboard-check"></i></div>
                         <h3 class="card-task-title">{{ task.title }}</h3>
                     </div>
                     <span class="status-badge {% if task.status == 'Completed' %}status-completed{% else %}status-pending{% endif %}">
@@ -129,9 +175,7 @@
 
                 <div class="card-body">
                     <div class="card-staff">
-                        <div class="staff-avatar">
-                            {{ task.assigned_to.username|first|upper }}
-                        </div>
+                        <div class="staff-avatar">{{ task.assigned_to.username|first|upper }}</div>
                         <div class="staff-info">
                             <span class="staff-label">Staff Member</span>
                             <span class="staff-name">{{ task.assigned_to.username }}</span>
@@ -140,46 +184,78 @@
 
                     <div class="card-feedback">
                         <span class="feedback-label">Feedback</span>
-                        <p class="feedback-text">{{ task.remarks.last.feedback }}</p>
+                        <p class="feedback-text">{{ last.feedback }}</p>
                     </div>
 
-                    <div class="card-date">
+                    {% if last %}
+                    {% if last.attachments.all %}
+                    <div class="card-attachment" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                        <span class="staff-label">Attachments</span>
+                        <div style="margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
+                            {% for att in last.attachments.all %}
+                            <a href="{{ att.file.url }}" target="_blank" style="display:flex; align-items:center; gap:8px; color:#059669; text-decoration:none; font-size:0.9rem;">
+                                <i class="fas fa-paperclip"></i> View {{ forloop.counter }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% elif last.attachment_1 or last.attachment_2 or last.attachment_3 %}
+                    <div class="card-attachment" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                        <span class="staff-label">Attachment</span>
+                        <div style="margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
+                            {% if last.attachment_1 %}
+                            <a href="{{ last.attachment_1.url }}" target="_blank" style="display:flex; align-items:center; gap:8px; color:#059669; text-decoration:none; font-size:0.9rem;">
+                                <i class="fas fa-paperclip"></i> View 1
+                            </a>
+                            {% endif %}
+                            {% if last.attachment_2 %}
+                            <a href="{{ last.attachment_2.url }}" target="_blank" style="display:flex; align-items:center; gap:8px; color:#059669; text-decoration:none; font-size:0.9rem;">
+                                <i class="fas fa-paperclip"></i> View 2
+                            </a>
+                            {% endif %}
+                            {% if last.attachment_3 %}
+                            <a href="{{ last.attachment_3.url }}" target="_blank" style="display:flex; align-items:center; gap:8px; color:#059669; text-decoration:none; font-size:0.9rem;">
+                                <i class="fas fa-paperclip"></i> View 3
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
+                    <div class="card-date" style="margin-top: 10px;">
                         <i class="far fa-calendar"></i>
                         <span>Due: {{ task.due_date|date:"M d, Y" }}</span>
                     </div>
                 </div>
             </div>
+            {% endwith %}
             {% endfor %}
         </div>
 
-        <div id="noResults" class="no-results" style="display: none;">
-            <i class="fas fa-search"></i>
+        <div id="noResults" class="no-results" style="display: none; text-align: center; padding: 40px;">
+            <i class="fas fa-search" style="font-size: 2rem; color: #ccc;"></i>
             <p>No results found matching your criteria</p>
-            <small>Try adjusting your search or filter settings</small>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">
-                <i class="fas fa-inbox"></i>
-            </div>
-            <h2 class="empty-title">No Feedback Available</h2>
-            <p class="empty-description">
-                Feedback submissions from your team members will appear here once tasks are completed.
-            </p>
-            <a href="{% url 'ceo_dashboard' %}" class="btn-primary-custom">
-                <i class="fas fa-arrow-left"></i>
-                Return to Dashboard
-            </a>
-        </div>
-        {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+        <h2 class="empty-title">No Feedback Available</h2>
+        <p class="empty-description">Feedback submissions will appear here once tasks are completed.</p>
+        
+        <a href="{% if user.profile.role == 'CEO' %}{% url 'ceo_dashboard' %}{% elif user.profile.role == 'GM' %}{% url 'gm_dashboard' %}{% elif user.profile.role == 'Manager' or user.profile.role == 'ZM' or user.profile.role == 'IT' %}{% url 'manager_dashboard' %}{% elif user.profile.role == 'PS' %}{% url 'ps_dashboard' %}{% else %}#{% endif %}" class="btn-primary-custom">
+            <i class="fas fa-arrow-left"></i> Return to Dashboard
+        </a>
     </div>
+{% endif %}
 </div>
 
 <style>
     :root {
-        --primary-color: #1e40af;
-        --primary-dark: #1e3a8a;
-        --primary-light: #3b82f6;
+        --primary-color: #0d2b1e;
+        --primary-dark: #0a2118;
+        --primary-light: #10b981;
         --success-color: #059669;
         --success-bg: #d1fae5;
         --warning-color: #d97706;
@@ -187,7 +263,7 @@
         --text-primary: #111827;
         --text-secondary: #4b5563;
         --text-muted: #9ca3af;
-        --bg-primary: #f8fafc;
+        --bg-success: #f8fafc;
         --bg-secondary: #f1f5f9;
         --bg-white: #ffffff;
         --border-light: #e2e8f0;
@@ -263,7 +339,7 @@
     }
 
     .stat-badge {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
         padding: 1.25rem 2rem;
         border-radius: var(--radius-md);
@@ -333,7 +409,7 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #3b82f6;
+        border-color: #10b981;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
@@ -364,12 +440,12 @@
     }
 
     .filter-select:hover {
-        border-color: #3b82f6;
+        border-color: #10b981;
     }
 
     .filter-select:focus {
         outline: none;
-        border-color: #3b82f6;
+        border-color: #10b981;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
@@ -385,6 +461,7 @@
     .feedback-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
 
     .feedback-table thead {
@@ -402,13 +479,19 @@
         color: var(--text-secondary);
     }
 
+    /* Equal width columns - each gets 16.66% (100% / 6 columns) */
+    .feedback-table th,
+    .feedback-table td {
+        width: 16.66%;
+    }
+
     .feedback-table tbody tr {
         border-bottom: 1px solid var(--border-light);
         transition: var(--transition);
     }
 
     .feedback-table tbody tr:hover {
-        background: var(--bg-primary);
+        background: var(--bg-success);
     }
 
     .feedback-table tbody tr:last-child {
@@ -418,6 +501,8 @@
     .feedback-table td {
         padding: 1rem;
         vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Task Cell */
@@ -430,13 +515,13 @@
     .task-icon {
         width: 40px;
         height: 40px;
-        background: var(--bg-primary);
+        background: var(--bg-success);
         border: 1px solid var(--border-light);
         border-radius: var(--radius-sm);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #3b82f6;
+        color: #10b981;
         font-size: 1.125rem;
         flex-shrink: 0;
     }
@@ -445,6 +530,8 @@
         font-weight: 600;
         color: var(--text-primary);
         font-size: 0.875rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Staff Cell */
@@ -458,7 +545,7 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -474,11 +561,13 @@
         font-weight: 500;
         color: var(--text-primary);
         font-size: 0.875rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     /* Feedback Cell */
     .feedback-cell {
-        max-width: 400px;
         position: relative;
     }
 
@@ -489,6 +578,7 @@
         font-size: 0.875rem;
         display: -webkit-box;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
         transition: var(--transition);
@@ -496,13 +586,14 @@
 
     .feedback-text.expanded {
         -webkit-line-clamp: unset;
+        line-clamp: unset;
     }
 
     .expand-btn {
         margin-top: 0.5rem;
         background: none;
         border: none;
-        color: #3b82f6;
+        color: #10b981;
         font-size: 0.8125rem;
         font-weight: 600;
         cursor: pointer;
@@ -514,7 +605,7 @@
     }
 
     .expand-btn:hover {
-        color: #1e40af;
+        color: #0d2b1e;
     }
 
     .expand-btn i {
@@ -567,6 +658,42 @@
         font-size: 0.875rem;
     }
 
+    /* Attachment Styling */
+    .text-center { 
+        text-align: center; 
+    }
+
+    .file-icon-box {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #1a4731;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+        gap: 2px;
+    }
+
+    .file-icon-box i {
+        font-size: 1.2rem;
+    }
+
+    .view-text {
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .file-icon-box:hover {
+        transform: translateY(-2px);
+        color: #3730a3;
+    }
+
+    .no-file {
+        font-size: 0.9rem;
+        opacity: 0.5;
+    }
+
     /* Mobile Cards */
     .feedback-cards {
         display: none;
@@ -606,13 +733,13 @@
     .task-icon-mobile {
         width: 40px;
         height: 40px;
-        background: var(--bg-primary);
+        background: var(--bg-success);
         border: 1px solid var(--border-light);
         border-radius: var(--radius-sm);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #3b82f6;
+        color: #10b981;
         font-size: 1.125rem;
         flex-shrink: 0;
     }
@@ -636,7 +763,7 @@
         align-items: center;
         gap: 0.75rem;
         padding: 0.75rem;
-        background: var(--bg-primary);
+        background: var(--bg-success);
         border-radius: var(--radius-sm);
         border: 1px solid var(--border-light);
     }
@@ -744,7 +871,7 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
         text-decoration: none;
         border-radius: var(--radius-sm);
@@ -885,8 +1012,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // --- Role-based Export Logic (Babar Azam Style Persistence) ---
-        // Jab filter badle, tab export ke URL bhi update ho jayein
+        
         const params = `?q=${searchInput.value}&status=${statusFilter.value}`;
         if(exportExcelBtn) exportExcelBtn.href = `?export=excel&q=${searchInput.value}&status=${statusFilter.value}`;
         if(exportPDFBtn) exportPDFBtn.href = `?export=pdf&q=${searchInput.value}&status=${statusFilter.value}`;

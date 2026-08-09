@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    /* =============================================
+       Reply Letter Page - Premium Design
+       ============================================= */
+    :root {
+        --green-dark: #0d2b1e;
+        --green-main: #059669;
+        --green-light: #ecfdf5;
+        --green-border: #a7f3d0;
+        --text-dark: #111827;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --paper: #ffffff;
+        --radius: 12px;
+    }
+
+    .reply-wrapper {
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
+        padding: 28px 20px 50px;
+    }
+
+    /* ---- Top breadcrumb bar ---- */
+    .reply-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+    }
+
+    .reply-breadcrumb a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-muted);
+        font-size: .85rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 7px 14px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: all .15s;
+    }
+
+    .reply-breadcrumb a:hover {
+        color: var(--green-dark);
+        border-color: var(--green-main);
+        background: var(--green-light);
+    }
+
+    /* ---- Card ---- */
+    .reply-card {
+        background: var(--paper);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 24px rgba(15, 23, 42, .08);
+        overflow: hidden;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* ---- Header band ---- */
+    .reply-card-header {
+        background: linear-gradient(135deg, #0d2b1e 0%, #0f4030 100%);
+        padding: 28px 36px;
+        color: #fff;
+    }
+
+    .reply-card-header .badge-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #d1fae5;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .6px;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+    }
+
+    .reply-card-header h3 {
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin: 0 0 6px;
+    }
+
+    .reply-card-header p {
+        font-size: .87rem;
+        color: rgba(255,255,255,.6);
+        margin: 0;
+    }
+
+    /* ---- Original letter reference ---- */
+    .original-ref {
+        background: var(--green-light);
+        border: 1px solid var(--green-border);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 28px 36px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .original-ref .ref-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--green-main);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #fff;
+        font-size: .9rem;
+    }
+
+    .original-ref .ref-label {
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--green-main);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 2px;
+    }
+
+    .original-ref .ref-subject {
+        font-size: .95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .original-ref .ref-meta {
+        font-size: .8rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    /* ---- Form body ---- */
+    .reply-body {
+        padding: 28px 36px 36px;
+    }
+
+    .form-section-title {
+        font-size: .8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    /* TinyMCE wrapper */
+    #reply_text {
+        width: 100%;
+        min-height: 300px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-dark);
+        resize: vertical;
+    }
+
+    .tox-tinymce {
+        border-radius: 8px !important;
+        border-color: var(--border) !important;
+    }
+
+    /* Attachment box matching create_letter.html */
+    .attachment-box {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 18px 20px;
+        font-size: .88rem;
+    }
+
+    .attachment-box label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--green-dark);
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* Footer actions */
+    .reply-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 20px 36px;
+        border-top: 1px solid var(--border);
+        background: #fafafa;
+    }
+
+    .btn-cancel-reply {
+        padding: 10px 22px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: .88rem;
+        background: var(--paper);
+        cursor: pointer;
+        text-decoration: none;
+        transition: all .15s;
+    }
+
+    .btn-cancel-reply:hover {
+        border-color: #9ca3af;
+        color: var(--text-dark);
+    }
+
+    .btn-submit-reply {
+        padding: 10px 28px;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(135deg, #059669, #047857);
+        color: #fff;
+        font-weight: 700;
+        font-size: .9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 6px 16px rgba(5, 150, 105, .25);
+        transition: all .15s;
+    }
+
+    .btn-submit-reply:hover {
+        background: linear-gradient(135deg, #047857, #065f46);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(5, 150, 105, .35);
+    }
+
+    /* File name display */
+    #file-name-display {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: var(--green-light);
+        border: 1px solid var(--green-border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin-top: 10px;
+        font-size: .85rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+</style>
+
+<div class="reply-wrapper">
+    <!-- Breadcrumb / Back -->
+    <div class="reply-breadcrumb">
+        <a href="{% url 'letter_detail' letter.id %}">
+            <i class="fas fa-arrow-left"></i> Back to Letter
+        </a>
+    </div>
+
+    <div class="reply-card">
+        <!-- Header -->
+        <div class="reply-card-header">
+            <div class="badge-chip">
+                <i class="fas fa-reply"></i>
+                Official Reply
+            </div>
+            <h3><i class="fas fa-pen-alt me-2" style="opacity:.7;"></i>Reply to Official Letter</h3>
+            <p>Replying to <strong>{{ letter.sender.get_full_name|default:letter.sender.username }}</strong> &nbsp;&bull;&nbsp; Ref No: <strong>{{ letter.ref_no|default:"N/A" }}</strong></p>
+        </div>
+
+        <!-- Original letter ref banner -->
+        <div class="original-ref">
+            <div class="ref-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <div>
+                <div class="ref-label"> Letter Subject</div>
+                <div class="ref-subject">{{ letter.subject }}</div>
+                <div class="ref-meta">Sent on {{ letter.created_at|date:"d M, Y" }}</div>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="reply-body">
+                <!-- Reply Text -->
+                <div class="form-section-title mb-3">
+                    <i class="fas fa-pen-nib text-success"></i> Reply
+                </div>
+                <textarea id="reply_text" name="reply_text"></textarea>
+
+                <!-- Attachment -->
+                <div class="attachment-box mt-4">
+                    <label class="fw-bold mb-1">
+                        <i class="fas fa-paperclip me-1 text-success"></i> Attach Document / PDF (Optional)
+                    </label>
+                    <div id="attachments-container">
+                        <div class="d-flex align-items-center mt-2">
+                            <input type="file" name="reply_attachments" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-success mt-3" style="font-weight: 600;" onclick="addMoreAttachment()">
+                        <i class="fas fa-plus me-1"></i> Add More Document
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="reply-footer">
+                <a href="{% url 'letter_detail' letter.id %}" class="btn-cancel-reply">Cancel</a>
+                <button type="submit" class="btn-submit-reply">
+                    <i class="fas fa-paper-plane"></i> Submit Reply
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- TinyMCE from jsdelivr (no API key needed) -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js" crossorigin="anonymous"></script>
+<script>
+    tinymce.init({
+        selector: '#reply_text',
+        height: 400,
+        menubar: false,
+        plugins: 'advlist autolink lists link charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount',
+        toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor | table | removeformat',
+        font_size_formats: '10pt 11pt 12pt 14pt 16pt 18pt 20pt 24pt',
+        content_style: `
+            body {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 12pt;
+                line-height: 1.8;
+                color: #111827;
+                margin: 12px;
+            }
+            p { margin: 0 0 6pt; }
+            table { border-collapse: collapse; width: 100%; }
+            td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
+            th { background: #d1fae5; font-weight: 600; }
+        `,
+        skin: 'oxide',
+        branding: false,
+        statusbar: true,
+        elementpath: false,
+    });
+
+    // Add more attachments dynamically
+    function addMoreAttachment() {
+        const container = document.getElementById('attachments-container');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-flex align-items-center mt-2';
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'reply_attachments';
+        input.className = 'form-control form-control-sm';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-sm btn-outline-danger ms-2';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.style.padding = '0.25rem 0.5rem';
+        removeBtn.onclick = function () {
+            wrapper.remove();
+        };
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(removeBtn);
+        container.appendChild(wrapper);
+    }
+</script>
+
+{% endblock %}

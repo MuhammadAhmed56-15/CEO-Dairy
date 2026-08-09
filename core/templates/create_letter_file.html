@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary: #059669;
+        --primary-dark: #0d2b1e;
+        --primary-light: #10b981;
+        --primary-tint: #ecfdf5;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --border: #e6ebf1;
+        --bg: #f6f8fa;
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, .04);
+        --shadow-md: 0 12px 32px rgba(13, 43, 30, .07);
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    /* ---------- Header ---------- */
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-dark), #114430);
+        border-radius: var(--radius-lg);
+        padding: 30px 34px;
+        color: #fff;
+        box-shadow: 0 18px 40px rgba(13, 43, 30, .22);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::after {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, .05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .eyebrow-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .18);
+        color: #d1fae5;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 30px;
+        margin-bottom: 12px;
+    }
+
+    .page-header h2 {
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -.4px;
+        font-size: 1.6rem;
+    }
+
+    .page-header p {
+        opacity: .82;
+        margin-bottom: 0;
+        font-size: .9rem;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .22);
+        color: #fff;
+        font-weight: 600;
+        font-size: .85rem;
+        border-radius: var(--radius-md);
+        padding: 10px 18px;
+        transition: .2s ease;
+        white-space: nowrap;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, .2);
+        color: #fff;
+    }
+
+    /* ---------- Form card ---------- */
+
+    .form-card {
+        border: none;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        background: #fff;
+    }
+
+    .form-card .card-body {
+        padding: 36px;
+    }
+
+    .field-group {
+        margin-bottom: 24px;
+    }
+
+    .field-label {
+        font-weight: 700;
+        font-size: .87rem;
+        color: var(--ink);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .field-label .req {
+        color: #ef4444;
+        font-size: .8rem;
+    }
+
+    .field-label i {
+        color: var(--primary);
+        font-size: .85rem;
+        width: 16px;
+        text-align: center;
+    }
+
+    .field-hint {
+        font-size: .78rem;
+        color: var(--muted);
+        margin-top: 6px;
+    }
+
+    .form-control {
+        border: 1px solid #dbe3ec;
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        font-size: .93rem;
+        color: var(--ink);
+        transition: .2s ease;
+        background: #fbfcfe;
+    }
+
+    .form-control::placeholder {
+        color: #a3b0c2;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, .12);
+        background: #fff;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .char-counter {
+        font-size: .75rem;
+        color: #a3b0c2;
+        text-align: right;
+        margin-top: 6px;
+    }
+
+    /* ---------- Footer actions ---------- */
+
+    .form-footer {
+        border-top: 1px solid var(--border);
+        margin-top: 6px;
+        padding-top: 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn-cancel {
+        background: #f1f5f9;
+        color: var(--muted);
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        padding: 12px 22px;
+        border: none;
+        transition: .2s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #e2e8f0;
+        color: var(--ink);
+    }
+
+    .btn-save {
+        background: var(--primary-dark);
+        color: #fff;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        padding: 12px 26px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: .2s ease;
+        box-shadow: 0 8px 18px rgba(13, 43, 30, .18);
+    }
+
+    .btn-save:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    @media(max-width:768px) {
+
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header .row {
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-card .card-body {
+            padding: 26px 20px;
+        }
+
+        .form-footer {
+            flex-direction: column-reverse;
+        }
+
+        .btn-cancel,
+        .btn-save {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-xl-6">
+
+            <!-- Header -->
+
+            <div class="page-header mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+
+                    <div class="eyebrow-pill">
+                        <i class="fas fa-folder-plus"></i>
+                        New Registry Entry
+                    </div>
+
+                    <h2>Create New Letter File</h2>
+
+                    <p>Register a new letter file with a title and file number.</p>
+
+                </div>
+
+                <a href="{% url 'letter_files_list' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Files
+                </a>
+
+            </div>
+
+            <!-- Form -->
+
+            <div class="card form-card">
+
+                <div class="card-body">
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <div class="field-group">
+                            <label class="field-label" for="id_file_title">
+                                <i class="fas fa-heading"></i>
+                                File Title
+                                <span class="req">*</span>
+                            </label>
+                            <input type="text" id="id_file_title" name="file_title" class="form-control"
+                                placeholder="e.g. IT Department Letters 2026" maxlength="150" required>
+                            <div class="field-hint">A clear, descriptive name for this letter file.</div>
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" for="id_reference_number">
+                                <i class="fas fa-hashtag"></i>
+                                File Number
+                                <span class="req">*</span>
+                            </label>
+                            <input type="text" id="id_reference_number" name="reference_number" class="form-control"
+                                placeholder="e.g. REF/IT/2026/01" required>
+                            <div class="field-hint">Must be unique and follow the department's file numbering format.</div>
+                        </div>
+
+                        <div class="field-group mb-0">
+                            <label class="field-label" for="id_description">
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </label>
+                            <textarea id="id_description" name="description" class="form-control" rows="4"
+                                maxlength="500" placeholder="Brief details about this file..."></textarea>
+                            <div class="char-counter"><span id="descCount">0</span>/500</div>
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save"></i>
+                                Save File
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    (function () {
+        const desc = document.getElementById("id_description");
+        const counter = document.getElementById("descCount");
+
+        if (desc && counter) {
+            const update = () => { counter.textContent = desc.value.length; };
+            desc.addEventListener("input", update);
+            update();
+        }
+    })();
+</script>
+
+{% endblock %}

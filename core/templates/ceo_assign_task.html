@@ -3,285 +3,276 @@
 
 {% block extra_css %}
 <style>
+    /* Global Base Font Size Elevation — Pure UI ko mega scale par le jaane ke liye */
+    html, body {
+        font-size: 19px !important; /* Base size mazeed barha diya */
+    }
+
     /* Page Header Styling */
     .page-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         color: white;
-        padding: 40px;
-        border-radius: 15px;
+        padding: 25px 35px;
+        border-radius: 12px;
         margin-bottom: 30px;
-        box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     .page-header h2 {
         margin: 0;
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 700;
         display: flex;
         align-items: center;
         gap: 12px;
     }
-    
+
+    .page-header h2 i {
+        font-size: 32px !important;
+    }
+
     .page-header p {
-        margin: 10px 0 0 0;
+        margin: 8px 0 0 0;
         opacity: 0.95;
-        font-size: 15px;
-        font-weight: 400;
+        font-size: 16px;
+        font-weight: 500;
     }
 
     /* Form Container */
     .form-container {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        padding: 45px;
-        max-width: 950px;
+        border-radius: 16px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+        padding: 55px; /* Box ke andar ka space barhaya */
+        max-width: 1050px; /* Width thodi barhai taake text phaile na */
         margin: 0 auto;
     }
 
     /* Form Sections */
     .form-section {
-        margin-bottom: 35px;
-        padding-bottom: 35px;
-        border-bottom: 2px solid #f1f5f9;
+        margin-bottom: 45px;
+        padding-bottom: 45px;
+        border-bottom: 3px solid #f1f5f9; /* Border ko thoda solid kiya */
     }
-    
+
     .form-section:last-child {
         border-bottom: none;
         margin-bottom: 0;
         padding-bottom: 0;
     }
 
-    /* Section Titles */
+    /* Section Titles (e.g., Remarks & Feedback / Reference Attachments) */
     .section-title {
-        font-size: 20px;
-        font-weight: 700;
+        font-size: 28px; /* 24px se barha kar 28px kiya */
+        font-weight: 800;
         color: #1e293b;
-        margin-bottom: 25px;
+        margin-bottom: 35px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding-bottom: 12px;
-        border-bottom: 3px solid #3b82f6;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 4px solid #10b981; /* Line thodi moti ki */
     }
-    
+
     .section-title i {
-        color: #3b82f6;
-        font-size: 22px;
+        color: #10b981;
+        font-size: 32px; /* Icons ko 26px se 32px kiya */
     }
 
     /* Form Groups */
     .form-group {
-        margin-bottom: 25px;
+        margin-bottom: 35px;
     }
 
-    /* Form Labels */
+    /* Form Labels (e.g., RETURN REASON / CORRECTION NOTES) */
     .form-label {
-        font-weight: 600;
-        color: #334155;
-        margin-bottom: 10px;
-        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a; /* Thoda mazeed dark kiya taake wazay dikhay */
+        margin-bottom: 15px;
+        font-size: 19px; /* 16.5px se barha kar 19px kiya (Kafi wazay look) */
         display: flex;
         align-items: center;
-        gap: 8px;
-    }
-    
-    .form-label i {
-        color: #3b82f6;
-        font-size: 14px;
+        gap: 12px;
+        letter-spacing: 0.02em;
     }
 
-    /* Form Controls */
-    .form-control, .form-select {
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 14px 18px;
-        font-size: 15px;
+    .form-label i {
+        color: #10b981;
+        font-size: 22px; /* Labels ke sath wale icons barha diye */
+    }
+
+    /* Form Controls & Inputs Text Area (Typing text area) */
+    .form-control,
+    .form-select {
+        border: 2.5px solid #cbd5e1; /* Border thoda solid kiya */
+        border-radius: 12px;
+        padding: 18px 22px; /* Inputs ko mazeed khula aur easy-to-click kiya */
+        font-size: 19px; /* Input ke andar ki writing 17px se barha kar 19px ki */
         transition: all 0.3s ease;
         width: 100%;
         background: white;
+        color: #0f172a;
+        font-weight: 500;
     }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.35rem rgba(59, 130, 246, 0.2);
         outline: none;
         background: #fafbfc;
     }
-    
-    .form-control:hover, .form-select:hover {
-        border-color: #cbd5e1;
-    }
-    
+
     textarea.form-control {
-        min-height: 130px;
+        min-height: 180px; /* Height mazeed barhai */
         resize: vertical;
         font-family: inherit;
+        font-size: 19px !important; /* Plain text mode ka text bada kiya */
+        line-height: 1.8; /* Line spacing barhai taake parhne mein asani ho */
     }
 
-    /* Form Text (Helper) */
+    /* Form Text (Helper Text niche wala) */
     .form-text {
-        font-size: 13px;
-        color: #64748b;
-        margin-top: 8px;
+        font-size: 16.5px; /* 15px se barha kar 16.5px kiya */
+        color: #334155;
+        margin-top: 12px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 10px;
+        font-weight: 500;
     }
-    
+
     .form-text::before {
         content: "ℹ️";
-        font-size: 12px;
+        font-size: 16px;
     }
 
     /* Input Group with Icon */
     .input-group-icon {
         position: relative;
     }
-    
+
     .input-group-icon i {
         position: absolute;
-        left: 18px;
+        left: 20px;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 16px;
+        color: #64748b;
+        font-size: 22px; /* Input box ke andar ke icons mazeed barha diye */
         pointer-events: none;
         z-index: 1;
     }
-    
+
     .input-group-icon .form-control,
     .input-group-icon .form-select {
-        padding-left: 48px;
+        padding-left: 58px;
     }
 
-    /* Info Box */
+    /* Info Box (Blue Banner) */
     .info-box {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        border-left: 5px solid #3b82f6;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 30px;
+        background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+        border-left: 7px solid #10b981;
+        padding: 26px;
+        border-radius: 14px;
+        margin-bottom: 40px;
         display: flex;
         align-items: flex-start;
-        gap: 15px;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        gap: 18px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
     }
-    
+
     .info-box i {
-        color: #3b82f6;
-        font-size: 24px;
+        color: #10b981;
+        font-size: 32px; /* Info box icon 28px se 32px kiya */
         margin-top: 2px;
     }
-    
+
     .info-box-content {
         flex: 1;
     }
-    
+
     .info-box-title {
         font-weight: 700;
-        color: #1e40af;
-        margin-bottom: 6px;
-        font-size: 15px;
-    }
-    
-    .info-box-text {
-        color: #1e40af;
-        margin: 0;
-        font-size: 14px;
-        line-height: 1.6;
+        color: #0d2b1e;
+        margin-bottom: 10px;
+        font-size: 19px; /* Title size barhaya */
     }
 
-    /* Form Actions */
+    .info-box-text {
+        color: #0d2b1e;
+        margin: 0;
+        font-size: 17.5px; /* Details text barha diya */
+        line-height: 1.7;
+    }
+
+    /* Form Actions Area */
     .form-actions {
         display: flex;
-        gap: 15px;
+        gap: 20px;
         justify-content: flex-end;
-        margin-top: 35px;
-        padding-top: 35px;
-        border-top: 2px solid #f1f5f9;
+        margin-top: 45px;
+        padding-top: 40px;
+        border-top: 3px solid #f1f5f9;
     }
 
     /* Custom Buttons */
     .btn-custom {
-        padding: 14px 32px;
-        font-size: 15px;
-        font-weight: 600;
-        border-radius: 10px;
+        padding: 18px 42px; /* Buttons ka size aur solid kiya */
+        font-size: 19px; /* Buttons text 17px se 19px kiya */
+        font-weight: 700;
+        border-radius: 12px;
         border: none;
         transition: all 0.3s ease;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 14px;
         text-decoration: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    
+
     .btn-submit {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
     }
-    
+
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
     }
-    
-    .btn-submit:active {
-        transform: translateY(0);
-    }
-    
-    .btn-submit:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
+
     .btn-cancel {
         background: #e2e8f0;
-        color: #475569;
+        color: #334155;
     }
-    
+
     .btn-cancel:hover {
         background: #cbd5e1;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
         .form-container {
-            padding: 25px;
+            padding: 30px;
         }
-        
+
         .page-header {
-            padding: 25px;
+            padding: 20px;
         }
-        
+
         .page-header h2 {
             font-size: 24px;
         }
-        
+
         .form-actions {
             flex-direction: column;
         }
-        
+
         .btn-custom {
             width: 100%;
             justify-content: center;
-        }
-    }
-
-    /* Animation */
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
         }
     }
 </style>
@@ -293,9 +284,12 @@
         <div>
             <h2>
                 <i class="fas fa-plus-circle"></i>
-                Assign New Task
+                {{ user_role }} - Assign New Task
             </h2>
-            <p>Create and track a new task commitment for approval by CEO, GM, HR, or Manager</p>
+            <p>
+                Create a new task commitment for approval by
+                Authorized Management ({{ user_role }})
+            </p>
         </div>
     </div>
 </div>
@@ -308,7 +302,8 @@
             <i class="fas fa-info-circle"></i>
             <div class="info-box-content">
                 <div class="info-box-title">Important Information</div>
-                <p class="info-box-text">Fill in the task details below. Managers will review your commitment after approval.</p>
+                <p class="info-box-text">Fill in the task details below. Managers will review your commitment after
+                    approval.</p>
             </div>
         </div>
 
@@ -327,7 +322,8 @@
                         </label>
                         <div class="input-group-icon">
                             <i class="fas fa-heading"></i>
-                            <input type="text" name="title" class="form-control" placeholder="Enter task title" required>
+                            <input type="text" name="title" class="form-control" placeholder="Enter task title"
+                                required>
                         </div>
                         <small class="form-text">Give a clear and descriptive title for the task (Required)</small>
                     </div>
@@ -336,9 +332,11 @@
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fas fa-align-left"></i>
-                            Description <span class="text-muted" style="font-size: 0.8rem; font-weight: normal;">(Optional)</span>
+                            Description <span class="text-muted"
+                                style="font-size: 0.8rem; font-weight: normal;">(Optional)</span>
                         </label>
-                        <textarea name="description" class="form-control" placeholder="Provide detailed information about the task"></textarea>
+                        <textarea name="description" class="form-control"
+                            placeholder="Provide detailed information about the task"></textarea>
                         <small class="form-text">Provide detailed information about the task (Optional)</small>
                     </div>
                 </div>
@@ -363,20 +361,36 @@
                             <select name="assigned_to" class="form-select" required>
                                 <option value="" disabled selected>Select team member...</option>
                                 {% for user in form.fields.assigned_to.queryset %}
-                                    <option value="{{ user.id }}"
-                                        {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}
-                                            selected
-                                        {% endif %}
-                                    >
+
+                                {# 1. Pehle check karein ke user khud ko assign na kare #}
+                                {% if user.id != request.user.id %}
+
+                                {# 2. Agar CEO hai toh sab ko dikhao #}
+                                {% if request.user.profile.role == 'CEO' %}
+                                <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ user.username }} - {{ user.profile.role }}
+                                </option>
+
+                                {# 3. Agar GM hai toh CEO, PS aur dusre GMs ko chhupa do #}
+                                {% elif request.user.profile.role == 'GM' or request.user.username in 'GM_PMER,GM_Operation,GM_Project' %}
+                                    {% if user.profile.role != 'CEO' and user.profile.role != 'PS' and user.profile.role != 'GM' and 'GM' not in user.username %}
+                                    <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
                                         {{ user.username }} - {{ user.profile.role }}
                                     </option>
+                                    {% endif %}
+
+                                {# 4. Baqi sab roles ke liye #}
+                                {% else %}
+                                <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ user.username }} - {{ user.profile.role }}
+                                </option>
+                                {% endif %}
+
+                                {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
                         <small class="form-text">Select who should handle this task</small>
-                        {% if form.assigned_to.errors %}
-                            <div class="text-danger mt-2" style="font-size: 0.875rem;">{{ form.assigned_to.errors }}</div>
-                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -396,47 +410,30 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="form-actions">
-            <a href="{% url 'ceo_dashboard' %}" class="btn-custom btn-cancel">
-                <i class="fas fa-times"></i>
-                Cancel
+        <div class="d-flex gap-3 mt-4">
+            <a href="{% if request.user.profile.role == 'GM' %}{% url 'gm_dashboard' %}{% elif request.user.profile.role == 'Manager' %}{% url 'manager_dashboard' %}{% elif request.user.profile.role == 'PS' %}{% url 'ps_dashboard' %}{% else %}{% url 'ceo_dashboard' %}{% endif %}"
+                class="btn btn-secondary flex-fill py-2" style="font-weight: 500; font-size: 1.1rem;">
+                <i class="fas fa-times me-2"></i> Cancel
             </a>
-            <button type="submit" class="btn-custom btn-submit">
-                <i class="fas fa-check"></i>
-                Create Task
+            <button type="submit" class="btn btn-success flex-fill py-2" style="font-weight: 500; font-size: 1.1rem;">
+                <i class="fas fa-check me-2"></i> Create Task
             </button>
         </div>
     </form>
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('taskForm');
-        const submitBtn = form.querySelector('.btn-submit');
-        
-        // Form submission handler
-        form.addEventListener('submit', function(e) {
-            // Disable submit button and show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Task...';
-        });
-
-        // Enhanced form interactions
-        const formControls = document.querySelectorAll('.form-control, .form-select');
-        formControls.forEach(control => {
-            // Add visual feedback on interaction
-            control.addEventListener('focus', function() {
-                this.style.borderColor = '#3b82f6';
-            });
-            
-            control.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.style.borderColor = '#e2e8f0';
+        {% block extra_js %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.querySelector('form');
+                const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+                if (form && submitBtn) {
+                    form.addEventListener('submit', function () {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Task...';
+                    });
                 }
             });
-        });
-    });
-</script>
-{% endblock %}
+        </script>
+        {% endblock %}

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-7)d7a3o$ot4hm$zqjm3q)r7he8*q2wwpq!xrie@wiq328wzv6i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.16.50.98', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'tinymce', # <-- TinyMCE Editor yahan successfully add ho gaya hai
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.unread_notesheets',
+                'core.context_processors.notifications_processor',
             ],
         },
     },
@@ -105,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Karachi'
 
 USE_I18N = True
 
@@ -116,8 +119,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Increase upload limits for large attachments (bytes)
+# Allow up to 50 MB per uploaded file and ~150 MB for POST payloads
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 150 * 1024 * 1024  # 150 MB
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login ke baad kahan jana hai
+LOGIN_REDIRECT_URL = '/gm/'
+
+# Agar login na ho toh kahan bhejna hai
+LOGIN_URL = 'login'
+
+# Logout ke baad kahan jana hai
+LOGOUT_REDIRECT_URL = 'login'

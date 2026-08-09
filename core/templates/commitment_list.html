@@ -5,7 +5,7 @@
 <style>
     /* ========== GLOBAL FOUNDATION ========== */
     body {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%) !important;
         min-height: 100vh;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
@@ -26,7 +26,7 @@
     }
 
     .table-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         padding: 1.5rem 2rem;
         color: white;
     }
@@ -59,7 +59,7 @@
 
     .dataTables_filter input:focus {
         outline: none !important;
-        border-color: #3b82f6 !important;
+        border-color: #10b981 !important;
         background-color: white !important;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
     }
@@ -84,7 +84,7 @@
     }
 
     .custom-table thead th i {
-        color: #3b82f6;
+        color: #10b981;
         margin-right: 0.5rem;
         font-size: 0.875rem;
     }
@@ -101,7 +101,7 @@
     }
 
     .custom-table tbody tr:hover {
-        background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%) !important;
+        background: linear-gradient(90deg, #f0fdf4 0%, #d1fae5 100%) !important;
         transform: scale(1.01);
         box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
     }
@@ -164,9 +164,9 @@
     }
 
     .category-normal {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        color: #1e40af;
-        border: 2px solid #3b82f6;
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #0d2b1e;
+        border: 2px solid #10b981;
     }
 
     .category-urgent {
@@ -181,18 +181,31 @@
     }
 
     @keyframes urgentPulse {
-        0%, 100% { 
+
+        0%,
+        100% {
             box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
         }
-        50% { 
+
+        50% {
             box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
         }
     }
 
     @keyframes shake {
-        0%, 100% { transform: rotate(0deg); }
-        25% { transform: rotate(-15deg); }
-        75% { transform: rotate(15deg); }
+
+        0%,
+        100% {
+            transform: rotate(0deg);
+        }
+
+        25% {
+            transform: rotate(-15deg);
+        }
+
+        75% {
+            transform: rotate(15deg);
+        }
     }
 
     /* ========== LOCATION ========== */
@@ -203,7 +216,7 @@
     }
 
     .location-cell i {
-        color: #3b82f6;
+        color: #10b981;
         margin-right: 0.5rem;
     }
 
@@ -227,7 +240,7 @@
 
     .date-secondary {
         font-size: 0.8rem;
-        color: #3b82f6;
+        color: #10b981;
         font-weight: 600;
     }
 
@@ -291,8 +304,15 @@
     }
 
     @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
     }
 
     /* ========== OWNER AVATAR ========== */
@@ -306,7 +326,7 @@
         width: 40px;
         height: 40px;
         border-radius: 12px;
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -378,7 +398,7 @@
     }
 
     .btn-edit {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
@@ -422,13 +442,13 @@
     }
 
     .dataTables_paginate .paginate_button:hover {
-        background: #3b82f6 !important;
+        background: #10b981 !important;
         color: white !important;
-        border-color: #3b82f6 !important;
+        border-color: #10b981 !important;
     }
 
     .dataTables_paginate .paginate_button.current {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        background: linear-gradient(135deg, #0d2b1e 0%, #10b981 100%) !important;
         color: white !important;
         border-color: transparent !important;
     }
@@ -445,7 +465,7 @@
         .page-title {
             font-size: 1.5rem;
         }
-        
+
         .dataTables_filter input {
             width: 100% !important;
         }
@@ -486,7 +506,7 @@
 
     .premium-control:focus {
         background: #ffffff !important;
-        border-color: #3b82f6 !important;
+        border-color: #10b981 !important;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
         transform: translateY(-1px);
     }
@@ -508,7 +528,11 @@
     }
 
     /* DataTables Default UI Ko Clean Karein */
-    .dataTables_filter { display: none; } /* Purana search hide karein kyunke humne naya bana liya hai */
+    .dataTables_filter {
+        display: none;
+    }
+
+    /* Purana search hide karein kyunke humne naya bana liya hai */
     .dataTables_length select {
         border-radius: 8px;
         border: 1px solid #e2e8f0;
@@ -530,6 +554,7 @@
         color: #e11d48;
         border: 1px solid #fecdd3;
     }
+
     .btn-pdf:hover {
         background: #e11d48;
         color: white;
@@ -542,6 +567,7 @@
         color: #16a34a;
         border: 1px solid #bbf7d0;
     }
+
     .btn-excel:hover {
         background: #16a34a;
         color: white;
@@ -556,11 +582,11 @@
     <div class="table-card">
         <div class="table-header">
             <h2 class="table-title">
-                <i class="fas fa-table me-2"></i>All Commitments
+                <i class="fas fa-table me-2"></i>My Commitments
             </h2>
         </div>
-        
-        
+
+
         <div class="table-responsive">
             <table id="commitmentTable" class="table custom-table mb-0">
                 <thead>
@@ -577,7 +603,7 @@
                 </thead>
                 <tbody>
                     {% for c in commitments %}
-                    <tr {% if c.category == 'urgent' or c.category == 'Urgent' %}class="urgent-row"{% endif %}>
+                    <tr {% if c.category == 'urgent' or c.category == 'Urgent' %}class="urgent-row" {% endif %}>
                         <td>
                             <div class="commitment-title">{{ c.title }}</div>
                         </td>
@@ -587,13 +613,14 @@
                             </div>
                         </td>
                         <td>
-                            <span class="category-badge {% if c.category == 'urgent' or c.category == 'Urgent' %}category-urgent{% else %}category-normal{% endif %}">
+                            <span
+                                class="category-badge {% if c.category == 'urgent' or c.category == 'Urgent' %}category-urgent{% else %}category-normal{% endif %}">
                                 {% if c.category == 'urgent' or c.category == 'Urgent' %}
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Urgent
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Urgent
                                 {% else %}
-                                    <i class="fas fa-folder"></i>
-                                    {{ c.category|default:"Normal" }}
+                                <i class="fas fa-folder"></i>
+                                {{ c.category|default:"Normal" }}
                                 {% endif %}
                             </span>
                         </td>
@@ -609,7 +636,8 @@
                             </div>
                         </td>
                         <td>
-                            <span class="status-badge {% if c.status == 'Pending' %}badge-pending{% elif c.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                            <span
+                                class="status-badge {% if c.status == 'Pending' %}badge-pending{% elif c.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
                                 <span class="status-icon"></span>
                                 {{ c.status|upper }}
                             </span>
@@ -625,25 +653,36 @@
                         <td>
                             <div class="action-buttons">
                                 {% if profile.role == "CEO" %}
-                                    {% if c.status == 'Pending' %}
-                                        <a href="{% url 'update_status' c.pk 'Approved' %}" class="btn-action btn-approve" title="Approve">
-                                            <i class="fas fa-check"></i>
-                                            <span>Approve</span>
-                                        </a>
-                                        <a href="{% url 'update_status' c.pk 'Rejected' %}" class="btn-action btn-reject" title="Reject">
-                                            <i class="fas fa-times"></i>
-                                            <span>Reject</span>
-                                        </a>
-                                    {% else %}
-                                        <span class="finalized-text">Finalized</span>
-                                    {% endif %}
+                                {% if c.status == 'Pending' %}
+                                <a href="{% url 'update_status' c.pk 'Approved' %}" class="btn-action btn-approve"
+                                    title="Approve">
+                                    <i class="fas fa-check"></i>
+                                    <span>Approve</span>
+                                </a>
+                                <a href="{% url 'update_status' c.pk 'Rejected' %}" class="btn-action btn-reject"
+                                    title="Reject">
+                                    <i class="fas fa-times"></i>
+                                    <span>Reject</span>
+                                </a>
                                 {% else %}
-                                    {% if not c.is_expired %}
-                                        <a href="{% url 'edit_commitment' c.pk %}" class="btn-action btn-edit" title="Edit Commitment">
-                                            <i class="fas fa-edit"></i>
-                                            <span>Edit</span>
-                                        </a>
-                                    {% endif %}
+                                <span class="finalized-text">Finalized</span>
+                                {% endif %}
+                                {% else %}
+                                {% if c.status == 'Approved' or c.status == 'Rejected' %}
+                                <span class="finalized-text">
+                                    <i class="fas fa-lock me-1"></i> Finalized
+                                </span>
+                                {% elif not c.is_expired %}
+                                <a href="{% url 'edit_commitment' c.pk %}" class="btn-action btn-edit"
+                                    title="Edit Commitment">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Edit</span>
+                                </a>
+                                {% else %}
+                                <span class="finalized-text">
+                                    <i class="fas fa-clock me-1"></i> Expired
+                                </span>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>
@@ -667,70 +706,70 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-    // Initialize Table with Export Buttons support
-    var table = $('#commitmentTable').DataTable({
-        "dom": 'lrtipB', // 'B' adds buttons functionality
-        "pageLength": 10,
-        "language": {
-            "lengthMenu": "Show _MENU_ entries"
-        },
-        "buttons": [
-            {
-                extend: 'excelHtml5',
-                title: 'CEO Commitment Diary - Excel Export',
-                className: 'd-none', // Default buttons hide rakhein kyunke humne custom buttons banaye hain
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6] // Sirf data columns export karein, 'Actions' nahi
-                }
+    $(document).ready(function () {
+        // Initialize Table with Export Buttons support
+        var table = $('#commitmentTable').DataTable({
+            "dom": 'lrtipB', // 'B' adds buttons functionality
+            "pageLength": 10,
+            "language": {
+                "lengthMenu": "Show _MENU_ entries"
             },
-            {
-                extend: 'pdfHtml5',
-                title: 'CEO Commitment Diary - PDF Report',
-                orientation: 'landscape',
-                pageSize: 'A4',
-                className: 'd-none',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6]
+            "buttons": [
+                {
+                    extend: 'excelHtml5',
+                    title: 'CEO Commitment Diary - Excel Export',
+                    className: 'd-none', // Default buttons hide rakhein kyunke humne custom buttons banaye hain
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6] // Sirf data columns export karein, 'Actions' nahi
+                    }
                 },
-                customize: function (doc) {
-                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
-                    doc.styles.tableHeader.fillColor = '#1e40af'; // Manager Theme Color
+                {
+                    extend: 'pdfHtml5',
+                    title: 'CEO Commitment Diary - PDF Report',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    className: 'd-none',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    },
+                    customize: function (doc) {
+                        doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+                        doc.styles.tableHeader.fillColor = '#0d2b1e'; // Manager Theme Color
+                    }
                 }
-            }
-        ]
-    });
+            ]
+        });
 
-    // Custom Search (Integrated)
-    $('#customSearch').on('keyup', function() {
-        table.search(this.value).draw();
-    });
+        // Custom Search (Integrated)
+        $('#customSearch').on('keyup', function () {
+            table.search(this.value).draw();
+        });
 
-    // Category Filter (Column 2)
-    $('#categoryFilter').on('change', function() {
-        table.column(2).search(this.value).draw();
-    });
+        // Category Filter (Column 2)
+        $('#categoryFilter').on('change', function () {
+            table.column(2).search(this.value).draw();
+        });
 
-    // Status Filter (Column 5)
-    $('#statusFilter').on('change', function() {
-        table.column(5).search(this.value).draw();
-    });
+        // Status Filter (Column 5)
+        $('#statusFilter').on('change', function () {
+            table.column(5).search(this.value).draw();
+        });
 
-    // Reset Logic
-    $('#resetFilters').on('click', function() {
-        $('#customSearch, #categoryFilter, #statusFilter').val('');
-        table.search('').columns().search('').draw();
-    });
+        // Reset Logic
+        $('#resetFilters').on('click', function () {
+            $('#customSearch, #categoryFilter, #statusFilter').val('');
+            table.search('').columns().search('').draw();
+        });
 
-    // PDF Export Trigger (Connecting your custom button)
-    $('#exportPDF').on('click', function() {
-        table.button('.buttons-pdf').trigger();
-    });
+        // PDF Export Trigger (Connecting your custom button)
+        $('#exportPDF').on('click', function () {
+            table.button('.buttons-pdf').trigger();
+        });
 
-    // Excel Export Trigger (Connecting your custom button)
-    $('#exportExcel').on('click', function() {
-        table.button('.buttons-excel').trigger();
+        // Excel Export Trigger (Connecting your custom button)
+        $('#exportExcel').on('click', function () {
+            table.button('.buttons-excel').trigger();
+        });
     });
-});
 </script>
 {% endblock %}

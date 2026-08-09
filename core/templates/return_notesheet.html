@@ -1,0 +1,1939 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+  rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js" crossorigin="anonymous"
+  referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block content %}
+
+<style>
+  :root {
+    --color-primary-900: #0a2118;
+    --color-primary-800: #0d2b1e;
+    --color-primary-700: #1a4731;
+    --color-primary-600: #059669;
+    --color-primary-500: #10b981;
+    --color-primary-100: #d1fae5;
+    --color-primary-50: #f0fdf4;
+
+    --color-gray-900: #0a2118;
+    --color-gray-700: #334155;
+    --color-gray-600: #475569;
+    --color-gray-500: #64748b;
+    --color-gray-400: #94a3b8;
+    --color-gray-200: #e2e8f0;
+    --color-gray-100: #f1f5f9;
+    --color-gray-50: #f8fafc;
+
+    --color-danger-50: #fef2f2;
+    --color-danger-100: #fee2e2;
+    --color-danger-500: #ef4444;
+    --color-danger-600: #dc2626;
+    --color-danger-700: #b91c1c;
+
+    --color-neutral-400: #9ca3af;
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', var(--font-sans);
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 0 3px var(--color-primary-100);
+
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+
+    --container-max: 960px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page-container {
+    min-height: 100vh;
+    padding: var(--space-6) var(--space-4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-container::before,
+  .page-container::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .page-container::before {
+    width: 600px;
+    height: 600px;
+    background: var(--color-primary-500);
+    top: -200px;
+    right: -200px;
+  }
+
+  .page-container::after {
+    width: 400px;
+    height: 400px;
+    background: var(--color-primary-600);
+    bottom: -100px;
+    left: -100px;
+  }
+
+  .content-wrapper {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .content-wrapper.col-lg-12 {
+    max-width: 100%;
+  }
+
+  .ns-card {
+    background: white;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: slideUp var(--transition-slow) ease-out;
+    contain: layout style paint;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ns-card {
+      animation: none;
+    }
+  }
+
+  .ns-header {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+    padding: var(--space-8) var(--space-6);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .ns-header {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: var(--space-10) var(--space-8);
+    }
+  }
+
+  .ns-header__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ns-header__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgb(255 255 255 / 0.1);
+    color: var(--color-primary-100);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    margin-bottom: var(--space-3);
+  }
+
+  .ns-header__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    word-break: break-word;
+  }
+
+  .ns-header__subtitle {
+    margin-top: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: rgb(255 255 255 / 0.6);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .ns-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    .ns-header__actions {
+      margin-top: var(--space-2);
+    }
+  }
+
+  .ns-header__bg-icon {
+    position: absolute;
+    right: var(--space-8);
+    bottom: var(--space-4);
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .ns-header__bg-icon svg {
+    width: 90px;
+    height: 90px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    background: none;
+  }
+
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn--ghost {
+    background: rgb(255 255 255 / 0.1);
+    border-color: rgb(255 255 255 / 0.2);
+    color: white;
+  }
+
+  .btn--ghost:hover {
+    background: rgb(255 255 255 / 0.2);
+    border-color: rgb(255 255 255 / 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn--cancel {
+    background: transparent;
+    border-color: var(--color-gray-200);
+    color: var(--color-gray-600);
+  }
+
+  .btn--cancel:hover {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-400);
+    transform: translateY(-1px);
+  }
+
+  .btn--danger {
+    background: var(--color-danger-500);
+    border-color: var(--color-danger-500);
+    color: white;
+  }
+
+  .btn--danger:hover {
+    background: var(--color-danger-700);
+    border-color: var(--color-danger-700);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn__icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .ns-body {
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-gray-50);
+  }
+
+  @media (min-width: 640px) {
+    .ns-body {
+      padding: var(--space-10) var(--space-8);
+    }
+  }
+
+  .section {
+    margin-bottom: var(--space-10);
+    animation: fadeIn var(--transition-base) ease-out backwards;
+  }
+
+  .section:last-child {
+    margin-bottom: 0;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .field-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-primary-600);
+  }
+
+  .field-label__icon {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .field-label__required {
+    color: var(--color-danger-500);
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+
+  .btn-toggle-formatting {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-100);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    color: var(--color-primary-700);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all var(--transition-fast);
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+
+  .btn-toggle-formatting:hover {
+    background: var(--color-primary-100);
+    border-color: var(--color-primary-500);
+  }
+
+  .btn-toggle-formatting.active {
+    background: var(--color-primary-600);
+    color: white;
+    border-color: var(--color-primary-700);
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .editor-wrapper-block {
+    width: 100%;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-xl);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    color: var(--color-gray-900);
+    background: white;
+    box-shadow: var(--shadow-sm);
+    resize: vertical;
+    line-height: 1.7;
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    min-height: 12rem;
+  }
+
+  .form-input::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  .form-input:hover {
+    border-color: var(--color-gray-400);
+  }
+
+  .form-input:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .field-help {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    color: var(--color-gray-400);
+  }
+
+  .tox-tinymce {
+    border: 2px solid var(--color-primary-600) !important;
+    border-radius: var(--radius-xl) !important;
+    width: 100% !important;
+    font-family: var(--font-sans) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .tox .tox-toolbar,
+  .tox .tox-toolbar__overflow,
+  .tox .tox-toolbar-overlord {
+    background: #f0f4ff !important;
+  }
+
+  .tox .tox-toolbar__primary {
+    border-bottom: 1px solid #c7d7fc !important;
+    background: #f0f4ff !important;
+  }
+
+  .tox .tox-toolbar__secondary {
+    background: #e8effd !important;
+    border-bottom: 1px solid #c7d7fc !important;
+  }
+
+  .tox .tox-tbtn:hover {
+    background: #dbe8fd !important;
+    border-radius: 4px !important;
+  }
+
+  .tox .tox-tbtn--enabled,
+  .tox .tox-tbtn--enabled:hover {
+    background: #bfd4fc !important;
+    border-radius: 4px !important;
+  }
+
+  .tox .tox-tbtn--select {
+    min-width: 90px !important;
+  }
+
+  .tox .tox-tbtn--select .tox-tbtn__select-label {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+  }
+
+  .attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: white;
+    border: 2px solid var(--color-primary-100);
+    border-radius: var(--radius-xl);
+    padding: 0.5rem 0.85rem;
+    animation: fadeInRow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-wrap: wrap;
+  }
+
+  @keyframes fadeInRow {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .attachment-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-md);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+    letter-spacing: 0.03em;
+  }
+
+  .badge--flag {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  }
+
+  .badge--annex {
+    background: #7c3aed;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+  }
+
+  .badge--puc {
+    background: #0369a1;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(3, 105, 161, 0.3);
+  }
+
+  .type-select {
+    padding: 0.35rem 2rem 0.35rem 0.7rem;
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-primary-800);
+    background: white;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 12px;
+    min-width: 120px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    flex-shrink: 0;
+  }
+
+  .type-select:focus {
+    border-color: var(--color-primary-600);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
+  }
+
+  .attachment-item__input {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+  }
+
+  .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: transparent;
+    color: var(--color-neutral-400);
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  .btn-icon:hover {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border: 2px dashed var(--color-primary-100);
+    border-radius: var(--radius-xl);
+    color: var(--color-primary-700);
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    transition: all var(--transition-fast);
+    margin-top: 0.25rem;
+  }
+
+  .btn-add:hover {
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-600);
+  }
+
+  /* ============================================
+     DIGITAL SIGNATURE AUTO-STAMP (MODERN COMPACT)
+     ============================================ */
+  .signature-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .signature-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: #0f9d58;
+    color: white;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(15, 157, 88, 0.25);
+  }
+  
+  .signature-section-title {
+    color: #0d5c38;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .signature-stamp-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .signature-stamp-box__img-wrap {
+    background: #eef8f3;
+    border-radius: 12px;
+    padding: 0.8rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .signature-stamp-box__img {
+    max-height: 52px;
+    max-width: 160px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .signature-stamp-box__name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #111827;
+  }
+
+  .signature-stamp-box__role {
+    font-size: 0.85rem;
+    color: #4b5563;
+    margin-bottom: 0.2rem;
+  }
+
+  .signature-stamp-box__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.8rem;
+    background: #eef8f3;
+    color: #0f9d58;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+  }
+
+  .signature-missing-box {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #fffbeb;
+    border: 2px dashed #fcd34d;
+    border-radius: var(--radius-xl);
+    padding: 0.85rem 1.1rem;
+    color: #92400e;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .signature-missing-box svg {
+    flex-shrink: 0;
+  }
+
+  .signature-missing-box a {
+    color: #b45309;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-gray-200);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 640px) {
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Keyframes for loading spinner */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .preview-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .preview-modal-overlay.active {
+    display: flex;
+  }
+
+  .preview-modal {
+    background: white;
+    border-radius: var(--radius-2xl);
+    width: 100%;
+    max-width: 95vw;
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .preview-modal-header {
+    background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .preview-modal-header h2 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .preview-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .preview-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .preview-modal-body {
+    padding: 2rem;
+    overflow-y: scroll;
+    overflow-x: auto;
+    flex: 1;
+    background: #e8e8e8;
+    display: block;
+  }
+
+  .preview-page-wrapper {
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .preview-section {
+    background: white;
+    width: 850px;
+    min-height: 297mm;
+    height: auto;
+    padding: 0;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    display: block;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+
+  .preview-modal-footer {
+    padding: 1rem 1.75rem;
+    background: white;
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .btn-close-preview {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-gray-100);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-xl);
+    color: var(--color-gray-700);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .btn-close-preview:hover {
+    background: var(--color-gray-200);
+  }
+
+  .info-banner {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-100);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .info-banner__text {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-primary-700);
+  }
+
+  .info-banner__text strong {
+    font-weight: 700;
+    color: var(--color-primary-900);
+  }
+</style>
+
+
+<!-- Preview Modal -->
+<div class="preview-modal-overlay" id="previewModalOverlay">
+  <div class="preview-modal">
+    <div class="preview-modal-header">
+      <h2>📄 Notesheet Preview</h2>
+      <button class="preview-close-btn" id="previewCloseBtn">✕</button>
+    </div>
+    <div class="preview-modal-body">
+      <div class="preview-page-wrapper">
+        <div class="preview-section">
+          <iframe id="preview-iframe" style="width:100%; height:100%; border:none; display:block;"
+            sandbox="allow-same-origin">
+          </iframe>
+        </div>
+      </div>
+    </div>
+    <div class="preview-modal-footer">
+      <button class="btn-print-preview" id="previewPrintBtn" style="
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #0d5c38 0%, #10b981 100%);
+        border: none;
+        border-radius: var(--radius-xl);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s;
+      ">🖨️ Print / Save as PDF</button>
+      <button class="btn-close-preview" id="previewCloseBtnFooter">✕ Close Preview</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="page-container col-lg-12 col-md-12">
+  <div class="content-wrapper col-lg-12">
+    <article class="ns-card" aria-labelledby="return-title">
+
+      <header class="ns-header col-lg-12 ">
+        <div class="ns-header__content">
+          <span class="ns-header__badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Return Document
+          </span>
+
+          <h1 id="return-title" class="ns-header__title">Return Notesheet</h1>
+
+          <div class="ns-header__subtitle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            {{ notesheet.title }}
+          </div>
+        </div>
+
+        <div class="ns-header__actions">
+          <a href="javascript:history.back()" class="btn btn--ghost" aria-label="Cancel and go back">
+            <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Cancel
+          </a>
+        </div>
+
+        <div class="ns-header__bg-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M20 9.5H7.14m3.74-3.74L7.14 9.5l3.74 3.74" />
+          </svg>
+        </div>
+      </header>
+
+      <div class="ns-body">
+
+        <div class="section">
+          <div class="info-banner" role="note">
+            <p class="info-banner__text">
+              You are returning <strong>{{ notesheet.title }}</strong>. The remark you provide will be recorded in the
+              return history and will be visible to the original sender.
+              {% if existing_flag_count > 0 or existing_annexure_count > 0 or existing_puc_count > 0 %}
+              <br><br>
+              This notesheet already has <strong>{{ existing_flag_count }} flag(s)</strong>,
+              <strong>{{ existing_annexure_count }} annexure(s)</strong>, and
+              <strong>{{ existing_puc_count }} PUC(s)</strong> already assigned.
+              Any new attachments will continue from the next available sequence.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+
+        <form action="" method="POST" enctype="multipart/form-data" id="return-form">
+          {% csrf_token %}
+
+          <section class="section" aria-labelledby="remark-heading">
+            <div class="field-group">
+              <div class="field-label-container">
+                <label for="remark" class="field-label">
+                  <span class="field-label__icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                  </span>
+                  Remarks &amp; Feedback <span class="field-label__required" aria-label="required">*</span>
+                </label>
+                <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+                  <button type="button" id="toggle-rich-editor" class="btn-toggle-formatting">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                    Formatting Tools
+                  </button>
+                  <button type="button" id="preview-btn" class="btn-toggle-formatting"
+                    style="background: var(--color-primary-600); color: white; border-color: var(--color-primary-700);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Preview
+                  </button>
+                </div>
+              </div>
+
+              <div class="input-wrapper editor-wrapper-block" style="width: 100%; max-width: 100%;">
+                <textarea id="remark" name="remark" class="form-input"
+                  placeholder="Describe the reason for returning this notesheet, or specify the corrections required..."
+                  required rows="14"
+                  style="resize: vertical; min-height: 460px; font-family: Calibri, sans-serif; font-size: 1rem; line-height: 1.8;"></textarea>
+              </div>
+              <p class="field-help" id="remark-hint">This field is mandatory before submitting the return request.</p>
+            </div>
+          </section>
+
+          <section class="section" aria-labelledby="attachments-heading">
+            <div class="field-group">
+              <label class="field-label">
+                <span class="field-label__icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path
+                      d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                  </svg>
+                </span>
+                Supporting Attachments
+              </label>
+
+              <div class="attachment-list" id="attachment-list-container">
+                <!-- First row injected by JS on DOMContentLoaded -->
+              </div>
+
+              <button type="button" class="btn-add" id="add-attachment-btn"><span>+ Add More File</span></button>
+            </div>
+          </section>
+
+          <!-- Digital Signature Section -->
+          <section class="section" aria-labelledby="sig-heading" style="margin-top: 1.5rem;">
+            <div class="field-group">
+              <div class="signature-section-header" id="sig-heading">
+                <div class="signature-section-icon">✒️</div>
+                <div class="signature-section-title">Digital Signature</div>
+              </div>
+
+              {% if user.profile.signature %}
+              <div class="signature-stamp-box">
+                <div class="signature-stamp-box__img-wrap">
+                  <img src="{{ user.profile.signature.url }}" alt="Digital Signature" class="signature-stamp-box__img">
+                </div>
+                <span class="signature-stamp-box__name">{{ user.get_full_name|default:user.username }}</span>
+                <span class="signature-stamp-box__role">{{ user.profile.role }} · Signed Digitally</span>
+                <!-- Date/time shown below — reflects notesheet action date -->
+                <span style="
+                  display: inline-flex; align-items: center; gap: 0.4rem;
+                  font-size: 0.82rem; color: #374151; font-weight: 600;
+                  margin-top: 0.35rem;
+                  background: #f3f4f6; border: 1px solid #e5e7eb;
+                  border-radius: 6px; padding: 3px 10px;
+                  letter-spacing: 0.01em;
+                ">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  {% now "d M Y" %}
+                  &nbsp;&middot;&nbsp;
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {% now "h:i A" %}
+                </span>
+              </div>
+              {% else %}
+              <div class="signature-missing-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span>No saved signature found on your profile. <a href="{% url 'edit_profile_signature' %}?next={{ request.path }}">Add your digital signature</a> once to have it auto-stamped on every notesheet.</span>
+              </div>
+              {% endif %}
+            </div>
+          </section>
+
+          <div class="section form-actions">
+            <a href="javascript:history.back()" class="btn btn--cancel" aria-label="Cancel return">
+              <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Cancel
+            </a>
+
+            <button type="submit" class="btn btn--danger" aria-label="Confirm and return notesheet">
+              <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 9.5H7.14m3.74-3.74L7.14 9.5l3.74 3.74" />
+              </svg>
+              Return Notesheet
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </article>
+  </div>
+</div>
+
+<script>
+  const existingFlagCount = parseInt('{{ existing_flag_count|default:0 }}') || 0;
+  const existingAnnexureCount = parseInt('{{ existing_annexure_count|default:0 }}') || 0;
+  const existingPucCount = parseInt('{{ existing_puc_count|default:0 }}') || 0;
+
+  function indexToFlag(idx) {
+    const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '', n = idx + 1;
+    while (n > 0) { n--; result = alpha[n % 26] + result; n = Math.floor(n / 26); }
+    return result;
+  }
+
+  function indexToRoman(idx) {
+    const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+    const syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+    let n = idx + 1, r = '';
+    for (let i = 0; i < vals.length; i++) { while (n >= vals[i]) { r += syms[i]; n -= vals[i]; } }
+    return r;
+  }
+
+  function indexToPUC(idx) { return idx + 1; }
+
+  const TYPE_CLASS = { flag: 'badge--flag', annexure: 'badge--annex', puc: 'badge--puc' };
+
+  function recalculateAllBadges() {
+    const rows = document.getElementById('attachment-list-container')
+      .querySelectorAll('.attachment-item');
+    const counters = { flag: existingFlagCount, annexure: existingAnnexureCount, puc: existingPucCount };
+
+    rows.forEach(function (row) {
+      const type = row.querySelector('.type-select').value;
+      const idx = counters[type]++;
+      const badge = row.querySelector('.auto-badge');
+
+      let label = '';
+      if (type === 'flag') label = 'Flag ' + indexToFlag(idx);
+      else if (type === 'annexure') label = 'Annexure ' + indexToRoman(idx);
+      else label = 'PUC ' + indexToPUC(idx);
+
+      badge.textContent = label;
+      badge.className = 'badge auto-badge ' + TYPE_CLASS[type];
+
+      row.querySelector('input[name="attachment_flag[]"]').value = type === 'flag' ? label : '';
+      row.querySelector('input[name="attachment_annexure[]"]').value = type === 'annexure' ? label : '';
+      row.querySelector('input[name="attachment_puc[]"]').value = type === 'puc' ? label : '';
+      row.querySelector('input[name="attachment_labels[]"]').value = label;
+    });
+  }
+
+  function buildAttachmentRow(isFirst) {
+    const item = document.createElement('div');
+    item.className = 'attachment-item';
+
+    const delBtn = isFirst
+      ? `<div style="width:36px;"></div>`
+      : `<button type="button" class="btn-icon remove-attachment-btn" title="Remove">✕</button>`;
+
+    item.innerHTML = `
+      <select class="type-select" aria-label="Attachment type">
+        <option value="flag">🚩 Flag</option>
+        <option value="annexure">🔗 Annexure</option>
+        <option value="puc">📄 PUC</option>
+      </select>
+      <span class="badge auto-badge badge--flag"></span>
+      <input type="hidden" name="attachment_flag[]"     value="">
+      <input type="hidden" name="attachment_annexure[]" value="">
+      <input type="hidden" name="attachment_puc[]"      value="">
+      <input type="hidden" name="attachment_labels[]"   value="">
+      <input type="file"   name="attachments" class="attachment-item__input" style="flex:1;">
+      ${delBtn}
+    `;
+
+    item.querySelector('.type-select').addEventListener('change', recalculateAllBadges);
+
+    if (!isFirst) {
+      item.querySelector('.remove-attachment-btn').addEventListener('click', function () {
+        item.remove();
+        recalculateAllBadges();
+      });
+    }
+
+    return item;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('attachment-list-container');
+    container.appendChild(buildAttachmentRow(true));
+    recalculateAllBadges();
+  });
+
+  document.getElementById('add-attachment-btn').addEventListener('click', function () {
+    const container = document.getElementById('attachment-list-container');
+    const isFirst = container.querySelectorAll('.attachment-item').length === 0;
+    container.appendChild(buildAttachmentRow(isFirst));
+    recalculateAllBadges();
+  });
+
+  /* ── Submit sync ── */
+  document.getElementById('return-form').addEventListener('submit', function () {
+    if (typeof tinymce !== 'undefined' && tinymce.get('remark')) {
+      tinymce.get('remark').save();
+    }
+  });
+
+  /* ── Rich editor toggle ── */
+  let richEditorActive = false;
+
+  function initializeTinyMCE(btn, textarea) {
+    if (!richEditorActive) {
+      tinymce.init({
+        selector: '#remark',
+        menubar: true,
+        menu: {
+          file: { title: 'File', items: 'newdocument restoredraft | preview | importword exportpdf exportword | print | deleteallconversations' },
+          edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace' },
+          view: { title: 'View', items: 'code revisionhistory | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments' },
+          insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+          format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+          tools: { title: 'Tools', items: 'spellchecker spellcheckerlanguage | a11ycheck code wordcount' },
+          table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+        },
+        height: 460,
+        min_height: 600,
+        autoresize_bottom_margin: 50,
+        resize: true,
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+          'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'wordcount', 'codesample',
+          'emoticons', 'nonbreaking', 'pagebreak', 'quickbars', 'autoresize'
+        ],
+        relative_urls: false,
+        remove_script_host: true,
+        toolbar_mode: 'wrap',
+        paste_data_images: true,
+        paste_as_text: false,
+        /* ── ✂️ AUTO-CLEAN WORD PASTE ── */
+        paste_postprocess: function (plugin, args) {
+          var node = args.node;
+
+          /* 1 ▸ Strip all mso-* / Word-only CSS properties */
+          node.querySelectorAll('[style]').forEach(function (el) {
+            var raw = el.getAttribute('style') || '';
+            var cleaned = raw.split(';')
+              .map(function (s) { return s.trim(); })
+              .filter(function (s) {
+                if (!s) return false;
+                var prop = s.split(':')[0].trim().toLowerCase();
+                return !prop.startsWith('mso-')
+                  && prop !== 'tab-stops'
+                  && prop !== 'layout-grid-mode'
+                  && prop !== 'punctuation-wrap'
+                  && prop !== 'text-autospace';
+              })
+              .join('; ');
+            if (cleaned) { el.setAttribute('style', cleaned); }
+            else { el.removeAttribute('style'); }
+          });
+
+          /* 2 ▸ Remove Word-generated class attributes */
+          node.querySelectorAll('[class]').forEach(function (el) {
+            el.removeAttribute('class');
+          });
+
+          /* 3 ▸ Normalise paragraphs → Calibri 12pt, line-height 1.8 */
+          node.querySelectorAll('p').forEach(function (p) {
+            p.style.fontFamily = 'Calibri, Arial, sans-serif';
+            p.style.fontSize = '12pt';
+            p.style.lineHeight = '1.8';
+            if (!p.style.margin) p.style.margin = '0 0 6pt 0';
+          });
+
+          /* 4 ▸ Normalise headings */
+          var headingSizes = { H1: '22pt', H2: '18pt', H3: '14pt', H4: '13pt' };
+          Object.keys(headingSizes).forEach(function (tag) {
+            node.querySelectorAll(tag).forEach(function (h) {
+              h.style.fontFamily = 'Calibri, Arial, sans-serif';
+              h.style.fontSize = headingSizes[tag];
+              h.style.lineHeight = '1.4';
+              h.style.fontWeight = 'bold';
+            });
+          });
+
+          /* 5 ▸ Normalise inline spans */
+          node.querySelectorAll('span').forEach(function (span) {
+            if (!span.style.fontFamily)
+              span.style.fontFamily = 'Calibri, Arial, sans-serif';
+            if (!span.style.fontSize)
+              span.style.fontSize = '12pt';
+          });
+
+          /* 6 ▸ Fix tables → professional notesheet style */
+          node.querySelectorAll('table').forEach(function (tbl) {
+            tbl.style.borderCollapse = 'collapse';
+            tbl.style.width = '100%';
+            tbl.style.margin = '8pt 0';
+            tbl.removeAttribute('width');
+            tbl.removeAttribute('border');
+            tbl.removeAttribute('cellspacing');
+            tbl.removeAttribute('cellpadding');
+          });
+          node.querySelectorAll('td, th').forEach(function (cell) {
+            cell.style.border = '1px solid #d1d5db';
+            cell.style.padding = '6px 10px';
+            cell.style.fontFamily = 'Calibri, Arial, sans-serif';
+            cell.style.fontSize = '12pt';
+            cell.style.lineHeight = '1.6';
+          });
+          node.querySelectorAll('th').forEach(function (th) {
+            th.style.background = '#d1fae5';
+            th.style.fontWeight = '600';
+          });
+
+          /* 7 ▸ Collapse consecutive empty paragraphs (max 1 blank line) */
+          var paras = Array.from(node.querySelectorAll('p'));
+          var lastEmpty = false;
+          paras.forEach(function (p) {
+            var isEmpty = p.textContent.trim() === '' ||
+              p.innerHTML.trim() === '&nbsp;' ||
+              p.innerHTML.trim() === '<br>';
+            if (isEmpty && lastEmpty) {
+              p.parentNode && p.parentNode.removeChild(p);
+            } else {
+              lastEmpty = isEmpty;
+            }
+          });
+
+          /* 8 ▸ Remove Word conditional-comment leftovers (w:, o:, v: tags) */
+          ['w\\:*', 'o\\:*', 'v\\:*'].forEach(function (sel) {
+            try {
+              node.querySelectorAll(sel).forEach(function (el) { el.remove(); });
+            } catch (e) { }
+          });
+        },
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '+body[style]',
+
+        // CUSTOM FLAGS BUTTON ADDED HERE IN TOOLBAR
+        toolbar: [
+          'undo redo | styles | fontfamily | fontsize',
+          'bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat | fullscreen'
+        ].join(' | '),
+
+        font_family_formats:
+          'Calibri=Calibri,sans-serif;' +
+          'Arial=arial,helvetica,sans-serif;' +
+          'Times New Roman=times new roman,times,serif;' +
+          'Courier New=courier new,courier,monospace;' +
+          'Georgia=georgia,palatino,serif;' +
+          'Verdana=verdana,geneva,sans-serif;' +
+          'Plus Jakarta Sans=Plus Jakarta Sans,system-ui,sans-serif;',
+
+        font_size_formats: '8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
+
+        style_formats: [
+          { title: 'Heading 1', block: 'h1', styles: { 'font-size': '26pt', 'font-weight': 'bold' } },
+          { title: 'Heading 2', block: 'h2', styles: { 'font-size': '20pt', 'font-weight': 'bold' } },
+          { title: 'Heading 3', block: 'h3', styles: { 'font-size': '16pt', 'font-weight': 'bold' } },
+          { title: 'Heading 4', block: 'h4', styles: { 'font-size': '14pt', 'font-weight': 'bold' } },
+          { title: 'Normal', block: 'p', styles: { 'font-size': '12pt', 'font-weight': 'normal' } },
+          { title: 'Block Quote', block: 'blockquote' },
+          { title: 'Code', inline: 'code' },
+        ],
+
+        content_style: `
+          html {
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 13pt;
+            line-height: 1.8;
+            color: #000000;
+            background: white;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 8px 16px;
+            box-sizing: border-box;
+          }
+
+          .mce-content-body {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+          }
+          h1 { font-size: 26pt; font-weight: bold; margin-bottom: 8px; }
+          h2 { font-size: 20pt; font-weight: bold; margin-bottom: 6px; }
+          h3 { font-size: 16pt; font-weight: bold; margin-bottom: 4px; }
+          h4 { font-size: 14pt; font-weight: bold; }
+          p  { margin: 0 0 8px; }
+          blockquote { border-left: 4px solid #059669; padding-left: 12px; color: #4b5563; }
+          table { border-collapse: collapse; width: 100%; }
+          td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
+          th { background: #d1fae5; font-weight: 600; }
+          /* 🔒 Letterhead fully non-interactive */
+          div.mceNonEditable,
+          div[contenteditable="false"] {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            pointer-events: none !important;
+            cursor: default !important;
+            caret-color: transparent !important;
+          }
+          hr { pointer-events: none !important; user-select: none !important; }
+        `,
+
+        branding: false,
+        elementpath: true,
+        statusbar: true,
+        wordcount_countregex: /[\\w\\u2019\\x27-]+/g,
+
+        quickbars_selection_toolbar: 'bold italic underline | formatselect | forecolor | bullist numlist',
+        quickbars_insert_toolbar: false,
+
+        setup: function (editor) {
+          editor.on('init', function () {
+            textarea.style.display = 'none';
+            richEditorActive = true;
+            btn.style.display = 'none';
+
+            // ╔═══════════════════════════════════════════════════════════════╗
+            // ║ PROFESSIONAL LETTERHEAD - AUTOMATIC INJECTION                ║
+            // ╚═══════════════════════════════════════════════════════════════╝
+            const currentContent = editor.getContent({ format: 'text' }).trim();
+            if (!currentContent) {
+              const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
+              const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+
+              editor.setContent(
+                '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
+                '<table style="width:100%;border-collapse:collapse;margin-bottom:4pt;padding:0;border:none;">' +
+                '<tr>' +
+                /* 🌟 WSSP LOGO SIZE INCREASED TO 135px TO MATCH INITIATE/FORWARD 🌟 */
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 10pt 12pt 0;border:none !important;">' +
+                '<img src="' + wsspLogo + '" alt="WSSP Logo" style="width:135px;height:135px;object-fit:contain;" />' +
+                '</td>' +
+                '<td style="text-align:center;vertical-align:middle;padding:12pt 8pt;border:none !important;">' +
+                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES,</p>' +
+                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 10pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">PESHAWAR, LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>' +
+                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>' +
+                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;"><strong>E mail: </strong><u style="color:#1d4ed8 !important;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219018</p>' +
+                '</td>' +
+                /* 🌟 KPK EMBLEM SIZE INCREASED TO 135px TO MATCH INITIATE/FORWARD 🌟 */
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 0 12pt 10pt;border:none !important;">' +
+                '<img src="' + kpkLogo + '" alt="KPK Emblem" style="width:135px;height:135px;object-fit:contain;" />' +
+                '</td>' +
+                '</tr>' +
+                '</table>' +
+                '</div>' +
+                '<hr style="border:none;border-top:1px solid #e5e7eb;margin:2pt 0 8pt 0;padding:0;" />' +
+                '<ol start="{{ next_para_num|default:1 }}" style="font-family: Calibri, sans-serif; font-size: 15px; margin-top: 10px;"><li><br data-mce-bogus="1"></li></ol>'
+              );
+              editor.selection.select(editor.getBody(), true);
+              editor.selection.collapse(false);
+            }
+          });
+          editor.on('change input keyup', function () {
+            editor.save();
+          });
+
+          /* ── 🔒 CTRL+A: Select only content below letterhead ── */
+          editor.on('keydown', function (e) {
+            const body = editor.getBody();
+            const boundary = body.querySelector('hr') || body.querySelector('.mceNonEditable');
+
+            /* —— CTRL+A: only select user content —— */
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
+              if (boundary) {
+                e.preventDefault();
+                e.stopPropagation();
+                const range = editor.dom.createRng();
+                range.setStartAfter(boundary);
+                range.setEndAfter(body.lastChild);
+                editor.selection.setRng(range);
+                return false;
+              }
+            }
+
+            /* —— BACKSPACE/DELETE: protect letterhead from deletion —— */
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+              if (!boundary) return;
+              const sel = editor.selection.getRng();
+              // If text is selected, allow normal delete
+              if (!sel.collapsed) return;
+              // Check how much content exists between boundary and cursor
+              try {
+                const checkRng = editor.dom.createRng();
+                checkRng.setStartAfter(boundary);
+                checkRng.setEnd(sel.startContainer, sel.startOffset);
+                const content = checkRng.toString().replace(/\u00a0/g, '').trim();
+                if (content === '') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return false;
+                }
+              } catch (ex) {
+                // Cursor is before/inside boundary — always block
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }
+            }
+          });
+
+          /* —— CLICK/MOUSEDOWN: redirect cursor away from letterhead —— */
+          editor.on('mousedown click', function (e) {
+            const body = editor.getBody();
+            const letterhead = body.querySelector('.mceNonEditable');
+            if (!letterhead) return;
+            const target = e.target;
+            if (letterhead === target || letterhead.contains(target)) {
+              e.preventDefault();
+              e.stopPropagation();
+              // Move cursor to first content paragraph after hr
+              const hr = body.querySelector('hr');
+              const anchor = hr || letterhead;
+              const range = editor.dom.createRng();
+              range.setStartAfter(anchor);
+              range.collapse(true);
+              editor.selection.setRng(range);
+              editor.focus();
+              return false;
+            }
+          });
+        }
+      });
+
+    } else {
+      const editor = tinymce.get('remark');
+      if (editor) {
+        editor.save();
+        const savedValue = textarea.value;
+        editor.remove();
+        textarea.value = savedValue;
+      }
+      textarea.style.display = 'block';
+      textarea.style.visibility = 'visible';
+      textarea.style.opacity = '1';
+      textarea.style.height = 'auto';
+      textarea.style.minHeight = '12rem';
+      textarea.removeAttribute('hidden');
+      richEditorActive = false;
+      btn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Formatting Tools`;
+      btn.classList.remove('active');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('toggle-rich-editor');
+    const textarea = document.getElementById('remark');
+    if (typeof tinymce === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js';
+      script.onload = () => initializeTinyMCE(btn, textarea);
+      script.onerror = () => alert('Editor load failed.');
+      document.head.appendChild(script);
+    } else {
+      initializeTinyMCE(btn, textarea);
+    }
+  });
+
+  document.getElementById('toggle-rich-editor').addEventListener('click', function () {
+    const btn = this;
+    const textarea = document.getElementById('remark');
+
+    if (typeof tinymce === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js';
+      script.onload = () => initializeTinyMCE(btn, textarea);
+      script.onerror = () => alert('Editor load failed.');
+      document.head.appendChild(script);
+    } else {
+      initializeTinyMCE(btn, textarea);
+    }
+  });
+
+  // Strip TinyMCE-injected letterhead from content to avoid duplicates in preview/print
+  function cleanRemarkContent(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Handle mceNonEditable wrapper div (new format)
+    const nonEditDiv = tmp.querySelector('div.mceNonEditable, div[contenteditable="false"]');
+    if (nonEditDiv && (nonEditDiv.querySelector('img') || (nonEditDiv.textContent || '').indexOf('CHIEF EXECUTIVE OFFICER') !== -1)) {
+      let next = nonEditDiv.nextElementSibling;
+      nonEditDiv.remove();
+      if (next && next.tagName === 'HR') next.remove();
+    } else {
+      // Fallback: handle bare table (old format)
+      const tables = tmp.querySelectorAll('table');
+      if (tables.length > 0) {
+        const firstTable = tables[0];
+        const text = firstTable.innerText || firstTable.textContent || '';
+        if (text.indexOf('CHIEF EXECUTIVE OFFICER') !== -1 ||
+          text.indexOf('WATER') !== -1 ||
+          text.indexOf('SANITATION') !== -1 ||
+          firstTable.querySelector('img') !== null) {
+          let next = firstTable.nextElementSibling;
+          firstTable.remove();
+          if (next && next.tagName === 'HR') next.remove();
+        }
+      }
+    }
+    // Remove leading empty paragraphs
+    while (tmp.firstElementChild &&
+      tmp.firstElementChild.tagName === 'P' &&
+      (tmp.firstElementChild.innerHTML.trim() === '' ||
+        tmp.firstElementChild.innerHTML.trim() === '&nbsp;')) {
+      tmp.firstElementChild.remove();
+    }
+    return tmp.innerHTML;
+  }
+
+  function openPreview() {
+    let remarkContent = '';
+
+    if (typeof tinymce !== 'undefined' && tinymce.get('remark')) {
+      remarkContent = cleanRemarkContent(tinymce.get('remark').getContent());
+    } else {
+      const plain = document.getElementById('remark').value;
+      remarkContent = plain.trim()
+        ? plain.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>')
+        : '';
+    }
+
+    const letterhead = `
+<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
+  <tr>
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="/static/images/wssp_logo_new.png"
+           onerror="this.style.display='none'"
+           alt="WSSP" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+    </td>
+    <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
+      <h4 style="font-weight:700;font-size:20px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR</h4>
+      
+      <p style="font-size:18px;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
+      <p style="font-size:17.5px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+      <p style="font-size:9.5pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
+        <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
+        &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219018
+      </p>
+    </td>
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="/static/images/kpk_emblem.png"
+           onerror="this.style.display='none'"
+           alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+    </td>
+  </tr>
+</table>
+<div style="border-top:3px solid #7a2e2e;margin:6pt 0 14pt 0;"></div>`;
+
+    const iframeDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Calibri&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    background: white;
+  }
+  body {
+    padding: 25mm 25mm 30mm 25mm;
+    font-size: 13pt;
+    line-height: 1.8;
+  }
+  p { margin: 0 0 6pt 0; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 4pt 6pt; }
+  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }
+  h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }
+  ul, ol { margin-left: 20pt; margin-bottom: 6pt; }
+  blockquote { border-left: 3pt solid #10b981; padding-left: 10pt; color: #4b5563; }
+  a { color: #10b981; }
+  strong, b { font-weight: bold; }
+  em, i { font-style: italic; }
+  u { text-decoration: underline; }
+</style>
+</head>
+<body>
+${letterhead}
+${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
+</body>
+</html>`;
+
+    const iframe = document.getElementById('preview-iframe');
+    document.getElementById('previewModalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+      const iframeWin = iframe.contentWindow || iframe.contentDocument;
+      const doc = iframe.contentDocument || iframeWin.document;
+      doc.open();
+      doc.write(iframeDoc);
+      doc.close();
+
+      setTimeout(() => {
+        try {
+          const body = doc.body;
+          const html = doc.documentElement;
+          const height = Math.max(
+            body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight
+          );
+          iframe.style.height = Math.max(height, 297 * 3.7795) + 'px';
+          iframe.parentElement.style.minHeight = iframe.style.height;
+        } catch (e) { }
+      }, 100);
+    }, 50);
+  }
+
+  function closePreview() {
+    document.getElementById('previewModalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('preview-btn').addEventListener('click', openPreview);
+  document.getElementById('previewCloseBtn').addEventListener('click', closePreview);
+  document.getElementById('previewCloseBtnFooter').addEventListener('click', closePreview);
+  document.getElementById('previewModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closePreview();
+  });
+
+  document.getElementById('previewPrintBtn').addEventListener('click', function () {
+    let remarkContent = '';
+    if (typeof tinymce !== 'undefined' && tinymce.get('remark')) {
+      remarkContent = cleanRemarkContent(tinymce.get('remark').getContent());
+    } else {
+      const plain = document.getElementById('remark').value;
+      remarkContent = plain.trim()
+        ? plain.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+        : '';
+    }
+
+    if (!remarkContent.trim()) {
+      alert('Please enter some remarks!');
+      return;
+    }
+
+    const letterhead = `
+<table style="width:100%;border-collapse:collapse;margin-bottom:18pt;padding:0;border:none;">
+  <tr>
+    <td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 10pt 12pt 0;">
+      <img src="${window.location.origin}/static/images/wssp_logo_new.png" alt="WSSP Logo" draggable="false" style="width:135px;height:135px;object-fit:contain;user-select:none;" />
+    </td>
+    <td style="text-align:center;vertical-align:middle;padding:12pt 8pt;">
+      <p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES,</p>
+      <p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 10pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">PESHAWAR, LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+      <p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
+      <p style="font-size:16pt !important;font-weight:bold !important;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;"><strong>E mail: </strong><u style="color:#1d4ed8 !important;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219018</p>
+    </td>
+    <td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 0 12pt 10pt;">
+      <img src="${window.location.origin}/static/images/kpk_emblem.png" alt="KPK Emblem" draggable="false" style="width:135px;height:135px;object-fit:contain;user-select:none;" />
+    </td>
+  </tr>
+</table>
+<hr style="border:none;border-top:3px solid #9a3a3a;margin:6pt 0 12pt 0;padding:0;" />`;
+
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Return Notesheet Print</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page {
+    size: A4;
+    margin: 25mm 20mm;
+  }
+  html, body {
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    background: white;
+  }
+  body { padding: 20mm; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none !important; }
+  }
+  p { margin: 0 0 6pt; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 4pt 6pt; }
+  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }
+  h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }
+  ul, ol { margin-left: 20pt; margin-bottom: 6pt; }
+  blockquote { border-left: 3pt solid #10b981; padding-left: 10pt; color: #4b5563; }
+  strong, b { font-weight: bold; }
+  em, i { font-style: italic; }
+  u { text-decoration: underline; }
+
+  .print-toolbar {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 9999;
+  }
+  .btn-do-print {
+    padding: 10px 20px;
+    background: #0d5c38;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-do-print:hover { background: #0a4d2f; }
+  .btn-do-close {
+    padding: 10px 20px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="print-toolbar no-print">
+    <button class="btn-do-print" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn-do-close" onclick="window.close()">Close</button>
+  </div>
+  <div class="letter-content">
+    ${letterhead}
+    ${remarkContent}
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 500);
+    };
+  <\/script>
+</body>
+</html>`);
+
+    printWindow.document.close();
+  });
+
+</script>
+
+{% endblock %}
