@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container-fluid py-4 px-4">
+<div class="container-fluid pt-2 pb-4 px-4">
 
     <!-- 🟢 TOP BANNER (Matching Dark Green Theme) -->
     <div class="card border-0 text-white mb-4 shadow-sm" style="background-color: #0f392b; border-radius: 12px;">
@@ -49,7 +49,8 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead style="background-color: #f8f9fa; font-size: 13px;" class="text-uppercase text-muted">
                         <tr>
-                            <th class="ps-4" style="width: 30%;">Title</th>
+                            <th class="ps-4" style="width: 5%;">#</th>
+                            <th style="width: 25%;">Title</th>
                             <th style="width: 15%;">Status</th>
                             <th style="width: 20%;">Created By</th>
                             <th style="width: 20%;">Date</th>
@@ -60,8 +61,13 @@
                         {% for notesheet in notesheets %}
                         <tr class="{% if notesheet.status == 'Pending' %}table-light fw-bold{% endif %}">
 
+                            <!-- Serial Number -->
+                            <td class="ps-4 text-muted fw-bold">
+                                {{ forloop.counter }}
+                            </td>
+
                             <!-- Title -->
-                            <td class="ps-4">
+                            <td>
                                 <a href="{% url 'view_notesheet' notesheet.id %}"
                                     class="text-decoration-none text-dark d-block text-truncate"
                                     style="max-width: 380px;">

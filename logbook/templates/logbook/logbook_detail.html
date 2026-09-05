@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .content {
+        background: #e8f0eb !important;
+    }
+    
+    .btn-create {
+        position:relative;z-index:1;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white; text-decoration: none;
+        padding: 12px 26px; border-radius: 12px;
+        font-weight: 700; font-size: 14px;
+        display: inline-flex; align-items: center; gap: 8px;
+        box-shadow: 0 6px 20px rgba(16,185,129,0.4), 0 1px 0 rgba(255,255,255,0.2) inset;
+        white-space: nowrap; transition: all 0.2s;
+    }
+    
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(16,185,129,0.5);
+        color: white;
+    }
+
+    .btn-secondary-custom {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-secondary-custom:hover {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .files-table thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 14px 16px;
+        border-bottom: 2px solid #e2e8f0;
+        border-right: 1px solid #e2e8f0;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .files-table thead th:last-child {
+        border-right: none;
+    }
+
+    .files-table tbody tr {
+        border-bottom: 1px solid #e8f4ec;
+        transition: background 0.15s;
+    }
+
+    .files-table tbody tr:hover {
+        background: #f0faf4;
+    }
+
+    .files-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .files-table tbody td {
+        padding: 18px 16px;
+        vertical-align: middle;
+        font-size: 16px;
+        border-right: 1px dashed #e2e8f0;
+    }
+
+    .files-table tbody td:last-child {
+        border-right: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #e8f0eb; min-height: 100vh; padding: 2rem;">
+
+    <!-- ── Header Banner ── -->
+    <div style="
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 55%, #0f3d28 100%);
+        border-radius: 20px;
+        padding: 32px 38px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 40px rgba(13,43,30,0.45), 0 2px 0 rgba(255,255,255,0.08) inset;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(255,255,255,0.08);
+    ">
+        <div style="position:absolute;top:-60%;right:-8%;width:300px;height:300px;background:radial-gradient(circle,rgba(52,211,153,0.15) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:-40%;left:5%;width:160px;height:160px;background:radial-gradient(circle,rgba(16,185,129,0.1) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+        <div style="position:relative;z-index:1;">
+            <span style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:13px;font-weight:700;padding:6px 16px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;display:inline-block;margin-bottom:12px;">
+                📝 Log Book Details
+            </span>
+            <h2 style="color:white;font-size:36px;font-weight:800;margin:0;letter-spacing:-0.5px;text-shadow:0 2px 8px rgba(0,0,0,0.3);">
+                Vehicle No. {{ logbook.vehicle_number }}
+            </h2>
+        </div>
+
+        <div style="position:relative;z-index:1; display:flex; gap:12px;">
+            <a href="{% url 'logbook_list' %}" class="btn-secondary-custom">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            {% if not is_manager %}
+            <a href="{% url 'add_logbook_entry' logbook.id %}" class="btn-create">
+                <i class="fas fa-plus"></i> Add Entry
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ── Table Card ── -->
+    <div style="background:white;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(13,43,30,0.09),0 1px 0 rgba(255,255,255,0.8) inset;border:1px solid rgba(212,232,219,0.8);">
+        
+        <div style="background:#f8fafc; padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <h5 style="margin:0; color:#0f172a; font-weight:800; font-size:18px;">
+                <i class="fas fa-clipboard-list" style="color:#10b981; margin-right:8px;"></i> Log Book Records
+            </h5>
+            <div style="background:#e0f2fe; color:#0369a1; padding:6px 14px; border-radius:20px; font-weight:700; font-size:13px;">
+                {{ entries.count }} Entries
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table files-table mb-0 text-center table-borderless">
+                <thead>
+                    <tr>
+                        <th style="border-top-left-radius: 12px;">Date</th>
+                        <th>Journey Details</th>
+                        <th>Purpose</th>
+                        <th>Officer & Driver</th>
+                        <th>Meter (From &rarr; To)</th>
+                        <th style="border-top-right-radius: 12px;">Distance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr class="file-row">
+                        <td style="color:#0d2b1e;font-weight:700; white-space:nowrap;">{{ entry.date|date:"d M Y" }}</td>
+                        <td>
+                            <div style="color:#0f172a; font-weight:600; text-align:left;">{{ entry.details_of_journey }}</div>
+                        </td>
+                        <td>
+                            <div style="color:#475569; font-weight:500;">{{ entry.purpose_of_journey }}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:700; color:#0f172a;">{{ entry.officer_name }}</div>
+                            {% if entry.driver_name %}
+                                <div style="color:#64748b; font-size:13px; font-weight:600; margin-top:4px;"><i class="fas fa-steering-wheel"></i> {{ entry.driver_name }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-weight:600; color:#334155; font-variant-numeric: tabular-nums;">
+                                {{ entry.meter_reading_from }} <i class="fas fa-arrow-right mx-1" style="color:#cbd5e1; font-size:12px;"></i> {{ entry.meter_reading_to }}
+                            </div>
+                        </td>
+                        <td>
+                            <span style="background:#f0faf4; color:#0d5c38; padding:6px 12px; border-radius:8px; font-weight:800; font-size:15px; border:1px solid #a7d4b8; display:inline-block; white-space:nowrap;">
+                                {{ entry.km_covered }} km
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding:60px;text-align:center;">
+                            <i class="fas fa-clipboard" style="font-size:48px;color:#cbd5e1;display:block;margin-bottom:14px;"></i>
+                            <p style="color:#64748b;font-weight:600;font-size:16px;margin:0;">No log book entries found.</p>
+                            {% if not is_manager %}
+                            <a href="{% url 'add_logbook_entry' logbook.id %}" class="btn-create" style="margin-top:20px;">
+                                <i class="fas fa-plus"></i> Add First Entry
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

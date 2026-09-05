@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .content {
+        background: #e8f0eb !important;
+    }
+
+    .btn-action-custom {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-action-custom:hover {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-add-entry {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+    }
+
+    .btn-add-entry:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 8px 22px rgba(16,185,129,0.5);
+    }
+
+    /* ── Digital Physical Register Paper Container ── */
+    .register-paper {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 32px 36px;
+        box-shadow: 0 12px 36px rgba(13,43,30,0.12);
+        border: 2px solid #0d2b1e;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .register-header-banner {
+        text-align: center;
+        border-bottom: 3px double #0d2b1e;
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+    }
+
+    .register-title-main {
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #0d2b1e;
+        margin: 0;
+    }
+
+    .register-sub-title {
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #059669;
+        margin: 4px 0 0 0;
+        letter-spacing: 0.5px;
+    }
+
+    .register-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #0d2b1e;
+        border-radius: 10px;
+        padding: 12px 18px;
+        margin-bottom: 20px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0d2b1e;
+    }
+
+    .register-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ── Physical Logbook Table Styling ── */
+    .register-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #0d2b1e;
+        font-size: 14px;
+    }
+
+    .register-table th {
+        background: #0d2b1e;
+        color: #ffffff;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        padding: 12px 8px;
+        border: 1px solid #0d2b1e;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .register-table td {
+        padding: 12px 8px;
+        border: 1px solid #cbd5e1;
+        vertical-align: middle;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .register-table tr:nth-child(even) td {
+        background-color: #f8fafc;
+    }
+
+    .register-table tr:hover td {
+        background-color: #f0faf4;
+    }
+
+    .empty-register-row td {
+        height: 42px;
+        color: #cbd5e1;
+    }
+
+    /* ── Print styling ── */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .register-paper, .register-paper * {
+            visibility: visible;
+        }
+        .register-paper {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 10px;
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #e8f0eb; min-height: 100vh; padding: 2rem;">
+
+    <!-- ── Navigation Action Bar (No Print) ── -->
+    <div class="no-print" style="
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 55%, #0f3d28 100%);
+        border-radius: 20px;
+        padding: 22px 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 40px rgba(13,43,30,0.45);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    ">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <a href="{% url 'vehicle_logbook' vehicle.id %}" class="btn-action-custom">
+                <i class="fas fa-th-large"></i> Back to Log Book Pages
+            </a>
+            
+            <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:12px;">
+                {% if prev_page %}
+                <a href="{% url 'logbook_page_detail' prev_page.id %}" class="btn-action-custom" style="padding:6px 12px;" title="Previous Page">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+                {% else %}
+                <span class="btn-action-custom text-muted" style="padding:6px 12px; opacity:0.5; cursor:not-allowed;"><i class="fas fa-chevron-left"></i></span>
+                {% endif %}
+
+                <span style="color:white; font-weight:800; padding:0 12px; font-size:15px;">
+                    Page {{ page.page_number }} of {{ total_pages_count }}
+                </span>
+
+                {% if next_page %}
+                <a href="{% url 'logbook_page_detail' next_page.id %}" class="btn-action-custom" style="padding:6px 12px;" title="Next Page">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <span class="btn-action-custom text-muted" style="padding:6px 12px; opacity:0.5; cursor:not-allowed;"><i class="fas fa-chevron-right"></i></span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button onclick="window.print()" class="btn-action-custom">
+                <i class="fas fa-print"></i> Print Page
+            </button>
+            <a href="{% url 'print_all_logbook_pages' vehicle.id %}" target="_blank" class="btn-action-custom">
+                <i class="fas fa-book"></i> Print All Pages
+            </a>
+        </div>
+    </div>
+
+    <!-- ── DIGITAL PHYSICAL REGISTER PAGE PAPER ── -->
+    <div class="register-paper">
+
+        <!-- Register Header -->
+        <div class="register-header-banner">
+            <h1 class="register-title-main">COMMISSIONERATE OF PESHAWAR DIVISION</h1>
+            <h2 class="register-sub-title">VEHICLE LOG BOOK REGISTER</h2>
+        </div>
+
+        <!-- Register Meta Grid Header -->
+        <div class="register-meta-grid">
+            <div class="register-meta-item">
+                <span>VEHICLE NO:</span>
+                <span style="color:#059669; font-size:17px; font-weight:900;">{{ vehicle.vehicle_number }}</span>
+            </div>
+            <div class="register-meta-item">
+                <span>SERIAL NO:</span>
+                <span>{{ logbook.serial_number|default:"-" }}</span>
+            </div>
+            <div class="register-meta-item">
+                <span>AVG KM/LITRE:</span>
+                <span>{{ logbook.average_to_litre|default:"-" }}</span>
+            </div>
+            <div class="register-meta-item" style="justify-content: flex-end;">
+                <span style="background:#0d2b1e; color:white; padding:4px 14px; border-radius:6px; font-size:16px;">
+                    PAGE NO. {{ page.page_number }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Physical Register Data Table -->
+        <div class="table-responsive">
+            <table class="register-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">#</th>
+                        <th style="width: 11%;">Date</th>
+                        <th style="width: 13%;">Time<br><small>(From &rarr; To)</small></th>
+                        <th style="width: 26%;">Details of Journey<br><small>(From &rarr; To)</small></th>
+                        <th style="width: 16%;">Purpose of Journey</th>
+                        <th style="width: 16%;">Officer / Driver</th>
+                        <th style="width: 14%;">Meter Reading<br><small>(From &rarr; To)</small></th>
+                        <th style="width: 10%;">KM Covered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center" style="white-space:nowrap;">{{ entry.date|date:"d-m-Y" }}</td>
+                        <td class="text-center" style="font-size:12px;">
+                            {{ entry.time_from|time:"h:i A" }} &rarr; {{ entry.time_to|time:"h:i A" }}
+                        </td>
+                        <td>{{ entry.details_of_journey }}</td>
+                        <td>{{ entry.purpose_of_journey }}</td>
+                        <td>
+                            <div><strong>{{ entry.officer_name }}</strong></div>
+                            {% if entry.driver_name %}
+                                <div style="font-size:12px; color:#475569;"><i class="fas fa-id-badge me-1"></i>{{ entry.driver_name }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center" style="font-size:13px; font-variant-numeric: tabular-nums;">
+                            {{ entry.meter_reading_from }} &rarr; {{ entry.meter_reading_to }}
+                        </td>
+                        <td class="text-center" style="font-weight:800; color:#059669;">
+                            {{ entry.km_covered }} km
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <em style="font-size:14px; font-weight:600; color:#64748b; display:block; margin-bottom:12px;">No entries recorded on Page {{ page.page_number }} yet.</em>
+                            {% if not is_manager %}
+                            <div class="mt-2 no-print">
+                                <a href="{% url 'add_page_entry' page.id %}" style="background:#059669; color:#ffffff; font-weight:800; padding:10px 22px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:14px; box-shadow:0 4px 14px rgba(5,150,105,0.25);">
+                                    <i class="fas fa-plus-circle"></i> + Add Entry
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

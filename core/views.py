@@ -6,7 +6,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import Profile, Commitment, Task, NotesheetAttachment, UserHierarchy  # Saare models aik saath
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from .models import Profile, Commitment, Task, NotesheetAttachment, UserHierarchy, Notification  # Saare models aik saath
 from .forms import CommitmentForm, RemarkForm, TaskAssignForm
 from .utils import create_notification
 # =========================================================
@@ -29,7 +30,7 @@ def login_view(request):
                 return redirect("ps_dashboard")
             elif profile.role == "GM":
                 return redirect("gm_dashboard")
-            elif profile.role in ["Manager", "ZM", "AM", "IT", "CFO", "HR"]:
+            elif profile.role in ["Manager", "ZM", "AM", "IT", "CFO", "HR", "Auditor"]:
                 return redirect("manager_dashboard")
             else:
                 messages.error(request, "Role not recognized")
@@ -62,7 +63,12 @@ import json
 def ps_dashboard(request):
     profile = Profile.objects.get(user=request.user)
     if profile.role != "PS":
-        return redirect("ceo_dashboard")
+        if profile.role == "CEO":
+            return redirect("ceo_dashboard")
+        elif profile.role == "GM":
+            return redirect("gm_dashboard")
+        else:
+            return redirect("manager_dashboard")
 
     # KPI counts
     total = Commitment.objects.filter(created_by=profile).count()
@@ -298,7 +304,12 @@ def ceo_dashboard(request):
 
     profile = Profile.objects.get(user=request.user)
     if profile.role != "CEO":
-        return redirect("ps_dashboard")
+        if profile.role == "PS":
+            return redirect("ps_dashboard")
+        elif profile.role == "GM":
+            return redirect("gm_dashboard")
+        else:
+            return redirect("manager_dashboard")
 
     today = timezone.now()
     next_week = today + timedelta(days=7)
@@ -441,7 +452,7 @@ def get_chart_data(request):
     from .models import Commitment, Notesheet, Task, Letter, Profile
     
     profile = Profile.objects.get(user=request.user)
-    if profile.role != "CEO":
+    if profile.role not in ["CEO", "Manager", "ZM", "AM", "IT", "CFO", "HR", "GM", "Auditor"]:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     dates_str = request.GET.get('dates', '')
@@ -460,11 +471,18 @@ def get_chart_data(request):
                 initiated = Notesheet.objects.filter(created_by=request.user, created_at__date=date).count()
                 data.append(initiated)
             elif section == 'task':
-                created = Task.objects.filter(created_at__date=date).count()
+                if profile.role == 'CEO':
+                    created = Task.objects.filter(created_at__date=date).count()
+                else:
+                    created = Task.objects.filter(assigned_to=request.user, created_at__date=date).count()
                 data.append(created)
             elif section == 'letter':
                 sent = Letter.objects.filter(sender=request.user, created_at__date=date).count()
                 data.append(sent)
+            elif section == 'requisition':
+                from .models import VehicleRequisition
+                count = VehicleRequisition.objects.filter(created_at__date=date).count()
+                data.append(count)
             else:
                 count = Commitment.objects.filter(
                     commitment_date__date=date,
@@ -1093,6 +1111,31 @@ def manager_dashboard(request):
     letter_category_labels = ['Inbox', 'Outbox', 'Drafts']
     letter_category_data = [letters_inbox_count, letters_outbox_count, letters_drafts_count]
 
+    # Requisitions Data (Only if Fleet_Manager)
+    req_total_count = 0
+    req_pending_count = 0
+    req_approved_count = 0
+    req_completed_count = 0
+    req_rejected_count = 0
+    req_total_list = []
+    req_pending_list = []
+    req_approved_list = []
+    req_completed_list = []
+    
+    if request.user.username == 'Fleet_Manager':
+        from .models import VehicleRequisition
+        req_qs = VehicleRequisition.objects.all()
+        req_total_count = req_qs.count()
+        req_pending_count = req_qs.filter(status='Pending').count()
+        req_approved_count = req_qs.filter(status='Approved').count()
+        req_completed_count = req_qs.filter(status='Completed').count()
+        req_rejected_count = req_qs.filter(status='Rejected').count()
+        
+        req_total_list = req_qs.order_by('-created_at')
+        req_pending_list = req_qs.filter(status='Pending').order_by('-created_at')
+        req_approved_list = req_qs.filter(status='Approved').order_by('-created_at')
+        req_completed_list = req_qs.filter(status='Completed').order_by('-created_at')
+
     context = {
         # Notesheets lists/counts
         "ns_total_count": ns_total_count,
@@ -1129,6 +1172,17 @@ def manager_dashboard(request):
         "letters_inbox_list": letters_inbox,
         "letter_category_labels": letter_category_labels,
         "letter_category_data": letter_category_data,
+
+        # Requisitions (Fleet_Manager)
+        "req_total_count": req_total_count,
+        "req_pending_count": req_pending_count,
+        "req_approved_count": req_approved_count,
+        "req_completed_count": req_completed_count,
+        "req_rejected_count": req_rejected_count,
+        "req_total_list": req_total_list,
+        "req_pending_list": req_pending_list,
+        "req_approved_list": req_approved_list,
+        "req_completed_list": req_completed_list,
     }
     
     return render(request, 'manager_dashboard.html', context)
@@ -1154,6 +1208,16 @@ def gm_dashboard(request):
     from .models import Notesheet, NotesheetForward, File, Letter, Task, Commitment, Profile
     from django.utils import timezone
     from datetime import timedelta
+
+    if hasattr(request.user, 'profile'):
+        role = request.user.profile.role
+        if role != 'GM':
+            if role == 'CEO':
+                return redirect('ceo_dashboard')
+            elif role == 'PS':
+                return redirect('ps_dashboard')
+            else:
+                return redirect('manager_dashboard')
 
     today = timezone.now()
     next_week = today + timedelta(days=7)
@@ -1366,6 +1430,7 @@ def file_detail(request, file_id):
 # =========================================================
 
 @login_required
+@xframe_options_sameorigin
 def initiate_notesheet(request):
     from .models import NotesheetAttachment, NotesheetAgenda
 
@@ -1429,6 +1494,15 @@ def initiate_notesheet(request):
                         file=f,
                         flag_name=label
                     )
+
+                attached_logbook_paths = request.POST.getlist('attached_logbook_paths[]')
+                for path in attached_logbook_paths:
+                    if path:
+                        NotesheetAttachment.objects.create(
+                            notesheet=notesheet,
+                            file=path,
+                            flag_name='LogBook'
+                        )
 
                 messages.success(request, f"Notesheet '{notesheet.title}' created successfully!")
                 return redirect('my_notesheets')
@@ -1561,6 +1635,7 @@ def forward_notesheet(request, pk):
 # =========================================================
 
 @login_required
+@xframe_options_sameorigin
 def initiate_notesheet(request):
     from .models import NotesheetAttachment, NotesheetAgenda
 
@@ -1625,13 +1700,32 @@ def initiate_notesheet(request):
                         flag_name=label
                     )
 
+                attached_logbook_paths = request.POST.getlist('attached_logbook_paths[]')
+                for path in attached_logbook_paths:
+                    if path:
+                        NotesheetAttachment.objects.create(
+                            notesheet=notesheet,
+                            file=path,
+                            flag_name='LogBook'
+                        )
+
                 create_notification(
                     recipient=target_user,
                     sender=request.user,
-                    title=f"New Notesheet Initiated",
+                    title=f"New Notesheet Received",
                     message=f"Notesheet '{notesheet.title}' has been initiated by {request.user.username}.",
                     link=f"/notesheet/view/{notesheet.id}/",
                     notification_type='notesheet'
+                )
+                # Sender confirmation notification
+                create_notification(
+                    recipient=request.user,
+                    sender=request.user,
+                    title=f"You have sent notesheet '{notesheet.title}' to {target_user.username}.",
+                    message="",
+                    link=f"/notesheet/view/{notesheet.id}/",
+                    notification_type='notesheet',
+                    allow_self=True
                 )
 
                 messages.success(request, f"Notesheet '{notesheet.title}' created successfully!")
@@ -1858,10 +1952,20 @@ def forward_notesheet(request, pk):
             create_notification(
                 recipient=forwarded_user,
                 sender=request.user,
-                title=f"{'Task' if is_task else 'Notesheet'} Forwarded",
+                title=f"{'Task' if is_task else 'Notesheet'} Received",
                 message=f"'{notesheet.title}' has been forwarded to you by {request.user.username}.",
                 link=f"/notesheet/view/{notesheet.id}/" if not is_task else "/manager/tasks/",
                 notification_type='task' if is_task else 'notesheet'
+            )
+            # Sender confirmation notification
+            create_notification(
+                recipient=request.user,
+                sender=request.user,
+                title=f"You have forwarded '{notesheet.title}' to {forwarded_user.username}.",
+                message="",
+                link=f"/notesheet/view/{notesheet.id}/" if not is_task else "/manager/tasks/",
+                notification_type='task' if is_task else 'notesheet',
+                allow_self=True
             )
 
             messages.success(request, f"Forwarded to {forwarded_user.username}.")
@@ -1968,6 +2072,23 @@ def view_notesheet(request, task_id):
             notesheet.is_seen = True
             notesheet.seen_at = timezone.now()
             notesheet.save(update_fields=['is_seen', 'seen_at'])
+            # Update existing sent notification instead of creating a new one
+            sender_user = notesheet.assigned_by
+            if sender_user and sender_user != request.user:
+                sent_notification = Notification.objects.filter(
+                    recipient=sender_user,
+                    link=f"/notesheet/view/{notesheet.id}/"
+                ).filter(
+                    Q(title__icontains="sent") | Q(title__icontains="forwarded") | Q(title__icontains="returned")
+                ).order_by('-created_at').first()
+
+                if sent_notification:
+                    seen_time = timezone.localtime(timezone.now()).strftime("%d %b, %I:%M %p")
+                    seen_badge = f"<div style='margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #059669; padding: 2px 8px; border-radius: 12px; font-weight: 500; font-size: 0.7rem;'><i class='fas fa-check-double'></i> Seen at {seen_time}</div>"
+                    sent_notification.message = seen_badge
+                    sent_notification.is_read = False
+                    sent_notification.created_at = timezone.now()
+                    sent_notification.save()
         remarks = notesheet.remarks.all().order_by('created_at')
         agendas = []
         forwards = []
@@ -1978,6 +2099,27 @@ def view_notesheet(request, task_id):
             notesheet.is_seen = True
             notesheet.seen_at = timezone.now()
             notesheet.save(update_fields=['is_seen', 'seen_at'])
+            # Update existing sent notification instead of creating a new one
+            last_forward = notesheet.forwards.order_by('-forwarded_at').first()
+            if last_forward:
+                sender_user = last_forward.forwarded_by
+            else:
+                sender_user = notesheet.created_by
+            if sender_user and sender_user != request.user:
+                sent_notification = Notification.objects.filter(
+                    recipient=sender_user,
+                    link=f"/notesheet/view/{notesheet.id}/"
+                ).filter(
+                    Q(title__icontains="sent") | Q(title__icontains="forwarded") | Q(title__icontains="returned")
+                ).order_by('-created_at').first()
+
+                if sent_notification:
+                    seen_time = timezone.localtime(timezone.now()).strftime("%d %b, %I:%M %p")
+                    seen_badge = f"<div style='margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #059669; padding: 2px 8px; border-radius: 12px; font-weight: 500; font-size: 0.7rem;'><i class='fas fa-check-double'></i> Seen at {seen_time}</div>"
+                    sent_notification.message = seen_badge
+                    sent_notification.is_read = False
+                    sent_notification.created_at = timezone.now()
+                    sent_notification.save()
         remarks = []
         
         clean_agendas = []
@@ -2155,6 +2297,16 @@ def return_notesheet(request, pk):
                 link=f"/notesheet/view/{notesheet.id}/",
                 notification_type='notesheet'
             )
+            # Sender confirmation notification
+            create_notification(
+                recipient=current_user,
+                sender=current_user,
+                title=f"You have returned '{notesheet.title}' to {target_user.username}.",
+                message="",
+                link=f"/notesheet/view/{notesheet.id}/",
+                notification_type='notesheet',
+                allow_self=True
+            )
 
             messages.success(request, f"Notesheet returned successfully to {target_user.username}.")
         else:
@@ -2165,7 +2317,7 @@ def return_notesheet(request, pk):
             return redirect('ceo_dashboard')
         elif request.user.profile.role == 'GM':
             return redirect('gm_dashboard')
-        elif request.user.profile.role in ['Manager', 'ZM', 'IT', 'IT Officer']:
+        elif request.user.profile.role in ['Manager', 'ZM', 'IT', 'IT Officer', 'CFO', 'HR', 'Auditor']:
             return redirect('manager_dashboard')
         elif request.user.profile.role == 'PS':
             return redirect('ps_dashboard')
@@ -2413,6 +2565,7 @@ from django.contrib import messages
 from .models import Profile  # Apne Profile model ko import karein
 
 @login_required
+@xframe_options_sameorigin
 def edit_profile_signature(request):
     # Safely profile instance get ya create karein
     profile, created = Profile.objects.get_or_create(user=request.user)
@@ -2476,22 +2629,71 @@ def edit_profile_signature(request):
 # 📥 INBOX VIEW
 @login_required
 def notesheet_inbox(request):
+    from django.db.models import Q
+    from django.utils import timezone
+
+    # Mark unseen notesheets currently with user as seen upon accessing inbox
+    Notesheet.objects.filter(
+        current_holder=request.user,
+        is_seen=False
+    ).update(is_seen=True, seen_at=timezone.now())
+
+    forwarded_ids = NotesheetForward.objects.filter(
+        Q(forwarded_by=request.user) | Q(forwarded_to=request.user)
+    ).values_list('notesheet_id', flat=True)
+    
+    returned_ids = NotesheetReturn.objects.filter(
+        Q(returned_by=request.user) | Q(returned_to=request.user)
+    ).values_list('notesheet_id', flat=True)
+
     notesheets = Notesheet.objects.filter(
-        current_holder=request.user
-    ).order_by('-updated_at')
+        Q(current_holder=request.user) | 
+        Q(id__in=forwarded_ids) | 
+        Q(id__in=returned_ids)
+    ).distinct().order_by('-updated_at')
+    
     return render(request, 'notesheet_inbox.html', {'notesheets': notesheets})
+
+
+@login_required
+def api_unread_counts(request):
+    """
+    Returns real-time unread count totals for sidebar badges and notification icon.
+    """
+    from django.http import JsonResponse
+    from .models import Notesheet, Letter, Notification
+
+    unread_ns_count = Notesheet.objects.filter(
+        current_holder=request.user,
+        is_seen=False
+    ).count()
+
+    unread_letters_count = Letter.objects.filter(
+        receiver=request.user,
+        is_read=False,
+        is_draft=False
+    ).count()
+
+    unread_notifs_count = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).count()
+
+    return JsonResponse({
+        'status': 'success',
+        'unread_notesheets_count': unread_ns_count,
+        'unread_letters_count': unread_letters_count,
+        'unread_notifications_count': unread_notifs_count,
+    })
+
 
 
 # 📤 OUTBOX VIEW
 @login_required
 def notesheet_outbox(request):
-    from django.db.models import Q
-    forwarded_ids = NotesheetForward.objects.filter(
-        forwarded_by=request.user
-    ).values_list('notesheet_id', flat=True)
     notesheets = Notesheet.objects.filter(
-        Q(created_by=request.user) | Q(id__in=forwarded_ids)
-    ).exclude(current_holder=request.user).distinct().order_by('-updated_at')
+        created_by=request.user
+    ).exclude(current_holder=request.user).order_by('-updated_at')
     return render(request, 'notesheet_outbox.html', {'notesheets': notesheets})
 
 # =========================================================
@@ -2568,3 +2770,608 @@ def mark_notification_as_read(request, notification_id):
         return redirect(notification.link)
     
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+# =========================================================
+# VEHICLE REQUISITION VIEWS
+# =========================================================
+@login_required
+def requisition_list(request):
+    from .models import VehicleRequisition
+    if request.user.username in ['Manager_Admin', 'Fleet_Manager']:
+        requisitions = VehicleRequisition.objects.all().order_by('-created_at')
+        is_manager = True
+    else:
+        requisitions = VehicleRequisition.objects.filter(fleet_officer=request.user).order_by('-created_at')
+        is_manager = False
+    
+    return render(request, 'requisition_list.html', {
+        'requisitions': requisitions,
+        'is_manager': is_manager
+    })
+
+@login_required
+def create_requisition(request):
+    from .models import VehicleRequisition
+    from .forms import VehicleRequisitionForm
+    from django.contrib.auth.models import User
+    
+    if request.method == "POST":
+        # Combine the 4 separate issue fields into one issue_description
+        post_data = request.POST.copy()
+        issues = []
+        for i in range(1, 5):
+            val = post_data.get(f'issue_{i}', '').strip()
+            if val:
+                issues.append(f'({i}) {val}')
+        if issues:
+            post_data['issue_description'] = '\n'.join(issues)
+        
+        form = VehicleRequisitionForm(post_data)
+        if form.is_valid():
+            req = form.save(commit=False)
+            req.fleet_officer = request.user
+            # Fetch Manager Admin
+            try:
+                manager = User.objects.get(username='Manager_Admin')
+                req.manager_admin = manager
+            except User.DoesNotExist:
+                messages.error(request, "Manager Admin not found in the system.")
+                return redirect('requisition_list')
+            
+            # Handle Signatures
+            import base64
+            from django.core.files.base import ContentFile
+            import uuid
+
+            driver_sig_data = request.POST.get('driver_signature_data')
+            if driver_sig_data:
+                format, imgstr = driver_sig_data.split(';base64,')
+                ext = format.split('/')[-1]
+                req.driver_signature = ContentFile(base64.b64decode(imgstr), name=f'driver_sig_{uuid.uuid4()}.{ext}')
+
+            fleet_sig_data = request.POST.get('fleet_officer_signature_data')
+            if fleet_sig_data:
+                format, imgstr = fleet_sig_data.split(';base64,')
+                ext = format.split('/')[-1]
+                req.fleet_officer_signature = ContentFile(base64.b64decode(imgstr), name=f'fleet_sig_{uuid.uuid4()}.{ext}')
+            elif hasattr(request.user, 'profile') and request.user.profile.signature:
+                # If no fresh signature was drawn, use their saved profile signature
+                req.fleet_officer_signature = request.user.profile.signature
+            
+            req.save()
+            
+            # Send Notification to Manager Admin
+            create_notification(
+                recipient=manager,
+                sender=request.user,
+                title="New Vehicle Requisition",
+                message=f"{request.user.username} submitted a requisition for vehicle {req.vehicle_number}.",
+                link=f"/requisitions/",
+                notification_type='notesheet'
+            )
+            
+            messages.success(request, "Requisition form submitted successfully.")
+            return redirect('requisition_list')
+    else:
+        form = VehicleRequisitionForm()
+        
+    # Fetch only Manager Admin users for the "Send To" dropdown
+    manager_admin_users = User.objects.filter(username='Manager_Admin')
+    return render(request, 'create_requisition.html', {
+        'form': form,
+        'manager_admin_users': manager_admin_users,
+    })
+
+@login_required
+def update_requisition_status(request, pk):
+    from .models import VehicleRequisition
+    if request.method == "POST" and request.user.username in ['Manager_Admin', 'Fleet_Manager']:
+        req = get_object_or_404(VehicleRequisition, pk=pk)
+        new_status = request.POST.get('status')
+        if new_status in dict(VehicleRequisition.STATUS_CHOICES):
+            req.status = new_status
+            req.save()
+            
+            # Notify the Fleet Officer
+            create_notification(
+                recipient=req.fleet_officer,
+                sender=request.user,
+                title="Requisition Status Updated",
+                message=f"Your requisition for {req.vehicle_number} is now {new_status}.",
+                link=f"/requisitions/",
+                notification_type='notesheet'
+            )
+            messages.success(request, f"Requisition status updated to {new_status}.")
+            
+    return redirect('requisition_list')
+
+@login_required
+def view_requisition(request, pk):
+    from .models import VehicleRequisition
+    req = get_object_or_404(VehicleRequisition, pk=pk)
+    
+    # Only allow the fleet officer who created it, or Manager_Admin/Fleet_Manager to view it
+    is_manager = request.user.username in ['Manager_Admin', 'Fleet_Manager']
+    if req.fleet_officer != request.user and not is_manager:
+        messages.error(request, "You are not authorized to view this requisition.")
+        return redirect('requisition_list')
+        
+    return render(request, 'view_requisition.html', {
+        'req': req,
+        'is_manager': is_manager
+    })
+
+# =========================================================
+# LOG BOOK HISTORY ATTACHMENT APIs
+# =========================================================
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.http import JsonResponse, HttpResponse
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def api_get_logbook_history(request):
+    """
+    Returns page-based digital logbook data for the selected vehicle.
+    """
+    from logbook.models import Vehicle, LogBook, LogBookPage
+
+    vehicles_qs = Vehicle.objects.all().order_by('vehicle_number')
+    vehicles_data = [
+        {
+            'id': v.id,
+            'vehicle_number': v.vehicle_number,
+            'registration_number': v.registration_number or '',
+            'type': v.vehicle_type or '',
+            'zone': v.zone or '',
+            'current_meter': v.current_meter_reading,
+        }
+        for v in vehicles_qs
+    ]
+
+    vehicle_id = request.GET.get('vehicle_id')
+    if not vehicle_id:
+        return JsonResponse({'vehicles': vehicles_data, 'pages': [], 'total_pages': 0, 'total_entries': 0})
+
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    logbook, _ = LogBook.objects.get_or_create(
+        vehicle=vehicle,
+        defaults={
+            'vehicle_number': vehicle.vehicle_number,
+            'opening_meter_reading': vehicle.current_meter_reading
+        }
+    )
+
+    if logbook.pages.count() == 0:
+        initial_pages = [
+            LogBookPage(logbook=logbook, page_number=i)
+            for i in range(1, 3)
+        ]
+        LogBookPage.objects.bulk_create(initial_pages)
+
+    # Attach any unassigned entries to Page 1 for backward compatibility
+    first_page = logbook.pages.filter(page_number=1).first()
+    if first_page:
+        logbook.entries.filter(page__isnull=True).update(page=first_page)
+
+    pages_qs = logbook.pages.all().prefetch_related('entries').order_by('page_number')
+    total_pages = pages_qs.count()
+    total_entries = 0
+
+    pages_list = []
+    for p in pages_qs:
+        entries_qs = p.entries.all().order_by('date', 'time_from')
+        total_entries += entries_qs.count()
+
+        p_entries = [
+            {
+                'id': e.id,
+                'date': e.date.strftime('%Y-%m-%d'),
+                'formatted_date': e.date.strftime('%d-%m-%Y'),
+                'time_from': e.time_from.strftime('%I:%M %p') if e.time_from else '',
+                'time_to': e.time_to.strftime('%I:%M %p') if e.time_to else '',
+                'officer_name': e.officer_name or '-',
+                'driver_name': e.driver_name or '-',
+                'meter_from': e.meter_reading_from,
+                'meter_to': e.meter_reading_to,
+                'km_covered': e.km_covered,
+                'pol_drawn': str(e.pol_drawn),
+                'purpose': e.purpose_of_journey or '-',
+                'details': e.details_of_journey or '-',
+                'remarks': e.remarks or '-',
+                'file_url': e.signed_requisition.url if e.signed_requisition else '',
+            }
+            for e in entries_qs
+        ]
+
+        pages_list.append({
+            'id': p.id,
+            'page_number': p.page_number,
+            'entries_count': len(p_entries),
+            'entries': p_entries,
+        })
+
+    return JsonResponse({
+        'vehicles': vehicles_data,
+        'vehicle': {
+            'id': vehicle.id,
+            'vehicle_number': vehicle.vehicle_number,
+            'registration_number': vehicle.registration_number or '-',
+            'zone': vehicle.zone or '-',
+            'vehicle_type': vehicle.vehicle_type or '-',
+            'current_meter': vehicle.current_meter_reading,
+            'logbook_serial': logbook.serial_number or '-',
+            'average_to_litre': str(logbook.average_to_litre) if logbook.average_to_litre else '-',
+        },
+        'total_pages': total_pages,
+        'total_entries': total_entries,
+        'pages': pages_list,
+    })
+
+
+def generate_logbook_history_pdf(vehicle, logbook, pages_qs, officer_name="Fleet Officer"):
+    """
+    Generates a PDF document for Digital Vehicle Log Book History using ReportLab.
+    Always orders pages by page_number ASC.
+    """
+    import os
+    from io import BytesIO
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=15,
+        leading=18,
+        alignment=1,
+        textColor=colors.HexColor('#0d2b1e')
+    )
+
+    subtitle_style = ParagraphStyle(
+        'DocSubtitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        leading=15,
+        alignment=1,
+        textColor=colors.HexColor('#059669')
+    )
+
+    normal_style = ParagraphStyle(
+        'NormalText',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor('#1f2937')
+    )
+
+    bold_style = ParagraphStyle(
+        'BoldText',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor('#111827')
+    )
+
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8,
+        leading=10,
+        alignment=1,
+        textColor=colors.white
+    )
+
+    table_cell_style = ParagraphStyle(
+        'TableCell',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor('#111827')
+    )
+
+    banner_label_style = ParagraphStyle(
+        'BannerLabel',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=7,
+        leading=9,
+        textColor=colors.HexColor('#64748b')
+    )
+
+    banner_val_style = ParagraphStyle(
+        'BannerVal',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=13,
+        textColor=colors.HexColor('#0d2b1e')
+    )
+
+    banner_meter_style = ParagraphStyle(
+        'BannerMeterVal',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=13,
+        textColor=colors.HexColor('#059669')
+    )
+
+    elements = []
+
+    def fmt_num(val):
+        if val is None:
+            return '-'
+        try:
+            return f"{int(val):,}"
+        except (ValueError, TypeError):
+            return str(val)
+
+    # Modern 4-Column Header Banner (matching Screenshot 3)
+    reg_num = vehicle.registration_number or vehicle.vehicle_number or '-'
+    type_zone = f"{vehicle.vehicle_type or '-'} ({vehicle.zone or '-'})"
+    meter_reading = f"{fmt_num(vehicle.current_meter_reading)} KM"
+
+    meta_data = [
+        [
+            Paragraph("VEHICLE", banner_label_style),
+            Paragraph("REGISTRATION", banner_label_style),
+            Paragraph("TYPE / ZONE", banner_label_style),
+            Paragraph("CURRENT METER", banner_label_style),
+        ],
+        [
+            Paragraph(vehicle.vehicle_number, banner_val_style),
+            Paragraph(reg_num, banner_val_style),
+            Paragraph(type_zone, banner_val_style),
+            Paragraph(meter_reading, banner_meter_style),
+        ]
+    ]
+
+    meta_table = Table(meta_data, colWidths=[130, 130, 130, 130])
+    meta_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f0fdf4')),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#bbf7d0')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,0), 6),
+        ('BOTTOMPADDING', (0,0), (-1,0), 1),
+        ('TOPPADDING', (0,1), (-1,1), 1),
+        ('BOTTOMPADDING', (0,1), (-1,1), 6),
+        ('LEFTPADDING', (0,0), (-1,-1), 10),
+        ('RIGHTPADDING', (0,0), (-1,-1), 10),
+    ]))
+    elements.append(meta_table)
+    elements.append(Spacer(1, 12))
+
+    # Total Pages & Total Entries summary
+    total_pages_cnt = pages_qs.count()
+    total_entries_cnt = sum(p.entries.count() for p in pages_qs)
+
+    elements.append(Paragraph(f"<b>DIGITAL LOG BOOK PAGES ({total_pages_cnt} Pages, {total_entries_cnt} Total Entries)</b>", bold_style))
+    elements.append(Spacer(1, 8))
+
+    # Render Each Page Section
+    for page in pages_qs:
+        page_entries = list(page.entries.all().order_by('date', 'time_from'))
+        elements.append(Paragraph(f"<b>PAGE NO. {page.page_number}</b> &nbsp;&nbsp;<font color='#64748b'>({len(page_entries)} Entries)</font>", bold_style))
+        elements.append(Spacer(1, 4))
+
+        if page_entries:
+            history_headers = ["#", "Date", "Officer/Driver", "Details of Journey", "Purpose", "Meter From-To", "KM"]
+            table_data = [[Paragraph(h, table_header_style) for h in history_headers]]
+
+            for idx, e in enumerate(page_entries, 1):
+                table_data.append([
+                    Paragraph(str(idx), table_cell_style),
+                    Paragraph(e.date.strftime('%d-%m-%Y') if e.date else '-', table_cell_style),
+                    Paragraph(e.officer_name or e.driver_name or '-', table_cell_style),
+                    Paragraph(e.details_of_journey or '-', table_cell_style),
+                    Paragraph(e.purpose_of_journey or '-', table_cell_style),
+                    Paragraph(f"{fmt_num(e.meter_reading_from)} &rarr; {fmt_num(e.meter_reading_to)}", table_cell_style),
+                    Paragraph(f"{fmt_num(e.km_covered)} km", table_cell_style),
+                ])
+
+            history_table = Table(table_data, colWidths=[20, 65, 95, 150, 90, 70, 30])
+            history_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0d2b1e')),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+                ('PADDING', (0,0), (-1,-1), 4),
+                ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#f8fafc')])
+            ]))
+            elements.append(history_table)
+        else:
+            empty_table = Table([[Paragraph(f"<i>Log Book Page {page.page_number} exists, but no entries have been recorded yet.</i>", normal_style)]], colWidths=[520])
+            empty_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f8fafc')),
+                ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#e2e8f0')),
+                ('PADDING', (0,0), (-1,-1), 6),
+            ]))
+            elements.append(empty_table)
+
+        elements.append(Spacer(1, 10))
+
+    doc.build(elements)
+    buffer.seek(0)
+    summary_pdf_bytes = buffer.getvalue()
+
+    # Find attached scanned PDF documents to append
+    attached_pdf_paths = []
+    for page in pages_qs:
+        for entry in page.entries.all():
+            if entry.signed_requisition and hasattr(entry.signed_requisition, 'path') and os.path.exists(entry.signed_requisition.path):
+                fpath = entry.signed_requisition.path
+                if fpath.lower().endswith('.pdf') and fpath not in attached_pdf_paths:
+                    attached_pdf_paths.append(fpath)
+
+    # Return attached scanned PDF files directly without summary table cover page
+    if attached_pdf_paths:
+        try:
+            import pypdf
+            writer = pypdf.PdfWriter()
+            for pdf_p in attached_pdf_paths:
+                try:
+                    reader_attached = pypdf.PdfReader(pdf_p)
+                    for p in reader_attached.pages:
+                        writer.add_page(p)
+                except Exception:
+                    pass
+
+            if len(writer.pages) > 0:
+                merged_buffer = BytesIO()
+                writer.write(merged_buffer)
+                merged_buffer.seek(0)
+                return merged_buffer.getvalue()
+        except Exception:
+            pass
+
+    return summary_pdf_bytes
+
+
+@login_required
+def api_attach_logbook_history(request):
+    """
+    Generates Digital Log Book history PDF report and attaches it as a NotesheetAttachment.
+    """
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    vehicle_id = request.POST.get('vehicle_id')
+    notesheet_id = request.POST.get('notesheet_id')
+
+    if not vehicle_id:
+        return JsonResponse({'error': 'Vehicle ID is required.'}, status=400)
+
+    from logbook.models import Vehicle, LogBook, LogBookPage
+    from .models import Notesheet, NotesheetAttachment
+
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    logbook, _ = LogBook.objects.get_or_create(
+        vehicle=vehicle,
+        defaults={
+            'vehicle_number': vehicle.vehicle_number,
+            'opening_meter_reading': vehicle.current_meter_reading
+        }
+    )
+
+    if logbook.pages.count() == 0:
+        initial_pages = [
+            LogBookPage(logbook=logbook, page_number=i)
+            for i in range(1, 3)
+        ]
+        LogBookPage.objects.bulk_create(initial_pages)
+
+    pages_qs = logbook.pages.all().prefetch_related('entries').order_by('page_number')
+
+    officer_name = request.user.get_full_name() or request.user.username
+    pdf_bytes = generate_logbook_history_pdf(
+        vehicle=vehicle,
+        logbook=logbook,
+        pages_qs=pages_qs,
+        officer_name=officer_name
+    )
+
+    filename = f"Vehicle {vehicle.vehicle_number} - Digital Log Book History.pdf"
+
+    if notesheet_id:
+        notesheet = get_object_or_404(Notesheet, id=notesheet_id)
+        attachment = NotesheetAttachment.objects.create(
+            notesheet=notesheet,
+            file=ContentFile(pdf_bytes, name=filename),
+            flag_name='LogBook'
+        )
+        return JsonResponse({
+            'success': True,
+            'attachment_id': attachment.id,
+            'filename': filename,
+            'url': attachment.file.url,
+            'flag_name': 'LogBook',
+            'notesheet_id': notesheet.id
+        })
+    else:
+        from django.core.files.storage import default_storage
+        file_path = default_storage.save(f"notesheet_attachments/{filename}", ContentFile(pdf_bytes, name=filename))
+        file_url = default_storage.url(file_path)
+
+        return JsonResponse({
+            'success': True,
+            'filename': filename,
+            'file_path': file_path,
+            'url': file_url,
+            'flag_name': 'LogBook'
+        })
+
+
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+@login_required
+@xframe_options_exempt
+def view_document_inline(request):
+    """
+    Serves files inline (Content-Disposition: inline) so PDF files open directly in browser.
+    """
+    import os
+    import mimetypes
+    from urllib.parse import unquote
+    from django.conf import settings
+    from django.http import HttpResponseNotFound, HttpResponse
+
+    raw_url = request.GET.get('url', '')
+    raw_path = request.GET.get('path', '')
+
+    url = unquote(raw_url)
+    file_path = unquote(raw_path)
+
+    if url:
+        if '/media/' in url:
+            file_path = url.split('/media/')[-1]
+        else:
+            file_path = url
+
+    if not file_path:
+        return HttpResponseNotFound("No file path specified.")
+
+    file_path = unquote(file_path).replace('..', '').lstrip('/')
+    full_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+    if not os.path.exists(full_path) or not os.path.isfile(full_path):
+        # Fallback: search in MEDIA_ROOT / notesheet_attachments / basename
+        base_name = os.path.basename(file_path)
+        alt_path = os.path.join(settings.MEDIA_ROOT, 'notesheet_attachments', base_name)
+        if os.path.exists(alt_path) and os.path.isfile(alt_path):
+            full_path = alt_path
+
+    if not os.path.exists(full_path) or not os.path.isfile(full_path):
+        return HttpResponseNotFound(f"File not found on server: {os.path.basename(file_path)}")
+
+    content_type, _ = mimetypes.guess_type(full_path)
+    if not content_type:
+        content_type = 'application/pdf' if full_path.lower().endswith('.pdf') else 'application/octet-stream'
+
+    with open(full_path, 'rb') as f:
+        response = HttpResponse(f.read(), content_type=content_type)
+        response['Content-Disposition'] = f'inline; filename="{os.path.basename(full_path)}"'
+        response['X-Frame-Options'] = 'ALLOWALL'
+        return response

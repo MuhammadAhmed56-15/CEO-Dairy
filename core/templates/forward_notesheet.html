@@ -958,15 +958,16 @@
 
   .preview-section {
     background: white;
-    width: 850px;
-    min-height: 297mm;
+    width: 1000px;
+    max-width: 1000px;
+    min-height: 1414px;
     height: auto;
     padding: 0;
     margin: 0 auto 2rem auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border: none;
     display: block;
-    overflow: visible;
+    overflow: hidden;
     flex-shrink: 0;
   }
 
@@ -1185,15 +1186,33 @@
                 <!-- Injected by JS -->
               </div>
 
-              <button type="button" class="btn-add" id="add-attachment-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Add More File
-              </button>
+              <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; margin-top: 0.75rem;">
+                <div>
+                  <button type="button" class="btn-add" id="add-attachment-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add More File
+                  </button>
+                </div>
+                {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.username in "Manager_Admin MngrFleet Fleet_Manager" %}
+                <div>
+                  <button type="button" class="btn-attach-logbook" onclick="openLogBookModal('{{ notesheet.id }}')" style="
+                    background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);
+                    color: white; border: none; padding: 0.6rem 1.2rem; border-radius: var(--radius-lg);
+                    font-weight: 600; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+                    box-shadow: 0 4px 12px rgba(13, 43, 30, 0.2); transition: all 0.2s;
+                  ">
+                    <span>📚 Attach Log Book History</span>
+                  </button>
+                </div>
+                {% endif %}
+              </div>
             </div>
           </section>
+
+          {% include 'logbook_history_modal.html' %}
 
           <!-- Digital Signature Section -->
           <section class="section" aria-labelledby="sig-heading" style="margin-top: 1.5rem;">
@@ -1248,7 +1267,7 @@
                   aria-required="true" style="width: max-content; max-width: 100%;">
                   <option value="" disabled selected>Select recipient...</option>
                   {% for user in users %}
-                  <option value="{{ user.id }}">{{ user.username }} -- {{ user.profile.role }}</option>
+                  <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_display|default:user.profile.role }})</option>
                   {% endfor %}
                 </select>
               </div>
@@ -1854,19 +1873,20 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Calibri&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
+  html { height: 100%; }
+  body {
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.6;
     color: #000;
     background: white;
-  }
-  body {
     padding: 20mm 22mm 30mm 22mm;
     font-size: 13pt;
     line-height: 1.8;
+    display: flex;
+    flex-direction: column;
   }
   p { margin: 0 0 6pt 0; }
   table { border-collapse: collapse; width: 100%; }
@@ -1885,7 +1905,9 @@
 </head>
 <body>
 ${letterhead}
+<div style="border-left: 2.5px solid #000; padding-left: 14pt; margin-left: 6pt; flex: 1;">
 ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
+</div>
 </body>
 </html>`;
 
@@ -1908,7 +1930,7 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
             body.scrollHeight, body.offsetHeight,
             html.clientHeight, html.scrollHeight, html.offsetHeight
           );
-          iframe.style.height = Math.max(height, 297 * 3.7795) + 'px';
+          iframe.style.height = Math.max(height, 1414) + 'px'; // min 1414px for 1000px A4 ratio
           iframe.parentElement.style.minHeight = iframe.style.height;
         } catch (e) { }
       }, 100);
@@ -1950,8 +1972,8 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page { size: A4; margin: 25mm 20mm; }
-  html, body { font-family: Calibri, Arial, sans-serif; font-size: 12pt; line-height: 1.6; color: #000; background: white; }
-  body { padding: 20mm; }
+  html { height: 100%; }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 12pt; line-height: 1.6; color: #000; background: white; min-height: 100vh; padding: 20mm; display: flex; flex-direction: column; }
   @media print { body { padding: 0; } .no-print { display: none !important; } }
   p { margin: 0 0 6pt; }
   table { border-collapse: collapse; width: 100%; }
@@ -1974,7 +1996,9 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
     <button class="btn-do-print" onclick="window.print()">Print / Save as PDF</button>
     <button class="btn-do-close" onclick="window.close()">Close</button>
   </div>
-  <div class="letter-content">${content}</div>
+  <div style="border-left: 2.5px solid #000; padding-left: 14pt; margin-left: 6pt; flex: 1;">
+    <div class="letter-content">${content}</div>
+  </div>
   <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };<\/script>
 </body>
 </html>`);

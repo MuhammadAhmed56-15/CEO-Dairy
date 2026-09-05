@@ -872,15 +872,16 @@
 
   .preview-section {
     background: white;
-    width: 850px;
-    min-height: 297mm;
+    width: 1000px;
+    max-width: 1000px;
+    min-height: 1414px;
     height: auto;
     padding: 0;
     margin: 0 auto 2rem auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border: none;
     display: block;
-    overflow: visible;
+    overflow: hidden;
     flex-shrink: 0;
   }
 
@@ -1737,19 +1738,18 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Calibri&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
+  html { height: 100%; }
+  body {
     width: 100%;
-    height: 100%;
-    font-family: Calibri, Arial, sans-serif;
+    min-height: 100vh;
+    font-family: Arial, Calibri, sans-serif;
     font-size: 12pt;
-    line-height: 1.6;
+    line-height: 1.5;
     color: #000;
     background: white;
-  }
-  body {
-    padding: 25mm 25mm 30mm 25mm;
-    font-size: 13pt;
-    line-height: 1.8;
+    padding: 20mm 22mm 30mm 22mm;
+    display: flex;
+    flex-direction: column;
   }
   p { margin: 0 0 6pt 0; }
   table { border-collapse: collapse; width: 100%; }
@@ -1767,7 +1767,9 @@
 </head>
 <body>
 ${letterhead}
+<div style="border-left: 2.5px solid #000; padding-left: 14pt; margin-left: 6pt; flex: 1;">
 ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
+</div>
 </body>
 </html>`;
 
@@ -1790,7 +1792,7 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
             body.scrollHeight, body.offsetHeight,
             html.clientHeight, html.scrollHeight, html.offsetHeight
           );
-          iframe.style.height = Math.max(height, 297 * 3.7795) + 'px';
+          iframe.style.height = Math.max(height, 1414) + 'px'; // min 1414px for 1000px A4 ratio
           iframe.parentElement.style.minHeight = iframe.style.height;
         } catch (e) { }
       }, 100);
@@ -1857,14 +1859,18 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
     size: A4;
     margin: 25mm 20mm;
   }
-  html, body {
+  html { height: 100%; }
+  body {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.6;
     color: #000;
     background: white;
+    min-height: 100vh;
+    padding: 20mm; 
+    display: flex;
+    flex-direction: column;
   }
-  body { padding: 20mm; }
   @media print {
     body { padding: 0; }
     .no-print { display: none !important; }
@@ -1919,7 +1925,9 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
   </div>
   <div class="letter-content">
     ${letterhead}
-    ${remarkContent}
+    <div style="border-left: 2.5px solid #000; padding-left: 14pt; margin-left: 6pt; flex: 1;">
+      ${remarkContent}
+    </div>
   </div>
   <script>
     window.onload = function() {

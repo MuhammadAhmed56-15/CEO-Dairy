@@ -756,9 +756,136 @@
 {% block content %}
 <div class="welcome-header">
     <div class="welcome-content">
-        <h2>📊 Manager Dashboard Overview</h2>
+        <h2 id="dash-title">📊 {{ request.user.username }} Dashboard</h2>
+        <script>
+            (function() {
+                var rawRole = '{{ request.user.profile.role|default:"" }}';
+                var rawUsername = '{{ request.user.username }}';
+                var username = rawUsername.replace(/_/g, ' ');
+                if (rawUsername === 'AuditManager' || rawUsername === 'mngraudit') username = 'Manager Audit';
+                else if (rawUsername === 'MngrProc') username = 'Manager Procurement';
+                else if (rawUsername === 'MngrHr') username = 'Manager HR';
+                else if (rawUsername === 'MngrProj') username = 'Manager Project';
+                else if (rawUsername === 'MngrFin') username = 'Manager Finance';
+                else if (rawUsername === 'MngrBilling') username = 'Manager Billing';
+                else if (rawUsername === 'MngrPlan') username = 'Manager Planning';
+                else if (rawUsername === 'MngrSWMHO') username = 'Manager SWM HO';
+                else if (rawUsername === 'MngrOPS') username = 'Manager Operation';
+                else if (rawUsername === 'MngrFleet') username = 'Manager Fleet';
+                else if (rawUsername === 'MngrCLC') username = 'Manager CLC';
+                else if (rawUsername === 'MngrMIS' || rawUsername === 'mngrmis') username = 'Manager MIS';
+                else if (rawUsername === 'MngrSWMZoneA') username = 'Manager SWM A';
+                else if (rawUsername === 'MngrSWMZoneB') username = 'Manager SWM B';
+                else if (rawUsername === 'MngrSWMZoneC') username = 'Manager SWM C';
+                else if (rawUsername === 'MngrSWMZoneD') username = 'Manager SWM D';
+                else if (rawUsername === 'MngrSWMZoneE') username = 'Manager SWM E';
+                else if (rawUsername === 'MngrWSA') username = 'Manager WS&WMM A';
+                else if (rawUsername === 'MngrWSB') username = 'Manager WS&WMM B';
+                else if (rawUsername === 'MngrWSC') username = 'Manager WS&WMM C';
+                else if (rawUsername === 'MngrWSD') username = 'Manager WS&WMM D';
+                else if (rawUsername === 'MngrWSE') username = 'Manager WS&WMM E';
+                else if (rawUsername === 'MngrA_AZoneA') username = 'Manager A&A A';
+                else if (rawUsername === 'MngrA_AZoneB') username = 'Manager A&A B';
+                else if (rawUsername === 'MngrA_AZoneC') username = 'Manager A&A C';
+                else if (rawUsername === 'MngrA_AZoneD') username = 'Manager A&A D';
+                else if (rawUsername === 'MngrA_AZoneE') username = 'Manager A&A E';
+                else if (rawUsername === 'fozonea' || rawUsername === 'Fleet_Officer_A') username = 'Fleet Officer Zone A';
+                else if (rawUsername === 'fozoneb' || rawUsername === 'Fleet_Officer_B') username = 'Fleet Officer Zone B';
+                else if (rawUsername === 'fozonec' || rawUsername === 'Fleet_Officer_C') username = 'Fleet Officer Zone C';
+                else if (rawUsername === 'fozoned' || rawUsername === 'Fleet_Officer_D') username = 'Fleet Officer Zone D';
+                else if (rawUsername === 'fozonee' || rawUsername === 'Fleet_Officer_E') username = 'Fleet Officer Zone E';
+                else if (rawUsername === 'ampmerho1' || rawUsername === 'AMPmerHO1') username = 'Assistant Manager PMER HO1';
+                else if (rawUsername === 'ampmerho2' || rawUsername === 'AMPmerHO2') username = 'Assistant Manager PMER HO2';
+                else if (rawUsername === 'amdatabaseho' || rawUsername === 'AMdatabaseHO') username = 'Assistant Manager Database';
+                else if (rawUsername === 'ambillingho' || rawUsername === 'AMbillingHO') username = 'Assistant Manager Billing';
+                else if (rawUsername === 'aoho1') username = 'Accounts Officer HO1';
+                else if (rawUsername === 'aoho2') username = 'Accounts Officer HO2';
+                else if (rawUsername === 'aoho3') username = 'Accounts Officer HO3';
+                else if (rawUsername === 'amcczonea') username = 'Assistant Manager Customer Care Zone A';
+                else if (rawUsername === 'amcczoneb') username = 'Assistant Manager Customer Care Zone B';
+                else if (rawUsername === 'amcczonec') username = 'Assistant Manager Customer Care Zone C';
+                else if (rawUsername === 'amcczoned') username = 'Assistant Manager Customer Care Zone D';
+                else if (rawUsername === 'amcczonee') username = 'Assistant Manager Customer Care Zone E';
+                else if (rawUsername === 'amhrzonea') username = 'Assistant Manager HR & Admin Zone A';
+                else if (rawUsername === 'amhrzoneb') username = 'Assistant Manager HR & Admin Zone B';
+                else if (rawUsername === 'amhrzonec') username = 'Assistant Manager HR & Admin Zone C';
+                else if (rawUsername === 'amhrzoned') username = 'Assistant Manager HR & Admin Zone D';
+                else if (rawUsername === 'amhrzonee') username = 'Assistant Manager HR & Admin Zone E';
+                else if (rawUsername === 'amprocho' || rawUsername === 'AMprocho') username = 'Assistant Manager Procurement HO';
+                
+                var fn = '{{ request.user.first_name|escapejs }}'.trim();
+                var ln = '{{ request.user.last_name|escapejs }}'.trim();
+                var gn = '{{ request.user.get_full_name|escapejs }}'.trim();
+                
+                var fullName = gn || (fn + (ln ? ' ' + ln : '')).trim() || fn || ln;
+                if (!fullName) {
+                    if (rawUsername === 'CFO') fullName = 'Haidar Ali';
+                    else if (rawUsername === 'CIA' || rawUsername === 'cia') fullName = 'Asif Shah';
+                    else if (rawUsername === 'ZM_A') fullName = 'Tariq Aziz';
+                    else if (rawUsername === 'ZM_B') fullName = 'Aamir Gull';
+                    else if (rawUsername === 'ZM_C') fullName = 'Maria Shahnaz';
+                    else if (rawUsername === 'ZM_D') fullName = 'Turab Shah';
+                    else if (rawUsername === 'ZM_E') fullName = 'Anwar Ul Haq';
+                    else if (rawUsername === 'Manager_Media') fullName = 'Ali Hassan';
+                    else if (rawUsername === 'AuditManager' || rawUsername === 'mngraudit') fullName = 'Wajid Ali Khan';
+                    else if (rawUsername === 'MngrProc') fullName = 'Saleem Rafiq';
+                    else if (rawUsername === 'MngrHr') fullName = 'Saqib Nawaz';
+                    else if (rawUsername === 'MngrProj') fullName = 'Jahangir Khan';
+                    else if (rawUsername === 'MngrFin') fullName = 'Sheraz Khan';
+                    else if (rawUsername === 'MngrPlan') fullName = 'Sajjad Khan';
+                    else if (rawUsername === 'MngrSWMHO') fullName = 'Muhammad Saeed';
+                    else if (rawUsername === 'MngrOPS') fullName = 'Muhammad Ijaz';
+                    else if (rawUsername === 'MngrBilling') fullName = 'Nusrat Ali';
+                    else if (rawUsername === 'MngrFleet') fullName = 'Muhammad Anwar';
+                    else if (rawUsername === 'MngrCLC') fullName = 'Muhammad Ismail';
+                    else if (rawUsername === 'MngrMIS' || rawUsername === 'mngrmis') fullName = 'Asim Ghauri';
+                    else if (rawUsername === 'MngrSWMZoneA') fullName = 'Muhammad Basit';
+                    else if (rawUsername === 'MngrSWMZoneB') fullName = 'Gohar Ali';
+                    else if (rawUsername === 'MngrSWMZoneC') fullName = 'Tariq Saddique';
+                    else if (rawUsername === 'MngrSWMZoneD') fullName = 'Muhammad Ziad';
+                    else if (rawUsername === 'MngrSWMZoneE') fullName = 'Usman Khan';
+                    else if (rawUsername === 'MngrWSA') fullName = 'Syed Ali Raza Shah';
+                    else if (rawUsername === 'MngrWSB') fullName = 'Zafar Ullah Bangash';
+                    else if (rawUsername === 'MngrWSC') fullName = 'Muneeb Ullah Khan';
+                    else if (rawUsername === 'MngrWSD') fullName = 'Farman Ali';
+                    else if (rawUsername === 'MngrWSE') fullName = 'Anwar Ul Haq';
+                    else if (rawUsername === 'MngrA_AZoneA') fullName = 'Syed Nasir Shah';
+                    else if (rawUsername === 'MngrA_AZoneB') fullName = 'Jahangir Khan Khattak';
+                    else if (rawUsername === 'MngrA_AZoneC') fullName = 'Mansoor Rehman';
+                    else if (rawUsername === 'MngrA_AZoneD') fullName = 'Maqbool Ali';
+                    else if (rawUsername === 'MngrA_AZoneE') fullName = 'Muhammad Ali Shah';
+                    else if (rawUsername === 'fozonea' || rawUsername === 'Fleet_Officer_A') fullName = 'Mustarif Khan';
+                    else if (rawUsername === 'fozoneb' || rawUsername === 'Fleet_Officer_B') fullName = 'Muhammad Aimal Khan';
+                    else if (rawUsername === 'fozonec' || rawUsername === 'Fleet_Officer_C') fullName = 'Adnan Faraz';
+                    else if (rawUsername === 'fozoned' || rawUsername === 'Fleet_Officer_D') fullName = 'Qaiser Khan';
+                    else if (rawUsername === 'fozonee' || rawUsername === 'Fleet_Officer_E') fullName = 'Muhammad Adnan';
+                    else if (rawUsername === 'ampmerho1' || rawUsername === 'AMPmerHO1') fullName = 'Muhammad Tayyab Sethi';
+                    else if (rawUsername === 'ampmerho2' || rawUsername === 'AMPmerHO2') fullName = 'Behram Khan';
+                    else if (rawUsername === 'amdatabaseho' || rawUsername === 'AMdatabaseHO') fullName = 'Jhangeer Khan';
+                    else if (rawUsername === 'ambillingho' || rawUsername === 'AMbillingHO') fullName = 'Waqas Ahmed';
+                    else if (rawUsername === 'aoho1') fullName = 'Aman Khan';
+                    else if (rawUsername === 'aoho2') fullName = 'Majid Khan';
+                    else if (rawUsername === 'aoho3') fullName = 'Sajid Khan';
+                    else if (rawUsername === 'amcczonea') fullName = 'Ilyas Jehan';
+                    else if (rawUsername === 'amcczoneb') fullName = 'Muhammad Waqas';
+                    else if (rawUsername === 'amcczonec') fullName = 'Maqsood Ali';
+                    else if (rawUsername === 'amcczoned') fullName = 'Muhammad Ilyas';
+                    else if (rawUsername === 'amcczonee') fullName = 'Syed Mohsin Shah';
+                    else if (rawUsername === 'amhrzonea') fullName = 'Muhammad Arif';
+                    else if (rawUsername === 'amhrzoneb') fullName = 'Asif Khan';
+                    else if (rawUsername === 'amhrzonec') fullName = 'Ahmed Ali';
+                    else if (rawUsername === 'amhrzoned') fullName = 'Malghalara Hidayat';
+                    else if (rawUsername === 'amhrzonee') fullName = 'Asif Saeed';
+                    else if (rawUsername === 'amprocho' || rawUsername === 'AMprocho') fullName = 'Siraj Munawar';
+                }
+                
+                var titleText = '📊 ' + username + ' Dashboard';
+                var el = document.getElementById('dash-title');
+                if (el) el.innerText = titleText;
+            })();
+        </script>
         <p>Monitor commitments, track progress, and review organizational performance.</p>
-        <p id="welcome-subtext">Here's your Notesheet overview for today</p>
+        <p id="welcome-subtext">Here's your overview for today</p>
         <div class="welcome-meta">
             <div class="meta-item">
                 <i class="fas fa-calendar-day"></i>
@@ -795,6 +922,9 @@
             <option value="notesheet" selected>Notesheet</option>
             <option value="task">Tasks</option>
             <option value="letter">Letters</option>
+            {% if request.user.username == 'Fleet_Manager' %}
+            <option value="requisition">Requisitions</option>
+            {% endif %}
         </select>
     </div>
 </div>
@@ -1195,7 +1325,71 @@
                     {% endfor %}
                 ]
             }
+        }{% if request.user.username == 'Fleet_Manager' %},
+        requisition: {
+            title: 'Requisition Overview',
+            subtext: "Here's your Requisitions overview for today",
+            cards: [
+                { value: '{{ req_total_count }}', label: 'Total Requisitions', icon: 'fa-truck-pickup', color: 'total', type: 'total' },
+                { value: '{{ req_pending_count }}', label: 'Pending Requisitions', icon: 'fa-clock', color: 'pending', type: 'pending' },
+                { value: '{{ req_approved_count }}', label: 'Approved Requisitions', icon: 'fa-check-circle', color: 'approved', type: 'approved' },
+                { value: '{{ req_completed_count }}', label: 'Completed Requisitions', icon: 'fa-check-double', color: 'rejected', type: 'completed' }
+            ],
+            pie: {
+                labels: ['Pending', 'Approved', 'Completed', 'Rejected'],
+                data: [
+                    {{ req_pending_count }},
+                    {{ req_approved_count }},
+                    {{ req_completed_count }},
+                    {{ req_rejected_count }}
+                ]
+            },
+            calendarEvents: [
+                {% for r in req_total_list %}
+                {
+                    title: 'Requisition: {{ r.vehicle_number|escapejs }}',
+                    start: '{{ r.created_at|date:"Y-m-d" }}T{{ r.created_at|date:"H:i:s" }}',
+                    allDay: false,
+                    color: '#f59e0b',
+                    extendedProps: {
+                        description: 'Issue: {{ r.issue_description|escapejs }}',
+                        location: 'Driver: {{ r.driver_name|escapejs }}',
+                        status: '{{ r.status|escapejs }}',
+                        time: '{{ r.created_at|date:"H:i" }}',
+                        details: [
+                            { label: 'Vehicle', value: '{{ r.vehicle_number|escapejs }}' },
+                            { label: 'Driver', value: '{{ r.driver_name|escapejs }}' },
+                            { label: 'Cost', value: '{{ r.estimated_cost|escapejs }}' },
+                            { label: 'Status', value: '{{ r.status|escapejs }}' }
+                        ]
+                    }
+                },
+                {% endfor %}
+            ],
+            lists: {
+                total: [
+                    {% for r in req_total_list %}
+                    { title: 'Vehicle {{ r.vehicle_number|escapejs }}', description: 'Driver: {{ r.driver_name|escapejs }} - {{ r.issue_description|escapejs }}', date: '{{ r.created_at|date:"M d, Y" }}', status: '{{ r.status }}', creator: '{{ r.fleet_officer.username|escapejs }}', location: 'Cost: {{ r.estimated_cost|default:"-" }}' },
+                    {% endfor %}
+                ],
+                pending: [
+                    {% for r in req_pending_list %}
+                    { title: 'Vehicle {{ r.vehicle_number|escapejs }}', description: 'Driver: {{ r.driver_name|escapejs }} - {{ r.issue_description|escapejs }}', date: '{{ r.created_at|date:"M d, Y" }}', status: '{{ r.status }}', creator: '{{ r.fleet_officer.username|escapejs }}', location: 'Cost: {{ r.estimated_cost|default:"-" }}' },
+                    {% endfor %}
+                ],
+                approved: [
+                    {% for r in req_approved_list %}
+                    { title: 'Vehicle {{ r.vehicle_number|escapejs }}', description: 'Driver: {{ r.driver_name|escapejs }} - {{ r.issue_description|escapejs }}', date: '{{ r.created_at|date:"M d, Y" }}', status: '{{ r.status }}', creator: '{{ r.fleet_officer.username|escapejs }}', location: 'Cost: {{ r.estimated_cost|default:"-" }}' },
+                    {% endfor %}
+                ],
+                completed: [
+                    {% for r in req_completed_list %}
+                    { title: 'Vehicle {{ r.vehicle_number|escapejs }}', description: 'Driver: {{ r.driver_name|escapejs }} - {{ r.issue_description|escapejs }}', date: '{{ r.created_at|date:"M d, Y" }}', status: '{{ r.status }}', creator: '{{ r.fleet_officer.username|escapejs }}', location: 'Cost: {{ r.estimated_cost|default:"-" }}' },
+                    {% endfor %}
+                ]
+            }
         }
+        {% endif %}
     };
 
     let activeSection = 'notesheet';

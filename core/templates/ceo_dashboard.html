@@ -756,7 +756,15 @@
 {% block content %}
 <div class="welcome-header">
     <div class="welcome-content">
-        <h2>📊 CEO Dashboard Overview</h2>
+        <h2 id="ceo-dash-title">📊 {{ request.user.username }} Dashboard</h2>
+        <script>
+            (function() {
+                var username = '{{ request.user.username }}'.replace(/_/g, ' ');
+                var titleText = '📊 ' + username + ' Dashboard';
+                var el = document.getElementById('ceo-dash-title');
+                if (el) el.innerText = titleText;
+            })();
+        </script>
         <p>Monitor commitments, track progress, and review organizational performance.</p>
         <p id="welcome-subtext">Here's your Notesheet overview for today</p>
         <div class="welcome-meta">

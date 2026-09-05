@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle {{ vehicle.vehicle_number }} — Complete Digital Log Book Register</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm 12mm;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #0f172a;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .print-toolbar {
+            background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(13,43,30,0.3);
+        }
+
+        /* ── Continuous Master Document ── */
+        .master-logbook-document {
+            background: white;
+            border: 2px solid #0d2b1e;
+            border-radius: 16px;
+            padding: 28px 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Master Header — Appears ONLY ONCE at the top */
+        .master-header-banner {
+            text-align: center;
+            border-bottom: 3px double #0d2b1e;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+
+        .master-title-main {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #0d2b1e;
+            margin: 0;
+        }
+
+        .master-sub-title {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #059669;
+            margin: 4px 0 0 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Master Metadata Banner */
+        .master-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1.5px solid #0d2b1e;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+        }
+
+        .master-meta-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .master-meta-label {
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+        }
+
+        .master-meta-value {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0d2b1e;
+        }
+
+        /* ── Page Section Styling ── */
+        .logbook-page-block {
+            margin-bottom: 22px;
+        }
+
+        .logbook-page-header {
+            background: #f1f5f9;
+            border: 1.5px solid #0d2b1e;
+            border-bottom: none;
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 13px;
+            color: #0d2b1e;
+        }
+
+        .logbook-page-badge {
+            background: #0d2b1e;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Register Table ── */
+        .register-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #0d2b1e;
+            font-size: 12.5px;
+        }
+
+        .register-table th {
+            background: #0d2b1e;
+            color: white;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 9px 6px;
+            border: 1px solid #0d2b1e;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .register-table td {
+            padding: 9px 6px;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .register-table tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        /* CSS Page Break for Printing */
+        .logbook-page-break {
+            page-break-after: always;
+            break-after: page;
+            height: 0;
+            margin: 0;
+            border: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .print-toolbar {
+                display: none !important;
+            }
+            .master-logbook-document {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .register-table th {
+                background-color: #0d2b1e !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .logbook-page-badge {
+                background-color: #0d2b1e !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Print Control Toolbar (No Print) ── -->
+    <div class="print-toolbar">
+        <div>
+            <h4 class="m-0 font-weight-bold" style="font-size:1.25rem;">
+                <i class="fas fa-book-open me-2" style="color:#34d399;"></i>
+                Vehicle {{ vehicle.vehicle_number }} — Official Digital Log Book
+            </h4>
+            <div style="font-size:0.85rem; color:#a7f3d0; margin-top:2px;">
+                Complete Document containing {{ pages.count }} Pages
+            </div>
+        </div>
+        <button onclick="window.print()" class="btn btn-success fw-bold px-4 py-2" style="border-radius:10px;">
+            <i class="fas fa-print me-2"></i> Print Full Log Book PDF
+        </button>
+    </div>
+
+    <!-- ── MASTER CONTINUOUS LOG BOOK DOCUMENT ── -->
+    <div class="master-logbook-document">
+
+        <!-- ── Continuous Page Sections Loop ── -->
+        {% for page in pages %}
+        <div class="logbook-page-block">
+            
+            <!-- Compact Page Section Header -->
+            <div class="logbook-page-header">
+                <div>
+                    <i class="fas fa-file-lines me-1" style="color:#059669;"></i>
+                    REGISTER PAGE {{ page.page_number }}
+                </div>
+                <span class="logbook-page-badge">
+                    PAGE NO. {{ page.page_number }} OF {{ pages.count }}
+                </span>
+            </div>
+
+            <!-- Page Register Entries Table -->
+            <table class="register-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">#</th>
+                        <th style="width: 11%;">Date</th>
+                        <th style="width: 13%;">Time</th>
+                        <th style="width: 25%;">Details of Journey</th>
+                        <th style="width: 15%;">Purpose of Journey</th>
+                        <th style="width: 16%;">Officer / Driver</th>
+                        <th style="width: 10%;">Meter Reading</th>
+                        <th style="width: 6%;">KM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in page.entries.all %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">{{ entry.date|date:"d-m-Y" }}</td>
+                        <td class="text-center" style="font-size:11.5px;">
+                            {% if entry.time_from %}{{ entry.time_from|time:"h:i A" }}{% else %}-{% endif %} &rarr; {% if entry.time_to %}{{ entry.time_to|time:"h:i A" }}{% else %}-{% endif %}
+                        </td>
+                        <td>{{ entry.details_of_journey|default:"-" }}</td>
+                        <td>{{ entry.purpose_of_journey|default:"-" }}</td>
+                        <td>
+                            <div><strong>{{ entry.officer_name|default:"-" }}</strong></div>
+                            {% if entry.driver_name and entry.driver_name != '-' %}
+                                <div style="font-size:11px; color:#475569;">Driver: {{ entry.driver_name }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center" style="font-size:12px;">
+                            {{ entry.meter_reading_from }} &rarr; {{ entry.meter_reading_to }}
+                        </td>
+                        <td class="text-center fw-bold" style="color:#059669;">
+                            {{ entry.km_covered }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-2" style="font-style:italic; font-size:12px;">
+                            Page {{ page.page_number }} — No entries recorded on this page yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        {% if not forloop.last %}
+        <div class="logbook-page-break"></div>
+        {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+</body>
+</html>
+

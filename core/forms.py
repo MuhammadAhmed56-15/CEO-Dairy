@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Commitment, Task, Notesheet, Remark, Profile
+from .models import Commitment, Task, Notesheet, Remark, Profile, VehicleRequisition
 
 # =========================================================
 # 1. COMMITMENT FORM
@@ -129,3 +129,26 @@ class TaskAssignForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         kwargs.pop('manager', None)
         super().__init__(*args, **kwargs)
+
+# =========================================================
+# 5. VEHICLE REQUISITION FORM
+# =========================================================
+class VehicleRequisitionForm(forms.ModelForm):
+    class Meta:
+        model = VehicleRequisition
+        fields = [
+            'zone', 'uc_route', 'vehicle_number', 'issue_description', 
+            'previous_issue_date', 'estimated_cost', 'driver_name', 
+            'driver_mobile', 'driver_cnic'
+        ]
+        widgets = {
+            'zone': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Zone'}),
+            'uc_route': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'U.C / Route'}),
+            'vehicle_number': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Vehicle Number'}),
+            'issue_description': forms.Textarea(attrs={'class': 'form-input form-input-line-textarea', 'rows': 4, 'placeholder': '(1) \n(2) \n(3) \n(4)'}),
+            'previous_issue_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input form-input-line'}),
+            'estimated_cost': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Rs. 10000'}),
+            'driver_name': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Driver Name'}),
+            'driver_mobile': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': '03XX-XXXXXXX'}),
+            'driver_cnic': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'XXXXX-XXXXXXX-X'}),
+        }

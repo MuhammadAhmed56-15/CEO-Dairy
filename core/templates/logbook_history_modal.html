@@ -1,0 +1,454 @@
+<!-- Log Book History Modal -->
+<style>
+  @keyframes logbookModalFadeIn {
+    from { opacity: 0; transform: scale(0.97) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .logbook-modal-container {
+    animation: logbookModalFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .logbook-field-input {
+    width: 100% !important;
+    height: 48px !important;
+    line-height: 46px !important;
+    padding: 0 16px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-sizing: border-box !important;
+    appearance: auto !important;
+  }
+  .logbook-field-input:focus {
+    outline: none !important;
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.18) !important;
+    background-color: #ffffff !important;
+  }
+  .btn-logbook-action {
+    height: 48px !important;
+    padding: 0 1.75rem !important;
+    border-radius: 10px !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    white-space: nowrap !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3) !important;
+  }
+  .btn-logbook-action:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
+  }
+</style>
+
+<div id="logbookHistoryModal" class="logbook-modal-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; z-index:9999999; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1.25rem;">
+  <div class="logbook-modal-container" style="background:white; border-radius:22px; width:96vw; max-width:1320px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow:hidden; border:1px solid #cbd5e1; margin:auto;">
+    
+    <!-- Modal Header -->
+    <div style="background:linear-gradient(135deg, #052e16 0%, #064e3b 50%, #047857 100%); padding:1.35rem 2rem; color:white; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; border-bottom:3px solid #10b981; position:relative;">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div>
+            <h3 style="margin:0; font-size:1.35rem; font-weight:800; color:white; letter-spacing:-0.01em;">Attach Log Book History</h3>
+            <p style="margin:0.2rem 0 0 0; font-size:0.85rem; color:#a7f3d0; font-weight:500;">Select vehicle to attach official logbook maintenance record PDF</p>
+          </div>
+        </div>
+      </div>
+      <button type="button" onclick="closeLogBookModal()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; border-radius:50%; width:38px; height:38px; font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">✕</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div style="padding:1.75rem 2rem; overflow-y:auto; flex:1; background:#f8fafc;">
+      
+      <!-- Selection Controls Card -->
+      <div style="background:white; border:1.5px solid #e2e8f0; border-radius:16px; padding:1.6rem; box-shadow:0 4px 20px rgba(0,0,0,0.04); margin-bottom:1.5rem;">
+        
+        <div style="display:grid; grid-template-columns: 1fr auto; gap:1.25rem; align-items:end;">
+          
+          <!-- Vehicle Selector -->
+          <div>
+            <label style="display:block; font-size:0.75rem; font-weight:800; text-transform:uppercase; color:#0f172a; letter-spacing:0.06em; margin-bottom:0.5rem;">
+              Select Vehicle Logbook History <span style="color:#ef4444;">*</span>
+            </label>
+            <select id="logbook_select_vehicle" class="logbook-field-input">
+              <option value="">-- Select Vehicle --</option>
+            </select>
+          </div>
+
+          <!-- View History Button -->
+          <div>
+            <button type="button" id="btn_view_logbook_history" onclick="fetchLogBookHistory()" class="btn-logbook-action" style="background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:white;">
+              <span>View History</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Loading State -->
+      <div id="logbook_history_loading" style="display:none; text-align:center; padding:3rem 1.5rem; color:#059669; background:white; border-radius:16px; border:1.5px solid #bbf7d0;">
+        <div style="font-weight:800; font-size:1.15rem; margin-bottom:0.4rem; color:#065f46;">Fetching Log Book Records...</div>
+        <div style="font-size:0.85rem; color:#64748b;">Loading maintenance history & meter readings...</div>
+      </div>
+
+      <!-- Results Container -->
+      <div id="logbook_history_results" style="display:none;">
+        
+        <!-- Vehicle Info Badge -->
+        <div id="logbook_vehicle_badge" style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:1.25rem; margin-bottom:1.25rem; display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem; box-shadow:0 2px 8px rgba(16,185,129,0.06);">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Digital Logbook Summary Banner -->
+        <div style="background:linear-gradient(135deg, #052e16 0%, #064e3b 100%); color:white; padding:0.85rem 1.4rem; border-radius:12px; font-weight:800; font-size:0.92rem; text-transform:uppercase; letter-spacing:0.05em; display:flex; justify-space-between; align-items:center; margin-bottom:1.25rem;">
+          <span><i class="fas fa-book-open" style="color:#34d399; margin-right:8px;"></i> DIGITAL LOG BOOK HISTORY</span>
+          <div style="display:flex; gap:8px;">
+            <span id="logbook_entries_summary" style="background:rgba(52,211,153,0.25); border:1px solid rgba(52,211,153,0.4); color:#a7f3d0; padding:4px 12px; border-radius:99px; font-size:0.8rem; font-weight:700;">Total Entries: 0</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Pages Container -->
+        <div id="logbook_pages_container" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <!-- Dynamically populated page by page -->
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div style="background:#f8fafc; border-top:1.5px solid #e2e8f0; padding:1.25rem 2rem; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <button type="button" onclick="closeLogBookModal()" style="background:white; border:1.5px solid #cbd5e1; color:#475569; padding:0.65rem 1.4rem; border-radius:10px; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">Cancel</button>
+      
+      <button type="button" id="btn_attach_this_history" onclick="attachThisHistory()" class="btn-logbook-action" style="display:none; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:white;">
+        <span>Attach This History PDF</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentLogBookData = null;
+
+  function openLogBookModal(notesheetId = null) {
+    window.currentModalNotesheetId = notesheetId;
+    const modal = document.getElementById('logbookHistoryModal');
+    if (modal) {
+      if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+      }
+      modal.style.display = 'flex';
+      loadVehiclesDropdown();
+    }
+  }
+
+  function closeLogBookModal() {
+    const modal = document.getElementById('logbookHistoryModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function loadVehiclesDropdown() {
+    fetch('/api/logbook-history/')
+      .then(r => r.json())
+      .then(data => {
+        const select = document.getElementById('logbook_select_vehicle');
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Select Vehicle --</option>';
+        if (data.vehicles) {
+          data.vehicles.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent = `${v.vehicle_number} (${v.registration_number || v.type || 'Vehicle'})`;
+            select.appendChild(opt);
+          });
+        }
+      });
+  }
+
+  function fetchLogBookHistory() {
+    const vehicleId = document.getElementById('logbook_select_vehicle').value;
+
+    if (!vehicleId) {
+      alert('Please select a vehicle first.');
+      return;
+    }
+
+    document.getElementById('logbook_history_loading').style.display = 'block';
+    document.getElementById('logbook_history_results').style.display = 'none';
+    document.getElementById('btn_attach_this_history').style.display = 'none';
+
+    fetch(`/api/logbook-history/?vehicle_id=${vehicleId}`)
+      .then(r => r.json())
+      .then(data => {
+        currentLogBookData = data;
+        document.getElementById('logbook_history_loading').style.display = 'none';
+        document.getElementById('logbook_history_results').style.display = 'block';
+        document.getElementById('btn_attach_this_history').style.display = 'inline-flex';
+
+        // Render Vehicle Badge
+        const v = data.vehicle;
+        document.getElementById('logbook_vehicle_badge').innerHTML = `
+          <div><span style="color:#64748b; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">VEHICLE</span><div style="font-weight:800; color:#052e16; font-size:1.1rem; margin-top:2px;">${v.vehicle_number}</div></div>
+          <div><span style="color:#64748b; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">REGISTRATION</span><div style="font-weight:700; color:#1e293b; font-size:1rem; margin-top:2px;">${v.registration_number}</div></div>
+          <div><span style="color:#64748b; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">TYPE</span><div style="font-weight:700; color:#1e293b; font-size:0.98rem; margin-top:2px;">${v.vehicle_type}</div></div>
+          <div><span style="color:#64748b; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">ZONE</span><div style="font-weight:700; color:#1e293b; font-size:0.98rem; margin-top:2px;">${v.zone}</div></div>
+        `;
+
+        // Render Summaries
+        document.getElementById('logbook_entries_summary').textContent = `Total Entries: ${data.total_entries}`;        // Render Page-by-Page Cards
+        const container = document.getElementById('logbook_pages_container');
+        container.innerHTML = '';
+
+        if (data.pages && data.pages.length > 0) {
+          data.pages.forEach(p => {
+            const pageDiv = document.createElement('div');
+            pageDiv.style.cssText = 'background:white; border:1.5px solid #cbd5e1; border-radius:14px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.04);';
+            
+            let entriesTableHtml = '';
+            let pdfViewerHtml = '';
+
+            if (p.entries && p.entries.length > 0) {
+              entriesTableHtml = `
+                <div style="overflow-x:auto;">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.85rem; border-top:1.5px solid #0d2b1e;">
+                    <thead style="background:#0d2b1e; color:#ffffff; text-transform:uppercase; font-size:0.75rem; letter-spacing:0.04em;">
+                      <tr>
+                        <th style="padding:10px 8px; font-weight:800; text-align:center; border:1px solid #0d2b1e; width:5%;">#</th>
+                        <th style="padding:10px 8px; font-weight:800; text-align:center; border:1px solid #0d2b1e; width:20%;">Date</th>
+                        <th style="padding:10px 8px; font-weight:800; text-align:center; border:1px solid #0d2b1e; width:35%;">Logbook / Vehicle Number</th>
+                        <th style="padding:10px 8px; font-weight:800; text-align:center; border:1px solid #0d2b1e; width:40%;">Uploaded Document / File Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+              `;
+
+              p.entries.forEach((e, idx) => {
+                const bg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+                const fileHtml = e.file_url ? `
+                  <span style="font-weight:600; color:#1e293b; word-break:break-all;"><i class="fas fa-paperclip me-1" style="color:#0284c7;"></i>${e.file_url.split('/').pop()}</span>
+                ` : '<span style="color:#94a3b8; font-style:italic;">No file uploaded</span>';
+
+                entriesTableHtml += `
+                  <tr style="background:${bg};">
+                    <td style="padding:10px 8px; font-weight:700; text-align:center; vertical-align:top; border:1px solid #cbd5e1; color:#64748b;">${idx + 1}</td>
+                    <td style="padding:10px 8px; font-weight:700; text-align:center; vertical-align:top; border:1px solid #cbd5e1; white-space:nowrap; color:#0f172a;">${e.formatted_date}</td>
+                    <td style="padding:10px 8px; font-weight:700; vertical-align:top; border:1px solid #cbd5e1; color:#0d2b1e;"><i class="fas fa-book me-1" style="color:#059669;"></i> ${v.vehicle_number}</td>
+                    <td style="padding:10px 8px; vertical-align:top; border:1px solid #cbd5e1;">${fileHtml}</td>
+                  </tr>
+                `;
+              });
+
+              entriesTableHtml += '</tbody></table></div>';
+
+              // Find first entry with a valid file_url to embed the full document viewer frame
+              const pdfEntry = p.entries.find(e => e.file_url);
+              if (pdfEntry && pdfEntry.file_url) {
+                const fileUrl = pdfEntry.file_url;
+                if (fileUrl.toLowerCase().includes('.pdf')) {
+                  pdfViewerHtml = `
+                    <div style="padding: 16px; background: #ffffff; border-top: 2px solid #0d2b1e;">
+                      <div style="border: 2px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                        <object data="${fileUrl}#toolbar=1&navpanes=0" type="application/pdf" width="100%" height="750px" style="display: block;">
+                          <embed src="${fileUrl}#toolbar=1&navpanes=0" type="application/pdf" width="100%" height="750px" />
+                          <iframe src="${fileUrl}" width="100%" height="750px" style="border: none;"></iframe>
+                        </object>
+                      </div>
+                    </div>
+                  `;
+                } else {
+                  pdfViewerHtml = `
+                    <div style="padding: 16px; background: #ffffff; border-top: 2px solid #0d2b1e; text-align: center;">
+                      <div style="background: #ffffff; padding: 18px; border-radius: 14px; border: 2px solid #cbd5e1; box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+                        <img src="${fileUrl}" alt="Logbook Document Page" style="max-width: 100%; max-height: 750px; border-radius: 10px; object-fit: contain;">
+                      </div>
+                    </div>
+                  `;
+                }
+              }
+            } else {
+              entriesTableHtml = `
+                <div style="padding:16px 20px; color:#64748b; font-style:italic; font-size:0.88rem; background:#fafafa;">
+                  Log Book Page ${p.page_number} exists, but no entries have been recorded yet.
+                </div>
+              `;
+            }
+
+            pageDiv.innerHTML = `
+              <div style="background:#f1f5f9; border-bottom:1.5px solid #e2e8f0; padding:10px 18px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:800; font-size:0.95rem; color:#0d2b1e;">PAGE NO. ${p.page_number}</span>
+                <span style="background:${p.entries_count > 0 ? '#dcfce7' : '#f1f5f9'}; color:${p.entries_count > 0 ? '#166534' : '#64748b'}; border:1px solid ${p.entries_count > 0 ? '#bbf7d0' : '#cbd5e1'}; padding:3px 12px; border-radius:99px; font-size:0.78rem; font-weight:700;">
+                  ${p.entries_count} ${p.entries_count === 1 ? 'Entry' : 'Entries'}
+                </span>
+              </div>
+              <div>${entriesTableHtml}</div>
+              ${pdfViewerHtml}
+            `;
+
+            container.appendChild(pageDiv);
+          });
+        }
+      });
+  }
+
+  function attachThisHistory() {
+    const vehicleId = document.getElementById('logbook_select_vehicle').value;
+    const serviceType = 'General Service';
+
+    if (!vehicleId) return;
+
+    const btn = document.getElementById('btn_attach_this_history');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Generating PDF...</span>';
+
+    const formData = new FormData();
+    formData.append('vehicle_id', vehicleId);
+    formData.append('service_type', serviceType);
+    if (window.currentModalNotesheetId) {
+      formData.append('notesheet_id', window.currentModalNotesheetId);
+    }
+
+    fetch('/api/attach-logbook-history/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCsrfToken()
+      },
+      body: formData
+    })
+    .then(r => r.json())
+    .then(res => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Attach This History PDF</span>';
+      if (res.success) {
+        closeLogBookModal();
+        
+        // If we are in initiate_notesheet (new form)
+        const container = document.getElementById('attachment-list-container');
+        if (container) {
+          const viewUrl = '/view-document/?url=' + encodeURIComponent(res.url);
+          const row = document.createElement('div');
+          row.className = 'attachment-row-item';
+          row.style.cssText = 'display:inline-flex; align-items:center; gap:10px; margin-top:8px; padding:8px 14px; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; box-shadow:0 2px 6px rgba(16,185,129,0.06);';
+          row.innerHTML = `
+            <span style="background:#059669; color:white; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:0.03em;">LOGBOOK</span>
+            <span style="font-weight:700; font-size:0.9rem; color:#0f172a; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-file-pdf" style="color:#dc2626; font-size:1rem;"></i> ${res.filename}</span>
+            <button type="button" onclick="previewAttachmentModal('${viewUrl}', '${res.filename}')" style="background:#e0f2fe; color:#0369a1; border:1.5px solid #bae6fd; padding:4px 14px; border-radius:8px; font-size:0.85rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='white';" onmouseout="this.style.background='#e0f2fe'; this.style.color='#0369a1';">
+              <i class="fas fa-eye"></i> View
+            </button>
+            ${res.file_path ? `<input type="hidden" name="attached_logbook_paths[]" value="${res.file_path}">` : ''}
+          `;
+          container.appendChild(row);
+        }
+
+        // If we are in view_notesheet or forward_notesheet and saved directly to NotesheetAttachment
+        const existingList = document.querySelector('.action-attachments__list-modern') || document.getElementById('existing-attachments-list');
+        if (existingList && res.attachment_id) {
+          const viewUrl = '/view-document/?url=' + encodeURIComponent(res.url);
+          const item = document.createElement('div');
+          item.className = 'attachment-row-modern';
+          item.style.cssText = 'display:inline-flex; align-items:center; gap:12px; padding:8px 14px; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; margin-top:8px; box-shadow:0 2px 6px rgba(16,185,129,0.06);';
+          item.innerHTML = `
+            <div class="attachment-row__info" style="display:flex; align-items:center; gap:10px;">
+              <span class="attachment-flag attachment-flag--green" style="background:#059669; color:white; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:6px; text-transform:uppercase;">LOGBOOK</span>
+              <span class="attachment-row__name" style="font-weight:700; font-size:0.9rem; color:#0f172a; display:inline-flex; align-items:center; gap:6px;"><i class="fas fa-file-pdf" style="color:#dc2626; font-size:1rem;"></i> ${res.filename}</span>
+            </div>
+            <div class="attachment-row__actions" style="margin-left:0;">
+              <button type="button" onclick="previewAttachmentModal('${viewUrl}', '${res.filename}')" class="attachment-link" style="background:#e0f2fe; color:#0369a1; border:1.5px solid #bae6fd; padding:4px 14px; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s;">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </div>
+          `;
+          existingList.appendChild(item);
+        }
+      } else {
+        alert('Error attaching history: ' + (res.error || 'Unknown error'));
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Attach This History PDF</span>';
+      alert('Failed to attach logbook history.');
+    });
+  }
+
+  function getCsrfToken() {
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+    return cookie ? cookie.split('=')[1] : (document.querySelector('[name=csrfmiddlewaretoken]')?.value || '');
+  }
+
+  function previewAttachmentModal(url, filename) {
+    let modal = document.getElementById('docPreviewModal');
+    let container = document.getElementById('docPreviewContainer');
+    let title = document.getElementById('docPreviewTitle');
+    let newTabBtn = document.getElementById('docPreviewNewTabBtn');
+
+    if (modal && container) {
+      if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+      }
+      if (title) title.textContent = filename || 'Document Viewer';
+      if (newTabBtn) newTabBtn.href = url;
+      
+      const pdfUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&view=FitH`;
+      container.innerHTML = `
+        <object data="${pdfUrl}" type="application/pdf" width="100%" height="100%" style="display:block;">
+          <embed src="${pdfUrl}" type="application/pdf" width="100%" height="100%" />
+          <iframe style="width:100%; height:100%; border:none; background:#525659;" src="${pdfUrl}"></iframe>
+        </object>
+      `;
+      modal.style.display = 'flex';
+    } else {
+      window.open(url, '_blank');
+    }
+  }
+
+  function closeDocPreviewModal() {
+    let modal = document.getElementById('docPreviewModal');
+    let container = document.getElementById('docPreviewContainer');
+    if (modal) modal.style.display = 'none';
+    if (container) container.innerHTML = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeDocPreviewModal();
+      closeLogBookModal();
+    }
+  });
+</script>
+
+<!-- Document Preview Modal -->
+<div id="docPreviewModal" onclick="if(event.target === this) closeDocPreviewModal();" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; z-index:999999999; background:rgba(15, 23, 42, 0.82); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:1.25rem; box-sizing:border-box;">
+  <div style="background:white; border-radius:22px; width:96vw; max-width:1400px; height:92vh; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 25px 60px -12px rgba(0, 0, 0, 0.6); overflow:hidden; border:1px solid #cbd5e1; margin:auto;">
+    
+    <!-- Modal Header -->
+    <div style="background:linear-gradient(135deg, #052e16 0%, #064e3b 50%, #047857 100%); padding:1.1rem 1.75rem; color:white; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; border-bottom:3px solid #10b981; position:relative;">
+      <div>
+        <h3 id="docPreviewTitle" style="margin:0; font-size:1.25rem; font-weight:800; color:white; letter-spacing:-0.01em;">Document Viewer</h3>
+        <p style="margin:0.2rem 0 0 0; font-size:0.82rem; color:#a7f3d0; font-weight:500;">Official Document Preview & File Inspection</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <a id="docPreviewNewTabBtn" href="#" target="_blank" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:0.45rem 1.1rem; border-radius:10px; font-size:0.85rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+          <i class="fas fa-external-link-alt"></i> Open in New Tab
+        </a>
+        <button type="button" onclick="closeDocPreviewModal()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; border-radius:50%; width:38px; height:38px; font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'" title="Close Viewer">✕</button>
+      </div>
+    </div>
+
+    <!-- Modal Body (IFrame Container) -->
+    <div id="docPreviewContainer" style="flex:1; background:#525659; position:relative; overflow:hidden;">
+    </div>
+
+  </div>
+</div>

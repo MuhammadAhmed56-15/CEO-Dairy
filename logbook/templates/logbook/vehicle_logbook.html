@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 10mm 12mm;
+    }
+
+    .content {
+        background: #f1f5f9 !important;
+    }
+
+    .btn-action-custom {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 9px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 13.5px;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .btn-action-custom:hover {
+        background: rgba(255,255,255,0.28);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    .btn-add-entry-sm {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 7px 18px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 10px rgba(16,185,129,0.35);
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .btn-add-entry-sm:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 6px 18px rgba(16,185,129,0.45);
+    }
+
+    .btn-add-page-main {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: white;
+        padding: 13px 30px;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 15px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        box-shadow: 0 8px 24px rgba(4,120,87,0.35);
+        white-space: nowrap;
+        transition: all 0.25s ease;
+    }
+
+    .btn-add-page-main:hover {
+        transform: translateY(-3px);
+        color: white;
+        box-shadow: 0 12px 32px rgba(4,120,87,0.48);
+    }
+
+    .btn-delete-sm {
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 12.5px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-delete-sm:hover {
+        background: #ef4444;
+        color: white;
+        border-color: #dc2626;
+        box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+    }
+
+    /* ── Continuous Physical Register Paper Container ── */
+    .register-paper-continuous {
+        background: transparent;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        margin-bottom: 28px;
+        position: relative;
+    }
+
+    /* ── Page Section Block Styling ── */
+    .logbook-page-block {
+        margin-bottom: 32px;
+        scroll-margin-top: 100px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(13,43,30,0.07), 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+        border: 1.5px solid #cbd5e1;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .logbook-page-header-bar {
+        background: linear-gradient(135deg, #0d2b1e 0%, #164e33 100%);
+        border-bottom: 3px solid #10b981;
+        padding: 14px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 800;
+        font-size: 15px;
+        color: #ffffff;
+    }
+
+    /* ── Physical Logbook Table Styling ── */
+    .register-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .register-table th {
+        background: #0d2b1e;
+        color: #ffffff;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.6px;
+        padding: 14px 12px;
+        border: 1px solid #0d2b1e;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .register-table td {
+        padding: 13px 12px;
+        border: 1px solid #cbd5e1;
+        vertical-align: top;
+        color: #0f172a;
+        font-weight: 600;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .register-table tr:nth-child(even) td {
+        background-color: #f8fafc;
+    }
+
+    .register-table tr:hover td {
+        background-color: #f0faf4;
+    }
+
+    .logbook-page-break {
+        page-break-after: always;
+        break-after: page;
+        height: 0;
+        margin: 0;
+        border: none;
+    }
+
+    /* ── Print styling ── */
+    @media print {
+        body {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .register-paper-continuous {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .register-table th {
+            background-color: #0d2b1e !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .logbook-page-header-bar {
+            background-color: #0d2b1e !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background: #f1f5f9; min-height: 100vh; padding: 2.25rem 1.5rem;">
+
+    <div style="max-width: 1360px; margin: 0 auto;">
+
+    <!-- ── Top Action Control Bar (No Print) ── -->
+    <div class="no-print" style="
+        background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 55%, #0f3d28 100%);
+        border-radius: 24px;
+        padding: 36px 44px;
+        margin-bottom: 28px;
+        box-shadow: 0 20px 50px rgba(13,43,30,0.45), 0 2px 0 rgba(255,255,255,0.08) inset;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        min-height: 110px;
+        border: 1px solid rgba(255,255,255,0.14);
+    ">
+        <!-- Ambient Decorative Glow Circles -->
+        <div style="position:absolute;top:-60%;right:-8%;width:340px;height:340px;background:radial-gradient(circle,rgba(52,211,153,0.2) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;bottom:-50%;left:5%;width:200px;height:200px;background:radial-gradient(circle,rgba(16,185,129,0.15) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+        <!-- Left: Title -->
+        <div style="position:relative; z-index:1;">
+            <span style="background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);color:#a7f3d0;font-size:12.5px;font-weight:800;padding:6px 18px;border-radius:20px;text-transform:uppercase;letter-spacing:1.2px;display:inline-block;margin-bottom:10px;">
+                <i class="fas fa-book-journal-whills me-1"></i> DIGITAL LOG BOOK REGISTER
+            </span>
+            <h2 style="color:white;font-size:36px;font-weight:900;margin:0 0 6px 0;letter-spacing:-0.6px;text-shadow:0 2px 8px rgba(0,0,0,0.35);">
+                Vehicle {{ vehicle.vehicle_number }}
+            </h2>
+            <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:0;font-weight:500;">
+                Executive vehicle logbook management &amp; record archive
+            </p>
+        </div>
+
+        <!-- Right: Actions (Back, Print Log Book, Go to Page) -->
+        <div style="position:relative; z-index:1; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+            <a href="{% url 'vehicle_list' %}" class="btn-action-custom">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+
+            <button onclick="window.print()" class="btn-action-custom" style="background:#059669; border-color:#10b981;">
+                <i class="fas fa-print me-1"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <!-- ── CONTINUOUS PHYSICAL DIGITAL REGISTER PAPER ── -->
+    <div class="register-paper-continuous">
+
+        <!-- Vehicle Metadata Info Badge Strip (No Print) -->
+        <div class="no-print" style="
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.75rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.25rem;
+            box-shadow: 0 8px 24px rgba(13,43,30,0.05);
+        ">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#0d2b1e; color:#a7f3d0; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-truck-front"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">VEHICLE</span>
+                    <div style="font-weight:900; color:#0d2b1e; font-size:1.15rem; margin-top:2px;">{{ vehicle.vehicle_number }}</div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#0284c7; color:#ffffff; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">REGISTRATION</span>
+                    <div style="font-weight:700; color:#1e293b; font-size:1.05rem; margin-top:2px;">{{ vehicle.registration_number|default:"-" }}</div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#d97706; color:#ffffff; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-truck-pickup"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">TYPE</span>
+                    <div style="font-weight:700; color:#1e293b; font-size:1.05rem; margin-top:2px;">{{ vehicle.vehicle_type|default:"-" }}</div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#0284c7; color:#ffffff; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-location-dot"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">ZONE</span>
+                    <div style="font-weight:700; color:#1e293b; font-size:1.05rem; margin-top:2px;">{{ vehicle.zone|default:"-" }}</div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#8b5cf6; color:#ffffff; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">DRIVER</span>
+                    <div style="font-weight:700; color:#1e293b; font-size:1.05rem; margin-top:2px;">
+                        {% if vehicle.driver %}{{ vehicle.driver.name }}{% elif vehicle.drivers.first %}{{ vehicle.drivers.first.name }}{% else %}<span class="text-muted" style="font-size:0.9rem;">Unassigned</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="background:#059669; color:#ffffff; width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:18px;">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div>
+                    <span style="color:#64748b; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; display:block;">STATUS</span>
+                    <div style="margin-top:2px;">
+                        {% if vehicle.status == 'Active' %}
+                            <span class="badge bg-success" style="padding:5px 10px; border-radius:6px; font-size:0.85rem;">Active</span>
+                        {% elif vehicle.status == 'Maintenance' %}
+                            <span class="badge bg-warning text-dark" style="padding:5px 10px; border-radius:6px; font-size:0.85rem;">Maintenance</span>
+                        {% else %}
+                            <span class="badge bg-secondary" style="padding:5px 10px; border-radius:6px; font-size:0.85rem;">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Modern Unified Logbook Table (Newest Entries Top) ── -->
+        <div class="logbook-page-block" style="margin-bottom: 24px;">
+            <div class="logbook-page-header-bar" style="background: linear-gradient(135deg, #0d2b1e 0%, #1a4731 100%);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-file-signature" style="color:#34d399; font-size:18px;"></i>
+                    <span style="letter-spacing:-0.2px; font-weight:800; font-size:16px;">
+                        LOG BOOK ENTRIES & PAGE HISTORY
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="register-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 6%;">#</th>
+                            <th style="width: 14%;">Page No.</th>
+                            <th style="width: 18%;">Date</th>
+                            <th style="width: 25%;">Logbook Name / Vehicle</th>
+                            <th style="width: 27%;">Uploaded Document / File Name</th>
+                            <th style="width: 10%;" class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for page in pages %}
+                            {% for entry in page.entries.all %}
+                            <tr>
+                                <td class="text-center" style="font-weight:700; color:#64748b;">{{ forloop.parentloop.counter }}</td>
+                                <td class="text-center" style="font-weight:800; color:#059669;">
+                                    <span style="background:#e6f4ea; color:#059669; border:1px solid #a7f3d0; padding:6px 14px; border-radius:10px; font-weight:800; font-size:14.5px; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+                                        {% if page.pdf_pages_count > 1 %}
+                                            Page {{ page.start_pdf_page }} &rarr; {{ page.end_pdf_page }}
+                                        {% else %}
+                                            Page {{ page.start_pdf_page }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-center" style="white-space:nowrap; font-weight:700;">{{ entry.date|date:"d-m-Y" }}</td>
+                                <td style="font-weight:700; color:#0d2b1e;">
+                                    <i class="fas fa-truck me-1" style="color:#059669;"></i> {{ logbook.vehicle_number }}
+                                </td>
+                                <td>
+                                    {% if entry.signed_requisition %}
+                                        <span style="font-weight:600; color:#1e293b; word-break:break-all;">
+                                            <i class="fas fa-file-pdf me-1" style="color:#dc2626;"></i> {{ entry.signed_requisition.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted" style="font-weight:500; font-style:italic;">No file uploaded</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center no-print">
+                                    {% if not is_manager %}
+                                    <a href="{% url 'delete_logbook_page' page.id %}"
+                                       class="btn-delete-sm"
+                                       title="Delete Page {{ page.page_number }}"
+                                       onclick="return confirm('Are you sure you want to delete Page {{ page.page_number }}?');">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <em style="font-size:14px; font-weight:600; color:#64748b; display:block; margin-bottom:12px;">Log Book Page {{ page.page_number }} is empty.</em>
+                                    {% if not is_manager %}
+                                    <div class="mt-2 no-print">
+                                        <a href="{% url 'add_page_entry' page.id %}" style="background:#059669; color:#ffffff; font-weight:800; padding:10px 22px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:14px; box-shadow:0 4px 14px rgba(5,150,105,0.25);">
+                                            <i class="fas fa-plus-circle"></i> + Add Entry
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <em>No logbook records found for this vehicle.</em>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── Single Unified Modern PDF Document Viewer (Top Page First) ── -->
+        {% if main_pdf_entry and main_pdf_entry.signed_requisition %}
+        <div style="background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(13,43,30,0.1); border: 1.5px solid #cbd5e1; margin-bottom: 24px;">
+            <div style="background: #0d2b1e; color: white; padding: 14px 24px; display: flex; justify-content: flex-end; align-items: center;">
+                <a href="{{ main_pdf_entry.signed_requisition.url }}" target="_blank" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <i class="fas fa-expand"></i> Fullscreen
+                </a>
+            </div>
+            <div style="padding: 18px; background: #f8fafc;">
+                {% if ".pdf" in main_pdf_entry.signed_requisition.url|lower %}
+                    <div style="border: 2px solid #cbd5e1; border-radius: 14px; overflow: hidden; background: #ffffff; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
+                        <object data="{{ main_pdf_entry.signed_requisition.url }}#toolbar=1&navpanes=0" type="application/pdf" width="100%" height="1100px" style="display: block;">
+                            <embed src="{{ main_pdf_entry.signed_requisition.url }}#toolbar=1&navpanes=0" type="application/pdf" width="100%" height="1100px" />
+                            <iframe src="{{ main_pdf_entry.signed_requisition.url }}" width="100%" height="1100px" style="border: none;"></iframe>
+                        </object>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; background: #ffffff; padding: 18px; border-radius: 14px; border: 2px solid #cbd5e1; box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+                        <img src="{{ main_pdf_entry.signed_requisition.url }}" alt="Logbook Page Document" style="max-width: 100%; max-height: 1100px; border-radius: 10px; object-fit: contain;">
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- ── Bottom Control Bar: Add New Page ── -->
+    {% if has_entries %}
+    <div class="no-print" style="
+        background: white;
+        border-radius: 20px;
+        padding: 22px 32px;
+        box-shadow: 0 8px 28px rgba(13,43,30,0.06);
+        border: 1.5px solid #cbd5e1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    ">
+        <div style="font-size: 15px; font-weight: 800; color: #0d2b1e;">
+            <i class="fas fa-book-open me-2" style="color:#059669;"></i>
+            END OF DIGITAL LOG BOOK HISTORY — TOTAL {{ total_pages_count }} PAGES
+        </div>
+
+        {% if not is_manager %}
+        <a href="{% url 'add_logbook_page' vehicle.id %}" class="btn-add-page-main">
+            <i class="fas fa-plus-circle"></i> + Add Page {{ next_page_num }}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    </div>
+</div>
+
+<script>
+    function jumpToPage(pageNum) {
+        const el = document.getElementById('page-' + pageNum);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageParam = urlParams.get('page');
+        if (pageParam && pageParam !== '1') {
+            setTimeout(function() {
+                jumpToPage(pageParam);
+            }, 200);
+        }
+    });
+</script>
+{% endblock %}

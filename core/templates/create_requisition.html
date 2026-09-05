@@ -1,0 +1,602 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}New Vehicle Requisition{% endblock %}
+
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+  rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+        --font-display: 'Playfair Display', Georgia, serif;
+    }
+
+    /* ===== Clean page wrapper ===== */
+    .req-page-wrapper {
+        min-height: calc(100vh - 70px);
+        background: transparent;
+        padding: 0 1rem;
+        font-family: var(--font-sans);
+    }
+
+    .req-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .req-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+        padding: 0;
+    }
+
+
+    .req-card-header {
+        background: linear-gradient(135deg, #0a2118 0%, #0d2b1e 60%, #1a4731 100%);
+        padding: 1.6rem 2rem 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .req-card-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 5px; height: 100%;
+        background: linear-gradient(180deg, #10b981, #059669);
+    }
+    .req-card-header::after {
+        content: '';
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 260px; height: 260px;
+        background: rgba(16,185,129,0.07);
+        border-radius: 50%;
+    }
+    .req-card-header__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(16,185,129,0.15);
+        border: 1px solid rgba(16,185,129,0.35);
+        color: #6ee7b7;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+        font-family: var(--font-sans);
+    }
+    .req-card-header__title {
+        font-family: var(--font-display);
+        font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+        font-weight: 700;
+        color: #f0fdf4;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        margin: 0 0 0.3rem 0;
+    }
+    .req-card-header__subtitle {
+        font-size: 0.875rem;
+        color: #6ee7b7;
+        font-family: var(--font-sans);
+        margin: 0;
+        opacity: 0.85;
+    }
+
+    .req-card-body {
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    /* Premium Paper Style Form Design */
+    .paper-form {
+        background: #fff;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 50px 60px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #e0e0e0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.8;
+        position: relative;
+    }
+    
+    .paper-form-header {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .paper-form-header h3 {
+        margin: 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 26px;
+        letter-spacing: 1px;
+    }
+    
+    .paper-form-header p {
+        margin: 8px 0 0;
+        font-size: 18px;
+        font-style: italic;
+    }
+    
+    .form-row-custom {
+        display: flex;
+        align-items: flex-end;
+        margin-bottom: 25px;
+    }
+    
+    .form-label-custom {
+        font-weight: bold;
+        margin-right: 15px;
+        font-size: 17px;
+        white-space: nowrap;
+    }
+    
+    .form-input-line {
+        border: none;
+        border-bottom: 1.5px dashed #555;
+        outline: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 17px;
+        padding: 0 5px 2px 5px;
+        margin: 0;
+        color: #000;
+        box-shadow: none !important;
+        display: block !important;
+        width: 100%;
+        text-align: left;
+        vertical-align: bottom;
+        line-height: 1.2;
+    }
+
+    .issue-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .issue-row-label {
+        font-weight: bold;
+        font-size: 17px;
+        white-space: nowrap;
+        line-height: 1.2;
+        padding-bottom: 4px;
+    }
+    .issue-row input.issue-input {
+        flex: 1;
+        border: none;
+        border-bottom: 1.5px dashed #555;
+        outline: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 17px;
+        padding: 0 5px 2px 5px;
+        color: #000;
+        box-shadow: none !important;
+        vertical-align: bottom;
+        line-height: 1.2;
+    }
+    .issue-row input.issue-input:focus {
+        border-bottom: 2px dashed #000;
+    }
+    
+    .form-input-line:focus {
+        border-bottom: 2px dashed #000;
+    }
+
+    input.form-input-line {
+        border-radius: 0;
+        -webkit-appearance: none;
+    }
+    
+    .form-input-line-textarea {
+        width: 100%;
+        border: none;
+        background: transparent;
+        background-image: repeating-linear-gradient(transparent, transparent 31px, #ccc 31px, #ccc 32px);
+        line-height: 32px; 
+        padding: 5px 0;
+        margin-top: 10px;
+        resize: none;
+        outline: none;
+        font-family: inherit;
+        font-size: 17px;
+        color: #000;
+        box-shadow: none !important;
+        display: block !important;
+    }
+    
+    .signature-area {
+        margin-top: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    
+    .signature-box {
+        text-align: center;
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    
+    .signature-line {
+        border-top: 1px solid #000;
+        padding-top: 8px;
+        font-weight: bold;
+        font-size: 16px;
+        margin-top: auto;
+    }
+
+    .sig-pad-container {
+        border: 1px dashed #ccc;
+        background: #fafafa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: crosshair;
+        width: 100%;
+        height: 120px;
+        position: relative;
+    }
+    .sig-pad-container canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    .clear-btn-wrap {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+
+    .errorlist {
+        color: #dc3545;
+        list-style: none;
+        padding-left: 0;
+        font-size: 14px;
+        font-family: sans-serif;
+        margin-top: 5px;
+    }
+
+    .btn-history {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        font-family: sans-serif;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .btn-history:hover {
+        background: #f0fdf4;
+        border-color: #059669;
+        color: #065f46;
+    }
+
+    /* Forward To select */
+    .req-forward-select {
+        width: max-content;
+        max-width: 100%;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: .95rem;
+        background-color: #fff;
+        color: #111827;
+        font-weight: 500;
+        outline: none;
+        cursor: pointer;
+        transition: all .2s ease;
+        font-family: var(--font-sans);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .req-forward-select:focus {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5,150,105,.15);
+    }
+
+</style>
+
+<div class="req-page-wrapper">
+    <div class="req-container">
+        <div class="req-card">
+
+            <!-- ===== Professional Card Header ===== -->
+            <header class="req-card-header">
+                <div class="req-card-header__badge">
+                    <i class="fas fa-file-alt"></i> Official Document
+                </div>
+                <h1 class="req-card-header__title">New Vehicle Requisition</h1>
+                <p class="req-card-header__subtitle">Report vehicle issues and forward for approval</p>
+            </header>
+
+            <div class="req-card-body">
+
+
+
+                <form action="{% url 'create_requisition' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="paper-form">
+                        
+                        <!-- Clean Logos Header -->
+                        <table style="width:100%;border-collapse:collapse;margin-bottom:12pt;">
+                            <tr>
+                                <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+                                    <img src="{% static 'images/wssp_logo_new.png' %}"
+                                        alt="WSSP" style="width:95px;height:95px;max-width:100%;object-fit:contain;">
+                                </td>
+                                <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
+                                    <h4 style="font-weight:700;font-size:24px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR</h4>
+                                    
+                                    <p style="font-size:20px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
+                                    <p style="font-size:19px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                                    <p style="font-size:11pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
+                                        <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
+                                        &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219074
+                                    </p>
+                                </td>
+                                <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+                                    <img src="{% static 'images/kpk_emblem.png' %}"
+                                        alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
+                        
+                        <div class="text-center" style="font-size: 18px; margin-top: 15px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            To, &nbsp;&nbsp;&nbsp;The Zonal Manager, Water & Sanitation Services, <span style="display: inline-block; width: 120px;">{{ form.zone }}</span>, Peshawar.
+                        </div>
+                        
+                        <div class="text-center mb-4 mt-1" style="font-size: 18px; font-weight: bold;">
+                            Respected Sir!
+                        </div>
+                        
+                        <!-- Line 1: vehicle number + UC route -->
+                        <div style="display:flex; align-items:flex-end; gap:8px; font-size:18px; margin-bottom:6px; flex-wrap:nowrap;">
+                            <span style="white-space:nowrap; flex-shrink:0;">It is respectfully submitted that vehicle number</span>
+                            <span style="flex: 2 1 200px; min-width:160px;">{{ form.vehicle_number }}</span>
+                            <span style="white-space:nowrap; flex-shrink:0;">serving in U.C / Route</span>
+                            <span style="flex: 2 1 200px; min-width:160px;">{{ form.uc_route }}</span>
+                        </div>
+                        <!-- Line 2: has the following issues -->
+                        <div style="font-size:18px; margin-bottom:18px;">
+                            has the following issues:
+                        </div>
+                        
+                        <!-- 4 separate issue input lines so numbers never disappear -->
+                        <div class="mb-5" style="margin-top: 10px;">
+                            <div class="issue-row">
+                                <span class="issue-row-label">(1)</span>
+                                <input type="text" name="issue_1" class="issue-input" placeholder="" autocomplete="off">
+                            </div>
+                            <div class="issue-row">
+                                <span class="issue-row-label">(2)</span>
+                                <input type="text" name="issue_2" class="issue-input" placeholder="" autocomplete="off">
+                            </div>
+                            <div class="issue-row">
+                                <span class="issue-row-label">(3)</span>
+                                <input type="text" name="issue_3" class="issue-input" placeholder="" autocomplete="off">
+                            </div>
+                            <div class="issue-row">
+                                <span class="issue-row-label">(4)</span>
+                                <input type="text" name="issue_4" class="issue-input" placeholder="" autocomplete="off">
+                            </div>
+                        </div>
+                        
+                        <div class="form-paragraph mb-4" style="font-size: 18px; line-height: 2.2;">
+                            The above-mentioned problem(s) was resolved before on 
+                            <span style="display: inline-block; width: 180px;">{{ form.previous_issue_date }}</span>. 
+                            Therefore, you are requested to kindly issue orders to resolve the above-mentioned problem(s).
+                        </div>
+
+                        <div class="form-paragraph mb-4" style="font-size: 18px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%;"></div>
+                                <span>The above-mentioned problem(s) have occurred for the first time in this vehicle.</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-paragraph mb-5" style="font-size: 18px;">
+                            <strong>Estimated Cost (if any):</strong> 
+                            <span style="display: inline-block; width: 250px;">{{ form.estimated_cost }}</span>
+                        </div>
+                        
+                        <div class="row mt-5 pt-3">
+                            <div class="col-md-12">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+                                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                                        <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">Driver Name:</span>
+                                        <span style="flex: 1; margin-right: 30px;">{{ form.driver_name }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+                                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                                        <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">Mobile Number:</span>
+                                        <span style="flex: 1; margin-right: 30px;">{{ form.driver_mobile }}</span>
+                                    </div>
+                                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                                        <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">Date:</span>
+                                        <input type="text" class="form-input-line" value="{% now 'd M Y' %}" readonly style="flex: 1;">
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; align-items: flex-end; width: 50%; margin-bottom: 25px;">
+                                    <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">CNIC Number:</span>
+                                    <span style="flex: 1;">{{ form.driver_cnic }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="signature-area">
+                            <div class="signature-box">
+                                <div class="sig-pad-container">
+                                    <canvas id="driver-signature-pad"></canvas>
+                                </div>
+                                <div class="clear-btn-wrap">
+                                    <button type="button" id="clear-driver-signature" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 13px;">Clear Pad</button>
+                                </div>
+                                <input type="hidden" name="driver_signature_data" id="driver_signature_data">
+                                <div class="signature-line">Driver Signature / Thumb</div>
+                            </div>
+                            <div class="signature-box">
+                                {% if request.user.profile.signature %}
+                                    <div class="mb-3 text-center">
+                                        <img src="{{ request.user.profile.signature.url }}" alt="Fleet Officer Signature" style="max-height: 80px; max-width: 100%;">
+                                    </div>
+                                {% endif %}
+                                <div class="mt-2" style="font-style: italic; font-size: 18px;">{{ request.user.username }}</div>
+                                <div class="signature-line">Fleet Officer Signature</div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Forward To — matches initiate notesheet style exactly -->
+                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+
+                    <div style="margin-bottom: 24px;">
+                        <label for="sendToSelect" style="
+                            font-weight: 700;
+                            font-size: 0.85rem;
+                            color: #374151;
+                            text-transform: none;
+                            letter-spacing: 0;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            margin-bottom: 10px;
+                        ">
+                            <span style="
+                                width: 24px; height: 24px;
+                                border-radius: 50%;
+                                background: #d1fae5;
+                                color: #059669;
+                                font-size: .85rem;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-weight: 800;
+                                flex-shrink: 0;
+                            ">→</span>
+                            Forward To <span style="color:#ef4444; margin-left:2px;">*</span>
+                        </label>
+                        <div>
+                            <select name="send_to_manager" id="sendToSelect" class="req-forward-select" required
+                                onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5,150,105,.15)'"
+                                onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                                <option value="" disabled selected>Select recipient...</option>
+                                {% for u in manager_admin_users %}
+                                <option value="{{ u.id }}">
+                                    {{ u.get_full_name|default:u.username|title }} (Manager)
+                                </option>
+                                {% empty %}
+                                <option value="" disabled>No Manager Admin found</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit Footer -->
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding-top: 16px;
+                        border-top: 1px solid #e5e7eb;
+                    ">
+                        <span style="font-size:.85rem; color:#6b7280;">
+                            <i class="fas fa-info-circle me-1"></i>All fields are required to proceed.
+                        </span>
+                        <button type="submit" id="submit-btn" style="
+                            background: linear-gradient(135deg, #0d2b1e 0%, #059669 100%);
+                            color: #fff;
+                            font-weight: 700;
+                            font-size: .97rem;
+                            border: none;
+                            border-radius: 12px;
+                            padding: 13px 36px;
+                            box-shadow: 0 4px 14px rgba(5,150,105,.35);
+                            cursor: pointer;
+                            transition: all .2s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            letter-spacing: 0.02em;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 22px rgba(5,150,105,.45)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(5,150,105,.35)'">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Requisition
+                        </button>
+                    </div>
+                </form>
+
+            </div><!-- /.req-card-body -->
+        </div><!-- /.req-card -->
+    </div><!-- /.req-container -->
+</div><!-- /.req-page-wrapper -->
+
+<!-- Signature Pad Script -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvas = document.getElementById('driver-signature-pad');
+        const hiddenDataField = document.getElementById('driver_signature_data');
+        const clearBtn = document.getElementById('clear-driver-signature');
+        const form = document.querySelector('form');
+
+        const signaturePad = new SignaturePad(canvas, {
+            penColor: "rgb(15, 57, 43)",
+            minWidth: 1,
+            maxWidth: 2.5
+        });
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const data = signaturePad.isEmpty() ? null : signaturePad.toData();
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+            if (data) signaturePad.fromData(data);
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        clearBtn.addEventListener('click', function () {
+            signaturePad.clear();
+            hiddenDataField.value = "";
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (!signaturePad.isEmpty()) {
+                hiddenDataField.value = signaturePad.toDataURL("image/png");
+            }
+        });
+    });
+</script>
+{% endblock %}

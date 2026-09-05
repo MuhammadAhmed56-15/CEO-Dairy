@@ -4,7 +4,7 @@ from .models import (
     Profile, Commitment, Employee, Task, Remark, 
     File, Notesheet, NotesheetForward, NotesheetAgenda,
     UserHierarchy, NotesheetReturn, NotesheetAttachment,
-    LetterFile, Letter, DraftLetter, Notification
+    LetterFile, Letter, DraftLetter, Notification, VehicleRequisition
 )
 
 # =========================================================
@@ -24,41 +24,253 @@ class FileAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 # =========================================================
-# 👤 PROFILE ADMIN
+# 👤 PROFILE ADMIN — Dual Signature Widget (Draw + Upload)
 # =========================================================
-from django.contrib import admin
-from django.utils.html import format_html
-from .models import Profile
+import base64
+import uuid
+from django import forms
+from django.core.files.base import ContentFile
+from django.utils.safestring import mark_safe
+
+
+class SignaturePadWidget(forms.Widget):
+    """Custom admin widget: draw on canvas OR upload image file."""
+    needs_multipart_form = True
+
+    def render(self, name, value, attrs=None, renderer=None):
+        current_html = ''
+        if value and hasattr(value, 'url'):
+            current_html = (
+                '<div style="margin-bottom:12px;">'
+                '<p style="font-size:12px;color:#6b7280;margin:0 0 6px;">Current saved signature:</p>'
+                f'<img src="{value.url}" style="max-height:90px;border:1px solid #059669;'
+                'padding:6px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(5,150,105,.15);">'
+                '</div>'
+            )
+
+        widget_id = (attrs or {}).get('id', f'id_{name}')
+
+        html = f'''
+<div style="font-family:Segoe UI,sans-serif;max-width:560px;">
+
+  <!-- TAB SWITCHER -->
+  <div style="display:flex;margin-bottom:0;border:1.5px solid #059669;border-radius:10px 10px 0 0;overflow:hidden;">
+    <button type="button" id="{widget_id}-tab-draw"
+      onclick="sigTabSwitch('{widget_id}','draw')"
+      style="flex:1;padding:9px 0;font-size:13px;font-weight:600;border:none;cursor:pointer;
+             background:linear-gradient(135deg,#0d2b1e,#059669);color:#fff;transition:.2s;">
+      &#9997;&#65039; Draw Signature
+    </button>
+    <button type="button" id="{widget_id}-tab-upload"
+      onclick="sigTabSwitch('{widget_id}','upload')"
+      style="flex:1;padding:9px 0;font-size:13px;font-weight:600;border:none;cursor:pointer;
+             background:#f9fafb;color:#374151;border-left:1.5px solid #059669;transition:.2s;">
+      &#128193; Upload Image
+    </button>
+  </div>
+
+  <!-- DRAW PANEL -->
+  <div id="{widget_id}-panel-draw"
+       style="border:1.5px solid #059669;border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#fafafa;">
+    <canvas id="{widget_id}-canvas"
+      style="width:100%;height:140px;background:#fff;border:1px dashed #a7f3d0;
+             border-radius:8px;cursor:crosshair;display:block;"></canvas>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+      <button type="button" onclick="sigClear('{widget_id}')"
+        style="padding:6px 16px;border:1px solid #dc2626;color:#dc2626;background:#fff;
+               border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+        &#128465; Clear
+      </button>
+      <span id="{widget_id}-status" style="font-size:11px;color:#9ca3af;">Draw your signature using mouse or touch</span>
+    </div>
+  </div>
+
+  <!-- UPLOAD PANEL (hidden by default) -->
+  <div id="{widget_id}-panel-upload"
+       style="display:none;border:1.5px solid #059669;border-top:none;border-radius:0 0 10px 10px;padding:14px;background:#fafafa;">
+    {current_html}
+    <input type="file" name="{name}_file" accept="image/*"
+           style="font-size:13px;padding:6px;border:1px solid #d1d5db;border-radius:6px;width:100%;">
+    <p style="font-size:11px;color:#9ca3af;margin:6px 0 0;">Accepted: PNG, JPG (transparent background preferred)</p>
+  </div>
+
+  <!-- Hidden: stores base64 drawn data -->
+  <input type="hidden" name="{name}_drawn" id="{widget_id}-drawn">
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+(function() {{
+  var wid = "{widget_id}";
+  var canvas = document.getElementById(wid + "-canvas");
+  if (!canvas) return;
+  var sp = new SignaturePad(canvas, {{ penColor: "rgb(10,50,30)", minWidth: 1, maxWidth: 2.5 }});
+  var drawn = document.getElementById(wid + "-drawn");
+  var statusEl = document.getElementById(wid + "-status");
+
+  function resize() {{
+    var r = window.devicePixelRatio || 1;
+    var d = sp.isEmpty() ? null : sp.toData();
+    canvas.width  = canvas.offsetWidth  * r;
+    canvas.height = canvas.offsetHeight * r;
+    canvas.getContext("2d").scale(r, r);
+    sp.clear();
+    if (d) sp.fromData(d);
+  }}
+  setTimeout(resize, 120);
+  window.addEventListener("resize", resize);
+
+  function captureSignature() {{
+    if (sp.isEmpty()) {{
+      drawn.value = "";
+      statusEl.textContent = "Draw your signature using mouse or touch";
+      statusEl.style.color = "#9ca3af";
+    }} else {{
+      drawn.value = sp.toDataURL("image/png");
+      statusEl.textContent = "✓ Signature captured — click Save to store it";
+      statusEl.style.color = "#059669";
+    }}
+  }}
+
+  // SignaturePad v4+ events
+  sp.addEventListener("endStroke", captureSignature);
+  canvas.addEventListener("mouseup", captureSignature);
+  canvas.addEventListener("touchend", captureSignature);
+
+  // Form submission fallback
+  var form = canvas.closest('form');
+  if (form) {{
+    form.addEventListener('submit', function() {{
+      if (document.getElementById(wid + "-panel-draw").style.display !== "none") {{
+        captureSignature();
+      }}
+    }});
+  }}
+
+  window.sigClear = window.sigClear || function(id) {{
+    if (id !== wid) return;
+    sp.clear();
+    drawn.value = "";
+    statusEl.textContent = "Draw your signature using mouse or touch";
+    statusEl.style.color = "#9ca3af";
+  }};
+
+  window.sigTabSwitch = window.sigTabSwitch || function(id, tab) {{
+    if (id !== wid) return;
+    var pd = document.getElementById(id + "-panel-draw");
+    var pu = document.getElementById(id + "-panel-upload");
+    var td = document.getElementById(id + "-tab-draw");
+    var tu = document.getElementById(id + "-tab-upload");
+    if (tab === "draw") {{
+      pd.style.display = ""; pu.style.display = "none";
+      td.style.background = "linear-gradient(135deg,#0d2b1e,#059669)"; td.style.color = "#fff";
+      tu.style.background = "#f9fafb"; tu.style.color = "#374151";
+      setTimeout(resize, 50);
+    }} else {{
+      pd.style.display = "none"; pu.style.display = "";
+      tu.style.background = "linear-gradient(135deg,#0d2b1e,#059669)"; tu.style.color = "#fff";
+      td.style.background = "#f9fafb"; td.style.color = "#374151";
+      // clear drawn value if switching to upload so we don't save both by mistake
+      drawn.value = "";
+    }}
+  }};
+}})();
+</script>
+'''
+        return mark_safe(html)
+
+    def value_from_datadict(self, data, files, name):
+        """
+        Always return None so Django's FileField keeps the existing value.
+        Actual saving is handled entirely in save_model.
+        """
+        return None
+
+    def value_omitted_from_data(self, data, files, name):
+        """
+        Return True so Django skips form processing for this field
+        and never touches the existing signature value.
+        All saving is done manually in ProfileAdmin.save_model().
+        """
+        return True
+
+
+class ProfileAdminForm(forms.ModelForm):
+    class Meta:
+        from .models import Profile
+        model = Profile
+        fields = '__all__'
+        widgets = {'signature': SignaturePadWidget()}
 
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    # Table View Columns
+    form = ProfileAdminForm
+
     list_display = ('user', 'role', 'department', 'employee', 'signature_preview')
     list_filter = ('role', 'department')
     search_fields = ('user__username', 'department', 'user__first_name', 'user__last_name')
     ordering = ('role', 'user__username')
-    
-    # Specific Profile Edit Page Par Preview Layout
+
     readonly_fields = ('signature_detail_preview',)
     fields = ('user', 'role', 'employee', 'department', 'signature', 'signature_detail_preview')
 
-    # 1. Table View Thumbnail (Chota Preview Table Mein)
+    def save_model(self, request, obj, form, change):
+        """
+        Save all non-signature fields first via super().
+        Then handle signature separately: drawn canvas OR uploaded file.
+        """
+        # Step 1: Save all other profile fields normally
+        super().save_model(request, obj, form, change)
+
+        # Step 2: Handle uploaded file (Upload Image tab)
+        from django.contrib import messages as msg
+        sig_file = request.FILES.get('signature_file')
+        if sig_file:
+            try:
+                filename = f'signatures/sig_upload_{obj.pk}_{uuid.uuid4().hex[:8]}.png'
+                obj.signature.save(filename, sig_file, save=True)
+                msg.success(request, '✅ Signature image uploaded and saved!')
+            except Exception as e:
+                msg.error(request, f'❌ Upload failed: {e}')
+            return
+
+        # Step 3: Handle drawn canvas signature (base64 PNG)
+        from django.contrib import messages as msg
+        drawn_data = request.POST.get('signature_drawn', '').strip()
+        if drawn_data and drawn_data.startswith('data:image'):
+            try:
+                header, imgstr = drawn_data.split(';base64,')
+                ext = (header.split('/')[-1] or 'png').split(';')[0]
+                filename = f'signatures/sig_drawn_{obj.pk}_{uuid.uuid4().hex[:8]}.{ext}'
+                decoded  = base64.b64decode(imgstr)
+                content  = ContentFile(decoded, name=filename)
+                obj.signature.save(filename, content, save=True)
+                msg.success(request, f'✅ Drawn signature saved! ({len(decoded)} bytes)')
+            except Exception as e:
+                msg.error(request, f'❌ Drawn signature failed: {e}')
+        else:
+            preview = (drawn_data[:60] + '...') if len(drawn_data) > 60 else (drawn_data or '-- empty --')
+            msg.warning(request, f'⚠️ No signature data received. signature_drawn="{preview}"')
+
+
     def signature_preview(self, obj):
         if obj.signature:
             return format_html(
-                '<img src="{}" style="height: 35px; width: auto; border: 1px solid #ccc; padding: 2px; background: white; border-radius: 4px;" />',
+                '<img src="{}" style="height:35px;width:auto;border:1px solid #059669;'
+                'padding:2px;background:white;border-radius:4px;" />',
                 obj.signature.url
             )
         return "No Signature"
     signature_preview.short_description = 'Signature'
 
-    # 2. Detail View Large Preview (Bada Preview Profile Form Mein)
     def signature_detail_preview(self, obj):
         if obj.signature:
             return format_html(
-                '<div style="margin-top: 5px;">'
-                '<img src="{}" style="max-height: 120px; width: auto; border: 1px solid #0f392b; padding: 6px; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />'
+                '<div style="margin-top:5px;">'
+                '<img src="{}" style="max-height:120px;width:auto;border:1px solid #059669;'
+                'padding:6px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(5,150,105,.15);" />'
                 '</div>',
                 obj.signature.url
             )
@@ -241,4 +453,15 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ('title', 'recipient', 'sender', 'notification_type', 'is_read', 'created_at')
     list_filter = ('notification_type', 'is_read', 'created_at')
     search_fields = ('title', 'message', 'recipient__username', 'sender__username')
-    ordering = ('-created_at',)
+    ordering = ('-created_at',)
+
+# =========================================================
+# 🚚 VEHICLE REQUISITION ADMIN
+# =========================================================
+@admin.register(VehicleRequisition)
+class VehicleRequisitionAdmin(admin.ModelAdmin):
+    list_display = ('vehicle_number', 'driver_name', 'fleet_officer', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('vehicle_number', 'driver_name', 'fleet_officer__username')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')

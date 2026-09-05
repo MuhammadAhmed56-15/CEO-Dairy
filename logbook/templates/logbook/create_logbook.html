@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary: #059669;
+        --primary-dark: #0d2b1e;
+        --primary-light: #10b981;
+        --primary-tint: #ecfdf5;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --border: #e6ebf1;
+        --bg: #f6f8fa;
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --shadow-md: 0 12px 32px rgba(13, 43, 30, .07);
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    .container, .container-fluid {
+        max-width: 1200px;
+    }
+
+    /* ---------- Page header ---------- */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-dark), #114430);
+        border-radius: var(--radius-lg);
+        padding: 28px 34px;
+        color: #fff;
+        box-shadow: 0 18px 40px rgba(13, 43, 30, .22);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .page-header::after {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, .05);
+        border-radius: 50%;
+    }
+
+    .eyebrow-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .18);
+        color: #d1fae5;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 30px;
+        margin-bottom: 10px;
+    }
+
+    .page-header h2 {
+        font-weight: 800;
+        margin-bottom: 4px;
+        font-size: 1.6rem;
+        letter-spacing: -.4px;
+    }
+
+    .page-header p {
+        opacity: .82;
+        margin-bottom: 0;
+        font-size: .9rem;
+    }
+
+    /* ---------- Form Styles ---------- */
+    .custom-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+    
+    .custom-card-header {
+        background: #fbfcfe;
+        border-bottom: 1px solid var(--border);
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .custom-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--primary-dark);
+        font-size: 1.1rem;
+    }
+
+    .icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--primary-tint);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .custom-card-body {
+        padding: 28px;
+    }
+
+    .form-group-label {
+        font-weight: 700;
+        font-size: .85rem;
+        color: var(--ink);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .custom-input {
+        border: 1px solid #dbe3ec !important;
+        border-radius: var(--radius-md) !important;
+        padding: 12px 16px !important;
+        font-size: .95rem !important;
+        background-color: #fbfcfe !important;
+        width: 100% !important;
+        transition: all 0.2s !important;
+    }
+
+    .custom-input:focus {
+        border-color: var(--primary-light) !important;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, .12) !important;
+        outline: none !important;
+        background-color: #fff !important;
+    }
+    
+    .btn-action {
+        background: var(--primary-dark);
+        color: #fff;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        padding: 12px 24px;
+        border: none;
+        transition: .2s ease;
+        box-shadow: 0 8px 18px rgba(13, 43, 30, .18);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    
+    .btn-cancel {
+        background: #fff;
+        color: var(--muted);
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        padding: 12px 24px;
+        border: 1px solid var(--border);
+        transition: .2s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        color: var(--ink);
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="page-header">
+        <div class="eyebrow-pill">
+            <i class="fas fa-book"></i> Transportation
+        </div>
+        <h2>Create New Log Book</h2>
+        <p>Start a new official log book for a WSSP vehicle.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="custom-card mb-4">
+            <div class="custom-card-header">
+                <div class="icon-box">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h5>LOG BOOK INFORMATION</h5>
+            </div>
+
+            <div class="custom-card-body">
+                <div class="row g-4" style="row-gap: 1.5rem;">
+                    
+                    <div class="col-md-4">
+                        <label class="form-group-label">Vehicle Number <span class="text-danger">*</span></label>
+                        {{ form.vehicle_number }}
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-group-label">Serial No. <span class="text-danger">*</span></label>
+                        {{ form.serial_number }}
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-group-label">Average to Litre <span class="text-danger">*</span></label>
+                        {{ form.average_to_litre }}
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-group-label">Vehicle</label>
+                        {{ form.vehicle }}
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-group-label">Opening Meter Reading <span class="text-danger">*</span></label>
+                        {{ form.opening_meter_reading }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4" style="margin-top: 1.5rem;">
+            <a href="{% url 'logbook_list' %}" class="btn-cancel text-decoration-none">
+                Cancel
+            </a>
+            <button type="submit" class="btn-action">
+                <i class="fas fa-save"></i>
+                Create Log Book
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll("input:not([type='hidden']), select, textarea");
+        inputs.forEach(input => {
+            if (!input.classList.contains("custom-input")) {
+                input.classList.add("custom-input");
+            }
+        });
+    });
+</script>
+
+{% endblock %}

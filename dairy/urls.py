@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Include your app URLs (assuming your app is named 'core')
     path('', include('core.urls')),
+    path('logbook/', include('logbook.urls')),
 ]
 
 # Serve media files during development

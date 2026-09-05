@@ -29,6 +29,7 @@ class Profile(models.Model):
         ('HR', 'HR'),
         ('IT', 'Officer'),
         ('CFO', 'Chief Financial Officer'),
+        ('Auditor', 'Auditor'),
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -440,3 +441,36 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.recipient.username} - {self.title}"
+
+# =====================================================================
+# VEHICLE REQUISITION
+# =====================================================================
+class VehicleRequisition(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+        ('Completed', 'Completed'),
+    )
+    fleet_officer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requisitions_created')
+    zone = models.CharField(max_length=100, blank=True, null=True)
+    uc_route = models.CharField(max_length=100, blank=True, null=True)
+    vehicle_number = models.CharField(max_length=50)
+    issue_description = models.TextField()
+    previous_issue_date = models.DateField(blank=True, null=True)
+    estimated_cost = models.CharField(max_length=50, blank=True, null=True)
+    driver_name = models.CharField(max_length=100)
+    driver_mobile = models.CharField(max_length=20, blank=True, null=True)
+    driver_cnic = models.CharField(max_length=20, blank=True, null=True)
+    driver_signature = models.ImageField(upload_to='requisition_signatures/', blank=True, null=True)
+    fleet_officer_signature = models.ImageField(upload_to='requisition_signatures/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    manager_admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requisitions_received')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.vehicle_number} - {self.driver_name}"

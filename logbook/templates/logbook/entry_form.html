@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ target_page_title|default:"Add Log Book Entry" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.content { background: #e8f0eb !important; }
+
+.lb-page {
+    background:
+        radial-gradient(1200px 520px at 12% -8%, rgba(255,255,255,.75), transparent 60%),
+        radial-gradient(900px 460px at 92% 4%, rgba(16,185,129,.10), transparent 62%),
+        #e8f0eb;
+    min-height: 100vh;
+    padding: 2.25rem 2rem 3rem;
+}
+
+.lb-shell { max-width: 900px; margin: 0 auto; }
+
+/* ── Hero banner ── */
+.lb-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 26px;
+    padding: 36px 40px;
+    margin-bottom: 26px;
+    background: linear-gradient(135deg, #0b2418 0%, #1a4731 52%, #0d3523 100%);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 22px 60px -18px rgba(13,43,30,.55), 0 1px 0 rgba(255,255,255,.10) inset;
+}
+.lb-hero > * { position: relative; z-index: 1; }
+
+.lb-eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.22);
+    color: #d9f8e7;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.6px;
+    text-transform: uppercase;
+    padding: 7px 18px; border-radius: 999px;
+    margin-bottom: 14px;
+}
+
+.lb-hero h1 {
+    color: #fff; font-size: 34px; font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.5px; margin: 0 0 16px;
+}
+
+.lb-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.lb-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.16);
+    color: rgba(255,255,255,.92);
+    font-size: 14.5px; font-weight: 600;
+    padding: 8px 16px; border-radius: 12px;
+}
+.lb-chip i { color: #6ee7b7; font-size: 14px; }
+
+/* ── Card ── */
+.lb-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(203,228,213,.85);
+    box-shadow: 0 8px 30px rgba(13,43,30,.07);
+    padding: 36px 40px;
+    margin-bottom: 26px;
+}
+
+.lb-label {
+    display: block; margin-bottom: 10px;
+    font-size: 15.5px; font-weight: 700;
+    color: #0b1524;
+}
+
+.lb-page .form-control {
+    width: 100%;
+    font-size: 16px; font-weight: 500; color: #0b1524;
+    background: #f7fafc;
+    border: 1.5px solid #dbe3ec;
+    border-radius: 14px;
+    padding: 14px 18px;
+    transition: border-color .18s, box-shadow .18s;
+}
+.lb-page .form-control:focus {
+    outline: none; background: #fff;
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,.15);
+}
+
+.lb-page input[type="file"].form-control { padding: 10px 14px; }
+.lb-page input[type="file"].form-control::file-selector-button {
+    margin-right: 16px; border: 0; border-radius: 10px;
+    padding: 9px 18px; font-size: 14.5px; font-weight: 700;
+    background: #eaf1f6; color: #334155;
+    cursor: pointer; transition: background .15s;
+}
+.lb-page input[type="file"].form-control::file-selector-button:hover {
+    background: #d9e6ee;
+}
+
+.btn-save-entry {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: white; border: none;
+    padding: 14px 32px; border-radius: 14px;
+    font-weight: 800; font-size: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(5,150,105,.35);
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-save-entry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(5,150,105,.45);
+    color: white;
+}
+
+.btn-cancel-entry {
+    background: white; border: 1.5px solid #cbd5e1;
+    color: #475569; padding: 14px 26px; border-radius: 14px;
+    font-weight: 700; font-size: 15px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+}
+.btn-cancel-entry:hover {
+    background: #f1f5f9; color: #1e293b;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lb-page">
+  <div class="lb-shell">
+
+    <!-- ═══ Hero ═══ -->
+    <header class="lb-hero">
+      <span class="lb-eyebrow"><i class="fas fa-plus-circle"></i> Log Book Entry</span>
+      <h1>{{ target_page_title|default:"Add Entry" }}</h1>
+      <div class="lb-meta">
+        <span class="lb-chip"><i class="fas fa-car-side"></i> Vehicle No. {{ vehicle.vehicle_number }}</span>
+        <span class="lb-chip"><i class="fas fa-file-lines"></i> {% if is_first_entry %}Page 1{% else %}Page {{ target_page_num }}{% endif %}</span>
+      </div>
+    </header>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="lb-card">
+        
+        <!-- Upload Document / File -->
+        <div class="mb-4">
+          <label class="lb-label" for="{{ form.signed_requisition.id_for_label }}">
+            <i class="fas fa-cloud-arrow-up me-2" style="color:#059669;"></i>
+            Upload Document / File (PDF / Image)
+          </label>
+          {{ form.signed_requisition }}
+          {% if form.signed_requisition.errors %}
+            <div class="text-danger mt-1 font-weight-bold">{{ form.signed_requisition.errors.0 }}</div>
+          {% endif %}
+          <small class="text-muted d-block mt-2">Supports PDF documents and JPG, PNG, WEBP image scans.</small>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-2">
+          <label class="lb-label" for="{{ form.date.id_for_label }}">
+            <i class="fas fa-calendar-day me-2" style="color:#059669;"></i>
+            Date
+          </label>
+          {{ form.date }}
+          {% if form.date.errors %}
+            <div class="text-danger mt-1 font-weight-bold">{{ form.date.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex align-items-center justify-content-between">
+        <a href="{% url 'vehicle_logbook' vehicle.id %}?page={{ page.page_number }}" class="btn-cancel-entry">
+          <i class="fas fa-times me-1"></i> Cancel
+        </a>
+        <button type="submit" class="btn-save-entry">
+          <i class="fas fa-check-circle me-1"></i> Save Log Book Entry
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

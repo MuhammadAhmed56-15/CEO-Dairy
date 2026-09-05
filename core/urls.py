@@ -60,6 +60,12 @@ urlpatterns = [
     path('notesheet/view/<int:task_id>/', views.view_notesheet, name='view_notesheet'),
     path('notesheet-detail/<int:task_id>/', views.notesheet_detail, name='view_notesheet_detail'), 
     
+    # LogBook History Attachment APIs & Inline Document Viewer
+    path('api/unread-counts/', views.api_unread_counts, name='api_unread_counts'),
+    path('api/logbook-history/', views.api_get_logbook_history, name='api_get_logbook_history'),
+    path('api/attach-logbook-history/', views.api_attach_logbook_history, name='api_attach_logbook_history'),
+    path('view-document/', views.view_document_inline, name='view_document_inline'),
+
     # Forward and Return Workflow
     path('notesheet/forward/<int:pk>/', views.forward_notesheet, name='forward_notesheet'),
     path('notesheet/return/<int:pk>/', views.return_notesheet, name='return_notesheet'),
@@ -83,6 +89,14 @@ urlpatterns = [
     # NOTIFICATIONS URL
     # =========================================================
     path('notifications/read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
+
+    # =========================================================
+    # VEHICLE REQUISITION URLs
+    # =========================================================
+    path('requisitions/', views.requisition_list, name='requisition_list'),
+    path('requisitions/new/', views.create_requisition, name='create_requisition'),
+    path('requisitions/view/<int:pk>/', views.view_requisition, name='view_requisition'),
+    path('requisitions/update/<int:pk>/', views.update_requisition_status, name='update_requisition_status'),
 
     # =========================================================
     # TINYMCE RICH TEXT EDITOR URL

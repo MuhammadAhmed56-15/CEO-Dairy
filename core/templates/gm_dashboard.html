@@ -756,7 +756,19 @@
 {% block content %}
 <div class="welcome-header">
     <div class="welcome-content">
-        <h2>📊 {{ user.profile.role|default:"GM" }} Dashboard Overview</h2>
+        <h2 id="gm-dash-title">📊 {{ request.user.username }} Dashboard</h2>
+        <script>
+            (function() {
+                var rawRole = '{{ request.user.profile.role|default:"" }}';
+                var rawUsername = '{{ request.user.username }}';
+                var username = rawUsername.replace(/_/g, ' ');
+                if (username.toUpperCase() === 'GM HR') username = 'GM HR';
+                
+                var titleText = '📊 ' + username + ' Dashboard';
+                var el = document.getElementById('gm-dash-title');
+                if (el) el.innerText = titleText;
+            })();
+        </script>
         <p>Monitor commitments, track progress, and review organizational performance.</p>
         <p id="welcome-subtext">Here's your Notesheet overview for today</p>
         <div class="welcome-meta">
