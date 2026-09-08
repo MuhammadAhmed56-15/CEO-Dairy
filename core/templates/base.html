@@ -918,20 +918,18 @@ font-size: 0.85rem;
                         {% if user.profile.role == 'CEO' %}
                         <a class="nav-link {% if request.resolver_match.url_name == 'ceo_dashboard' %}active{% endif %}"
                             href="{% url 'ceo_dashboard' %}">
-                            {% elif user.profile.role == 'GM' or user.profile.role == 'GM_HR' %}
-                            <a class="nav-link {% if request.resolver_match.url_name == 'gm_dashboard' %}active{% endif %}"
-                                href="{% url 'gm_dashboard' %}">
-                                {% elif user.profile.role == 'Manager' or user.profile.role == 'ZM' or user.profile.role == 'AM' or user.profile.role == 'IT' or user.profile.role == 'CFO' or user.profile.role == 'HR' or user.profile.role == 'Auditor' or 'Asis' in user.username or 'PMER' in user.username or 'Audit' in user.username %}
-                                <a class="nav-link {% if request.resolver_match.url_name == 'manager_dashboard' %}active{% endif %}"
-                                    href="{% url 'manager_dashboard' %}">
-                                    {% elif user.profile.role == 'PS' %}
-                                    <a class="nav-link {% if request.resolver_match.url_name == 'ps_dashboard' %}active{% endif %}"
-                                        href="{% url 'ps_dashboard' %}">
-                                        {% else %}
-                                        <a class="nav-link" href="#">
-                                            {% endif %}
-                                            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
-                                        </a>
+                        {% elif user.profile.role == 'GM' or user.profile.role == 'GM_HR' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'gm_dashboard' %}active{% endif %}"
+                            href="{% url 'gm_dashboard' %}">
+                        {% elif user.profile.role == 'PS' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'ps_dashboard' %}active{% endif %}"
+                            href="{% url 'ps_dashboard' %}">
+                        {% else %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'manager_dashboard' %}active{% endif %}"
+                            href="{% url 'manager_dashboard' %}">
+                        {% endif %}
+                            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+                        </a>
                     </li>
 
                     <!-- Commitments Dropdown -->
@@ -1003,7 +1001,7 @@ font-size: 0.85rem;
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'manager_tasks' or request.resolver_match.url_name == 'my_tasks' %}active{% endif %}"
                     href="{% url 'manager_tasks' %}">
-                    <i class="fas fa-inbox"></i> <span>My Tasks</span>
+                    <i class="fas fa-inbox"></i> <span>Inbox</span>
                 </a>
             </li>
 
@@ -1011,7 +1009,7 @@ font-size: 0.85rem;
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'all_tasks' or request.resolver_match.url_name == 'sent_tasks' %}active{% endif %}"
                     href="{% url 'all_tasks' %}">
-                    <i class="fas fa-clipboard-list"></i> <span>All Tasks</span>
+                    <i class="fas fa-paper-plane"></i> <span>Outbox</span>
                 </a>
             </li>
 
@@ -1133,7 +1131,7 @@ font-size: 0.85rem;
                         <div class="collapse {% if 'requisition' in request.resolver_match.url_name %}show{% endif %}"
                             id="requisitionCollapse">
                             <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
-                                {% if request.user.username != 'Manager_Admin' and request.user.username != 'Fleet_Manager' %}
+                                {% if request.user.username not in "Manager_Admin Fleet_Manager MngrFleet MngrA_AZoneA MngrA_AZoneB MngrA_AZoneC MngrA_AZoneD MngrA_AZoneE" %}
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name == 'create_requisition' %}active{% endif %}"
                                         href="{% url 'create_requisition' %}">
@@ -1144,7 +1142,7 @@ font-size: 0.85rem;
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name == 'requisition_list' %}active{% endif %}"
                                         href="{% url 'requisition_list' %}">
-                                        <i class="fas fa-list-alt"></i> <span>{% if request.user.username == 'Manager_Admin' or request.user.username == 'Fleet_Manager' %}Requisition Forms{% else %}My Submitted Forms{% endif %}</span>
+                                        <i class="fas fa-list-alt"></i> <span>{% if request.user.username in "Manager_Admin Fleet_Manager MngrFleet MngrA_AZoneA MngrA_AZoneB MngrA_AZoneC MngrA_AZoneD MngrA_AZoneE" %}Inbox{% else %}My Submitted Forms{% endif %}</span>
                                     </a>
                                 </li>
                             </ul>

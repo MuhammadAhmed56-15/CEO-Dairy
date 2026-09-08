@@ -4,48 +4,120 @@ from django.utils import timezone
 from tinymce.models import HTMLField  # TinyMCE Rich Text Editor
 
 # =========================================================
-# EMPLOYEE MODEL
+# ROLE MODEL
 # =========================================================
-class Employee(models.Model):
-    emp_id = models.CharField(max_length=20, unique=True)
-    name = models.CharField(max_length=100)
-    department = models.CharField(max_length=100)
-    designation = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.emp_id} - {self.name}"
-
-# =========================================================
-# PROFILE MODEL
-# =========================================================
-class Profile(models.Model):
-    ROLE_CHOICES = (
+class Role(models.Model):
+    CATEGORY_CHOICES = (
         ('CEO', 'CEO'),
         ('PS', 'Personal Secretary'),
         ('GM', 'General Manager'),
         ('Manager', 'Manager'),
         ('ZM', 'Zonal Manager'),
-        ('AM', 'Assistant Manager'),          
+        ('AM', 'Assistant Manager'),
         ('HR', 'HR'),
-        ('IT', 'Officer'),
+        ('Officer', 'Officer'),
         ('CFO', 'Chief Financial Officer'),
         ('Auditor', 'Auditor'),
+        ('Other', 'Other'),
     )
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default="HR")
-    employee = models.OneToOneField(
-        Employee,
+
+    code = models.CharField("Designation", max_length=50, unique=True)
+    name = models.CharField("Full Name", max_length=150)
+    category = models.CharField(
+        "Category",
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default='Manager'
+    )
+    user = models.OneToOneField(
+        User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="profile"
+        related_name="assigned_role",
+        verbose_name="User Name"
     )
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Role'
+        verbose_name_plural = 'Roles'
+
+    def __str__(self):
+        return self.code or self.name
+
+    def full_display(self):
+        if self.code and self.code != self.name:
+            return f"{self.code} ({self.name})"
+        return self.name
+
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.code == other or self.category == other or self.name == other
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.user:
+            profile, _ = Profile.objects.get_or_create(user=self.user)
+            if profile.role != self:
+                profile.role = self
+                profile.save()
+
+
+# =========================================================
+# ZONE MODEL
+# =========================================================
+class Zone(models.Model):
+    name = models.CharField(max_length=100, unique=True, help_text="e.g., Head Office, Zone-A, Zone-B")
+    title = models.CharField(max_length=200, default="WATER AND SANITATION SERVICES PESHAWAR", help_text="Main title on letterhead")
+    subtitle = models.CharField(max_length=255, default="WATER AND SANITATION SERVICES PESHAWAR", help_text="Subtitle on letterhead (2nd line)")
+    province = models.CharField(max_length=255, default="GOVERNMENT OF KHYBER PAKHTUNKHWA", blank=True, help_text="Province line on letterhead (e.g., Government of Khyber Pakhtunkhwa)")
+    address = models.CharField(max_length=255, default="Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad", blank=True, help_text="Address on letterhead")
+    phone = models.CharField(max_length=100, blank=True, null=True, help_text="Phone number for the letterhead")
+    logo_left = models.ImageField(upload_to='zone_logos/', blank=True, null=True, help_text="Left logo (defaults to WSSP logo if empty)")
+    logo_right = models.ImageField(upload_to='zone_logos/', blank=True, null=True, help_text="Right logo (defaults to KPK Emblem if empty)")
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Zone'
+        verbose_name_plural = 'Zones'
+
+    def __str__(self):
+        return self.name
+
+# =========================================================
+# PROFILE MODEL
+# =========================================================
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name="profiles")
+    zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
     department = models.CharField(max_length=100, blank=True, null=True)
     signature = models.ImageField(upload_to='signatures/', blank=True, null=True)
 
+    def get_role_display(self):
+        return str(self.role) if self.role else ""
+
+    def get_role_with_department(self):
+        return str(self.role) if self.role else (self.department or "")
+
     def __str__(self):
-        return f"{self.user.username} ({self.role})"
+        return f"{self.user.username} ({self.get_role_with_department()})"
+
+# Automatic Profile Creation Signal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def auto_create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.get_or_create(user=instance)
+
 
 # =========================================================
 # COMMITMENT MODEL
@@ -82,7 +154,7 @@ class Commitment(models.Model):
         User,
         related_name="invited_commitments",
         blank=True,
-        limit_choices_to={'profile__role': 'Manager'}
+        limit_choices_to=models.Q(profile__role__category='Manager') | models.Q(profile__role__code='Manager')
     )
     
     is_sent_to_manager = models.BooleanField(default=False)
@@ -464,6 +536,7 @@ class VehicleRequisition(models.Model):
     driver_cnic = models.CharField(max_length=20, blank=True, null=True)
     driver_signature = models.ImageField(upload_to='requisition_signatures/', blank=True, null=True)
     fleet_officer_signature = models.ImageField(upload_to='requisition_signatures/', blank=True, null=True)
+    is_first_time = models.BooleanField(default=False, verbose_name="First time occurrence")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     manager_admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requisitions_received')
     created_at = models.DateTimeField(auto_now_add=True)

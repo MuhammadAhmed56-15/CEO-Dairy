@@ -17,11 +17,11 @@ from .models import (
 class VehicleAdmin(admin.ModelAdmin):
 
     list_display = (
-        "vehicle_number",
-        "registration_number",
+        "vehicle_id_number",
+        "vehicle_name",
         "zone",
+        "category",
         "vehicle_type",
-        "current_meter_reading",
         "status",
     )
 
@@ -32,10 +32,10 @@ class VehicleAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "vehicle_number",
-        "registration_number",
-        "zone",
-        "driver_name",
+        "vehicle_id_number",
+        "vehicle_name",
+        "zone__name",
+        "category",
     )
 
 
@@ -62,7 +62,7 @@ class DriverAdmin(admin.ModelAdmin):
         "name",
         "mobile",
         "cnic",
-        "vehicle__vehicle_number",
+        "vehicle__vehicle_name",
     )
 
 
@@ -74,7 +74,7 @@ class DriverAdmin(admin.ModelAdmin):
 class LogBookAdmin(admin.ModelAdmin):
 
     list_display = (
-        "vehicle_number",
+        "vehicle_name",
         "serial_number",
         "average_to_litre",
         "opening_meter_reading",
@@ -87,7 +87,7 @@ class LogBookAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "vehicle_number",
+        "vehicle_name",
         "serial_number",
     )
 
@@ -110,7 +110,7 @@ class LogBookPageAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "logbook__vehicle_number",
+        "logbook__vehicle_name",
         "page_number",
     )
 
@@ -142,7 +142,7 @@ class LogBookEntryAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "logbook__vehicle_number",
+        "logbook__vehicle_name",
     )
 
 

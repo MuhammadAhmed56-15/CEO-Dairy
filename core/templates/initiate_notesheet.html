@@ -1037,7 +1037,7 @@
                 style="width: max-content; max-width: 100%;">
                 <option value="" disabled selected>Select recipient...</option>
                 {% for user in users %}
-                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_display|default:user.profile.role }})</option>
+                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})</option>
                 {% endfor %}
               </select>
             </div>
@@ -1491,6 +1491,11 @@
           table { border-collapse: collapse; width: 100%; }
           td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
           th { background: #d1fae5; font-weight: 600; }
+          /* Remove borders from letterhead table */
+          div.mceNonEditable table,
+          div.mceNonEditable td,
+          div.mceNonEditable th { border: none !important; }
+          hr { border: none !important; border-top: 2px solid #d1d5db !important; margin: 6pt 0 14pt 0 !important; }
           /* 🔒 Letterhead fully non-interactive */
           div.mceNonEditable,
           div[contenteditable="false"] {
@@ -1522,79 +1527,49 @@
             // ╚═══════════════════════════════════════════════════════════════╝
             const currentContent = editor.getContent({ format: 'text' }).trim();
             if (!currentContent) {
-              const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
-              const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+              {% if request.user.profile.zone %}
+                const zoneTitle = '{{ request.user.profile.zone.title|escapejs|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}';
+                const zoneSubtitle = '{{ request.user.profile.zone.subtitle|escapejs|default:"WATER AND SANITATION SERVICES PESHAWAR" }}';
+                const zoneProvince = '{{ request.user.profile.zone.province|escapejs|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}';
+                const zoneAddress = '{{ request.user.profile.zone.address|escapejs }}';
+                const zonePhone = '{{ request.user.profile.zone.phone|escapejs|default:"" }}';
+                const wsspLogo = '{% if request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url|escapejs }}{% else %}/static/images/wssp_logo_new.png{% endif %}?v=' + Date.now();
+                const kpkLogo = '{% if request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url|escapejs }}{% else %}/static/images/kpk_emblem.png{% endif %}?v=' + Date.now();
+              {% else %}
+                const zoneTitle = 'OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR';
+                const zoneSubtitle = 'WATER AND SANITATION SERVICES PESHAWAR';
+                const zoneProvince = 'GOVERNMENT OF KHYBER PAKHTUNKHWA';
+                const zoneAddress = 'Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad';
+                const zonePhone = '091-9219074';
+                const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
+                const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+              {% endif %}
 
-              // ─── Detect Zone user (ZM, Fleet Officers, Fleet Manager) ───
-              const currentUsername = '{{ request.user.username }}';
-              const currentRole     = '{{ request.user.profile.role }}';
-              const isZoneUser = (
-                currentRole === 'ZM' ||
-                currentUsername === 'Fleet_Manager' ||
-                currentUsername.startsWith('Fleet_Officer')
-              );
-
-              // ─── Determine Zone label from username ───
-              const zoneMap = {
-                'Fleet_Officer_A': 'ZONE-A',
-                'Fleet_Officer_B': 'ZONE-B',
-                'Fleet_Officer_C': 'ZONE-C',
-                'Fleet_Officer_D': 'ZONE-D',
-                'Fleet_Officer_E': 'ZONE-E',
-                'Fleet_Manager'  : 'ZONE-E',
-              };
-              const zoneName = zoneMap[currentUsername] || (currentRole === 'ZM' ? 'ZONE-E' : 'ZONE-E');
-
-              // ─── Zone Office Letterhead ───
-              const zoneLetterhead =
-                '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
-                '<table style="width:100%;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">' +
-                '<tr>' +
-                '<td style="width:130px;text-align:center;vertical-align:middle;padding:10pt 8pt 0 0;border:none !important;">' +
-                '<img src="' + wsspLogo + '" alt="WSSP Logo" style="width:120px;height:120px;object-fit:contain;" />' +
-                '</td>' +
-
-                '<td style="text-align:center;vertical-align:middle;padding:10pt 8pt 0 8pt;border:none !important;">' +
-                '<p style="font-weight:900;font-size:20pt;margin:0 0 2pt;font-family:Calibri,Arial,sans-serif;color:#1a3528;letter-spacing:0.5px;text-decoration:underline;text-underline-offset:3px;">WATER AND SANITATION SERVICES PESHAWAR</p>' +
-                '<p style="font-weight:700;font-size:15pt;margin:0 0 2pt;font-family:Calibri,Arial,sans-serif;color:#2d6a4f;letter-spacing:0.3px;">OFFICE OF THE ZONAL MANAGER ' + zoneName + ' (WSSP)</p>' +
-                '<p style="font-size:12pt;font-weight:600;margin:0;font-family:Calibri,Arial,sans-serif;color:#4a5568;">Landi Arbab Over Head Bridge, Ring Road Peshawar. Ph: 091-2322522</p>' +
-                '</td>' +
-
-                '<td style="width:130px;text-align:center;vertical-align:middle;padding:10pt 0 0 8pt;border:none !important;">' +
-                '<img src="' + kpkLogo + '" alt="KPK Emblem" style="width:120px;height:120px;object-fit:contain;" />' +
-                '</td>' +
-                '</tr>' +
-                '</table>' +
-                '</div>' +
-                '<hr style="border:none;border-top:1.5px solid #a7d4b8;margin:6pt 0 8pt 0;padding:0;" />' +
-                '<ol style="margin:8pt 0 0 24pt;padding:0;font-family:Calibri,Arial,sans-serif;font-size:13pt;line-height:1.8;"><li style="margin-bottom:4pt;"></li></ol>';
-
-              // ─── Head Office Letterhead (clean design) ───
+              // ─── Dynamic Letterhead ───
               const hqLetterhead =
                 '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
-                '<table style="width:100%;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">' +
+                '<table style="width:100%;border-collapse:collapse;margin-bottom:4pt;padding:0;border:none;">' +
                 '<tr>' +
-                '<td style="width:140px;text-align:center;vertical-align:middle;padding:10pt 8pt 0 0;border:none !important;">' +
-                '<img src="' + wsspLogo + '" alt="WSSP Logo" style="width:130px;height:130px;object-fit:contain;" />' +
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 10pt 12pt 0;border:none !important;">' +
+                '<img src="' + wsspLogo + '" alt="Left Logo" style="width:135px;height:135px;object-fit:contain;" />' +
                 '</td>' +
-
-                '<td style="text-align:center;vertical-align:middle;padding:10pt 8pt 0 8pt;border:none !important;">' +
-                '<p style="font-weight:900;font-size:26pt;margin:0 0 5pt;font-family:Calibri,Arial,sans-serif;color:#1a3528;letter-spacing:0.5px;text-decoration:underline;text-underline-offset:4px;">WATER AND SANITATION SERVICES PESHAWAR</p>' +
-                '<p style="font-weight:700;font-size:18pt;margin:0 0 4pt;font-family:Calibri,Arial,sans-serif;color:#2d6a4f;letter-spacing:0.3px;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>' +
-                '<p style="font-size:14pt;font-weight:600;margin:0 0 3pt;font-family:Calibri,Arial,sans-serif;color:#4a5568;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>' +
-                '<p style="font-size:14pt;font-weight:600;margin:0;font-family:Calibri,Arial,sans-serif;color:#4a5568;"><strong>E mail: </strong><u style="color:#1d4ed8;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219074</p>' +
+                '<td style="text-align:center;vertical-align:middle;padding:12pt 8pt;border:none !important;">' +
+                '<h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">' + zoneTitle + '</u></h4>' +
+                '<p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">' + zoneSubtitle + '</p>' +
+                '<p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">' + zoneProvince + '</p>' +
+                (zoneAddress ? '<p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;word-wrap:break-word;">' + zoneAddress + '</p>' : '') +
+                (zonePhone ? '<p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: ' + zonePhone + '</p>' : '') +
                 '</td>' +
-
-                '<td style="width:140px;text-align:center;vertical-align:middle;padding:10pt 0 0 8pt;border:none !important;">' +
-                '<img src="' + kpkLogo + '" alt="KPK Emblem" style="width:130px;height:130px;object-fit:contain;" />' +
+                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 0 12pt 10pt;border:none !important;">' +
+                '<img src="' + kpkLogo + '" alt="Right Logo" style="width:135px;height:135px;object-fit:contain;" />' +
                 '</td>' +
                 '</tr>' +
                 '</table>' +
                 '</div>' +
-                '<hr style="border:none;border-top:1.5px solid #a7d4b8;margin:6pt 0 8pt 0;padding:0;" />' +
+                '<hr style="border:none;border-top:1px solid #e5e7eb;margin:2pt 0 8pt 0;padding:0;" />' +
                 '<ol style="margin:8pt 0 0 24pt;padding:0;font-family:Calibri,Arial,sans-serif;font-size:13pt;line-height:1.8;"><li style="margin-bottom:4pt;"></li></ol>';
 
-              editor.setContent(isZoneUser ? zoneLetterhead : hqLetterhead);
+              editor.setContent(hqLetterhead);
               // Place cursor inside the first list item
               const ol = editor.getBody().querySelector('ol');
               if (ol && ol.firstElementChild) {
@@ -1909,66 +1884,44 @@
         </div>`
       : '';
 
-    // ── Detect Zone user for preview ──
-    const _previewUsername = '{{ request.user.username }}';
-    const _previewRole     = '{{ request.user.profile.role }}';
-    const _isZoneUser = (
-      _previewRole === 'ZM' ||
-      _previewUsername === 'Fleet_Manager' ||
-      _previewUsername.startsWith('Fleet_Officer')
-    );
-    const _zoneMap = {
-      'Fleet_Officer_A': 'ZONE-A', 'Fleet_Officer_B': 'ZONE-B',
-      'Fleet_Officer_C': 'ZONE-C', 'Fleet_Officer_D': 'ZONE-D',
-      'Fleet_Officer_E': 'ZONE-E', 'Fleet_Manager'  : 'ZONE-E',
-    };
-    const _zoneName = _zoneMap[_previewUsername] || 'ZONE-E';
+    {% if request.user.profile.zone %}
+      const _zoneTitle = '{{ request.user.profile.zone.title|escapejs }}';
+      const _zoneSubtitle = '{{ request.user.profile.zone.subtitle|escapejs }}';
+      const _zoneAddress = '{{ request.user.profile.zone.address|escapejs }}';
+      const _zonePhone = '{{ request.user.profile.zone.phone|escapejs|default:"" }}';
+      const _wsspLogo = '{% if request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url|escapejs }}{% else %}/static/images/wssp_logo_new.png{% endif %}';
+      const _kpkLogo = '{% if request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url|escapejs }}{% else %}/static/images/kpk_emblem.png{% endif %}';
+    {% else %}
+      const _zoneTitle = 'WATER AND SANITATION SERVICES PESHAWAR';
+      const _zoneSubtitle = 'LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.';
+      const _zoneAddress = 'Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad';
+      const _zonePhone = '';
+      const _wsspLogo = '/static/images/wssp_logo_new.png';
+      const _kpkLogo = '/static/images/kpk_emblem.png';
+    {% endif %}
 
-    const letterhead = _isZoneUser ? `
-<table style="width:100%;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
+    const letterhead = `
+<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
   <tr>
-    <td style="width:130px;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/wssp_logo_new.png"
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="${_wsspLogo}"
            onerror="this.style.display='none'"
-           alt="WSSP" style="width:115px;height:115px;max-width:100%;object-fit:contain;">
+           alt="Left Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">
     </td>
-    <td style="text-align:center;vertical-align:middle;padding:10pt 8pt;">
-      <h3 style="font-weight:900;font-size:22px;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a3528;text-decoration:underline;text-underline-offset:3px;word-wrap:break-word;">WATER AND SANITATION SERVICES PESHAWAR</h3>
-      <h4 style="font-weight:700;font-size:17px;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#2d6a4f;word-wrap:break-word;">OFFICE OF THE ZONAL MANAGER ${_zoneName} (WSSP)</h4>
-      <p style="font-size:15px;font-weight:600;margin:0;font-family:Calibri,Arial,sans-serif;color:#4a5568;word-wrap:break-word;">Landi Arbab Over Head Bridge, Ring Road Peshawar. Ph: 091-2322522</p>
+    <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
+      <h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">${_zoneTitle}</u></h4>
+      <p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">${_zoneSubtitle}</p>
+      <p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">${_zoneAddress}</p>
+      ${_zonePhone ? '<p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: ' + _zonePhone + '</p>' : ''}
     </td>
-    <td style="width:130px;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/kpk_emblem.png"
+    <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+      <img src="${_kpkLogo}"
            onerror="this.style.display='none'"
-           alt="KPK Emblem" style="width:115px;height:115px;max-width:100%;object-fit:contain;">
+           alt="Right Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">
     </td>
   </tr>
 </table>
-<div style="border-top:1.5px solid #a7d4b8;margin:10pt 0 16pt 0;"></div>` : `
-<table style="width:100%;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
-  <tr>
-    <td style="width:160px;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/wssp_logo_new.png"
-           onerror="this.style.display='none'"
-           alt="WSSP" style="width:130px;height:130px;max-width:100%;object-fit:contain;">
-    </td>
-    <td style="text-align:center;vertical-align:middle;padding:10pt 8pt;">
-      <h3 style="font-weight:900;font-size:28px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#1a3528;text-decoration:underline;text-underline-offset:3px;word-wrap:break-word;">WATER AND SANITATION SERVICES PESHAWAR</h3>
-      <h4 style="font-weight:700;font-size:21px;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#2d6a4f;word-wrap:break-word;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</h4>
-      <p style="font-size:17px;font-weight:600;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#4a5568;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-      <p style="font-size:17px;font-weight:600;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;word-wrap:break-word;">
-        <strong>E mail: </strong><u style="color:#1d4ed8;">wsspeshawar@gmail.com</u>
-        &nbsp;&nbsp;&nbsp;&nbsp; <strong>Phone #</strong> 091-9219074
-      </p>
-    </td>
-    <td style="width:160px;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/kpk_emblem.png"
-           onerror="this.style.display='none'"
-           alt="KPK Emblem" style="width:130px;height:130px;max-width:100%;object-fit:contain;">
-    </td>
-  </tr>
-</table>
-<div style="border-top:1.5px solid #a7d4b8;margin:10pt 0 16pt 0;"></div>`;
+<div style="border-top:2px solid #d1d5db;margin:6pt 0 14pt 0;"></div>`;
 
     const iframeDoc = `<!DOCTYPE html>
 <html lang="en">
@@ -2172,11 +2125,10 @@ ${letterhead}
              alt="WSSP" style="width:130px;height:130px;object-fit:contain;">
       </td>
       <td style="text-align:center;vertical-align:middle;padding:12pt 8pt 0 8pt;">
-        <p style="font-weight:900;font-size:20pt;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0;white-space:nowrap;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO)</p>
-        <p style="font-weight:900;font-size:20pt;margin:0 0 10pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0;white-space:nowrap;">WATER &amp; SANITATION SERVICES, PESHAWAR</p>
-        <p style="font-size:16pt;font-weight:bold;margin:0 0 4pt;font-family:Calibri,Arial,sans-serif;color:#4a5568;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-        <p style="font-size:16pt;font-weight:bold;margin:0 0 4pt;font-family:Calibri,Arial,sans-serif;color:#6b7280;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
-        <p style="font-size:16pt;font-weight:bold;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;"><strong>E mail: </strong><u style="color:#1d4ed8;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219074</p>
+        <p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</p>
+        <p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Local Government Complex, Khyber Pakhtunkhwa</p>
+        <p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+        <p style="font-size:16pt !important;font-weight:bold !important;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;"><strong>Email: </strong><u style="color:#059669 !important;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;|&nbsp;&nbsp;<strong>Phone:</strong> 091-9219074</p>
       </td>
       <td style="width:160px;text-align:center;vertical-align:middle;padding:8pt 0 0 6pt;">
         <img src="/static/images/kpk_emblem.png" onerror="this.style.display='none'"

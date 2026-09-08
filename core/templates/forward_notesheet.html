@@ -958,9 +958,9 @@
 
   .preview-section {
     background: white;
-    width: 1000px;
-    max-width: 1000px;
-    min-height: 1414px;
+    width: 1200px;
+    max-width: 1200px;
+    min-height: 1697px;
     height: auto;
     padding: 0;
     margin: 0 auto 2rem auto;
@@ -1267,7 +1267,7 @@
                   aria-required="true" style="width: max-content; max-width: 100%;">
                   <option value="" disabled selected>Select recipient...</option>
                   {% for user in users %}
-                  <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_display|default:user.profile.role }})</option>
+                  <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})</option>
                   {% endfor %}
                 </select>
               </div>
@@ -1601,6 +1601,11 @@
           table { border-collapse: collapse; width: 100%; }
           td, th { border: 1px solid #d1d5db; padding: 6px 10px; }
           th { background: #d1fae5; font-weight: 600; }
+          /* Remove borders from letterhead table */
+          div.mceNonEditable table,
+          div.mceNonEditable td,
+          div.mceNonEditable th { border: none !important; }
+          hr { border: none !important; border-top: 2px solid #d1d5db !important; margin: 6pt 0 14pt 0 !important; }
           /* 🔒 Letterhead fully non-interactive */
           div.mceNonEditable,
           div[contenteditable="false"] {
@@ -1632,30 +1637,40 @@
             // ╚═══════════════════════════════════════════════════════════════╝
             const currentContent = editor.getContent({ format: 'text' }).trim();
             if (!currentContent) {
-              const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
-              const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+              {% if request.user.profile.zone %}
+                const zoneTitle = '{{ request.user.profile.zone.title|escapejs|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}';
+                const zoneSubtitle = '{{ request.user.profile.zone.subtitle|escapejs|default:"WATER AND SANITATION SERVICES PESHAWAR" }}';
+                const zoneProvince = '{{ request.user.profile.zone.province|escapejs|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}';
+                const zoneAddress = '{{ request.user.profile.zone.address|escapejs }}';
+                const zonePhone = '{{ request.user.profile.zone.phone|escapejs|default:"" }}';
+                const wsspLogo = '{% if request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url|escapejs }}{% else %}/static/images/wssp_logo_new.png{% endif %}?v=' + Date.now();
+                const kpkLogo = '{% if request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url|escapejs }}{% else %}/static/images/kpk_emblem.png{% endif %}?v=' + Date.now();
+              {% else %}
+                const zoneTitle = 'OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR';
+                const zoneSubtitle = 'WATER AND SANITATION SERVICES PESHAWAR';
+                const zoneProvince = 'GOVERNMENT OF KHYBER PAKHTUNKHWA';
+                const zoneAddress = 'Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad';
+                const zonePhone = '091-9219074';
+                const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
+                const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
+              {% endif %}
 
               editor.setContent(
                 '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
-                '<table style="width:100%;border-collapse:collapse;margin-bottom:4pt;padding:0;border:none;">' +
+                '<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">' +
                 '<tr>' +
-                /* 🌟 WSSP LOGO SIZE 135px FOR PERFECT BALANCE 🌟 */
-                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 10pt 12pt 0;border:none !important;">' +
-                '<img src="' + wsspLogo + '" alt="WSSP Logo" style="width:135px;height:135px;object-fit:contain;" />' +
+                '<td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">' +
+                '<img src="' + wsspLogo + '" onerror="this.style.display=\'none\'" alt="Left Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">' +
                 '</td>' +
-
-                '<td style="text-align:center;vertical-align:middle;padding:12pt 8pt;border:none !important;">' +
-                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES,</p>' +
-                '<p style="font-weight:900 !important;font-size:18pt !important;margin:0 0 10pt;font-family:Calibri,Arial,sans-serif;color:#2d3748;letter-spacing:0.4px;line-height:1.5;">PESHAWAR, LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>' +
-
-                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0 0 6pt;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>' +
-
-                '<p style="font-size:16pt !important;font-weight:bold !important;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a202c;line-height:1.5;"><strong>E mail: </strong><u style="color:#1d4ed8 !important;">wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong> 091-9219018</p>' +
+                '<td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">' +
+                '<h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">' + zoneTitle + '</u></h4>' +
+                '<p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">' + zoneSubtitle + '</p>' +
+                '<p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">' + zoneProvince + '</p>' +
+                (zoneAddress ? '<p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;word-wrap:break-word;">' + zoneAddress + '</p>' : '') +
+                (zonePhone ? '<p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: ' + zonePhone + '</p>' : '') +
                 '</td>' +
-
-                /* 🌟 KPK EMBLEM SIZE 135px FOR PERFECT BALANCE 🌟 */
-                '<td style="width:145px;text-align:center;vertical-align:middle;padding:12pt 0 12pt 10pt;border:none !important;">' +
-                '<img src="' + kpkLogo + '" alt="KPK Emblem" style="width:135px;height:135px;object-fit:contain;" />' +
+                '<td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">' +
+                '<img src="' + kpkLogo + '" onerror="this.style.display=\'none\'" alt="Right Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">' +
                 '</td>' +
                 '</tr>' +
                 '</table>' +
@@ -1839,32 +1854,44 @@
     }
 
     // Build letterhead exactly like initiate_notesheet
+    {% if request.user.profile.zone %}
+      const _zoneTitle = '{{ request.user.profile.zone.title|escapejs }}';
+      const _zoneSubtitle = '{{ request.user.profile.zone.subtitle|escapejs }}';
+      const _zoneAddress = '{{ request.user.profile.zone.address|escapejs }}';
+      const _zonePhone = '{{ request.user.profile.zone.phone|escapejs|default:"" }}';
+      const _wsspLogo = '{% if request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url|escapejs }}{% else %}/static/images/wssp_logo_new.png{% endif %}';
+      const _kpkLogo = '{% if request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url|escapejs }}{% else %}/static/images/kpk_emblem.png{% endif %}';
+    {% else %}
+      const _zoneTitle = 'WATER AND SANITATION SERVICES PESHAWAR';
+      const _zoneSubtitle = 'LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.';
+      const _zoneAddress = 'Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad';
+      const _zonePhone = '';
+      const _wsspLogo = '/static/images/wssp_logo_new.png';
+      const _kpkLogo = '/static/images/kpk_emblem.png';
+    {% endif %}
+
     const letterhead = `
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">
   <tr>
     <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/wssp_logo_new.png"
+      <img src="${_wsspLogo}"
            onerror="this.style.display='none'"
-           alt="WSSP" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+           alt="Left Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">
     </td>
     <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
-      <h4 style="font-weight:700;font-size:20px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</h4>
-
-      <p style="font-size:18px;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
-      <p style="font-size:17.5px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-      <p style="font-size:9.5pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
-        <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
-        &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219018
-      </p>
+      <h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">${_zoneTitle}</u></h4>
+      <p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">${_zoneSubtitle}</p>
+      <p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">${_zoneAddress}</p>
+      ${_zonePhone ? '<p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: ' + _zonePhone + '</p>' : ''}
     </td>
     <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-      <img src="/static/images/kpk_emblem.png"
+      <img src="${_kpkLogo}"
            onerror="this.style.display='none'"
-           alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+           alt="Right Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">
     </td>
   </tr>
 </table>
-<div style="border-top:3px solid #7a2e2e;margin:6pt 0 14pt 0;"></div>`;
+<div style="border-top:2px solid #d1d5db;margin:6pt 0 14pt 0;"></div>`;
 
     const iframeDoc = `<!DOCTYPE html>
 <html lang="en">
@@ -1877,14 +1904,12 @@
   body {
     width: 100%;
     min-height: 100vh;
-    font-family: Calibri, Arial, sans-serif;
+    font-family: Arial, Calibri, sans-serif;
     font-size: 12pt;
-    line-height: 1.6;
+    line-height: 1.5;
     color: #000;
     background: white;
     padding: 20mm 22mm 30mm 22mm;
-    font-size: 13pt;
-    line-height: 1.8;
     display: flex;
     flex-direction: column;
   }
@@ -1894,7 +1919,8 @@
   h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }
   h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }
   h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }
-  ul, ol { margin-left: 20pt; margin-bottom: 6pt; }
+  ul, ol { margin-left: 0 !important; padding-left: 14pt !important; margin-bottom: 6pt !important; }
+  li { margin-bottom: 4pt !important; padding-left: 0 !important; }
   blockquote { border-left: 3pt solid #059669; padding-left: 10pt; color: #4b5563; }
   a { color: #059669; }
   strong, b { font-weight: bold; }
@@ -1930,7 +1956,7 @@ ${remarkContent || '<p style="color:#9ca3af;">(No remarks entered)</p>'}
             body.scrollHeight, body.offsetHeight,
             html.clientHeight, html.scrollHeight, html.offsetHeight
           );
-          iframe.style.height = Math.max(height, 1414) + 'px'; // min 1414px for 1000px A4 ratio
+          iframe.style.height = Math.max(height, 1697) + 'px'; // min 1697px for 1200px A4 ratio
           iframe.parentElement.style.minHeight = iframe.style.height;
         } catch (e) { }
       }, 100);

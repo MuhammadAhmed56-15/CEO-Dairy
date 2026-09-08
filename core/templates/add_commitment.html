@@ -725,13 +725,7 @@
 
                     {% for user in managers %}
                     <option value="{{ user.id }}">
-                        {% if user.profile.employee %}
-                        {{ user.profile.employee.emp_id }}
-                        – {{ user.profile.employee.name }}
-                        ({{ user.profile.employee.designation }})
-                        {% else %}
-                        {{ user.username }} (No Employee Record)
-                        {% endif %}
+                        {{ user.get_full_name|default:user.username }} {% if user.profile.department %}({{ user.profile.department }}){% endif %}
                     </option>
                     {% empty %}
                     <option disabled>No managers available</option>

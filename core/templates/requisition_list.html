@@ -250,7 +250,7 @@
                     <div class="req-card-header__badge">
                         <i class="fas fa-list"></i> Requisitions Log
                     </div>
-                    <h1 class="req-card-header__title">{% if is_manager %}Received Requisitions{% else %}My Submitted Requisitions{% endif %}</h1>
+                    <h1 class="req-card-header__title">{% if is_manager %}Requisition Inbox{% else %}My Submitted Requisitions{% endif %}</h1>
                     <p class="req-card-header__subtitle">View and manage vehicle maintenance requests</p>
                 </div>
                 {% if not is_manager %}
@@ -265,13 +265,12 @@
                     <table class="custom-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>No.</th>
                                 <th>Vehicle Number</th>
                                 <th>Driver Name</th>
                                 {% if is_manager %}
                                 <th>Fleet Officer</th>
                                 {% endif %}
-                                <th>Issue Summary</th>
                                 <th>Status</th>
                                 <th>Date Submitted</th>
                                 <th class="text-end">Action</th>
@@ -280,7 +279,7 @@
                         <tbody>
                             {% for req in requisitions %}
                             <tr>
-                                <td class="vehicle-id">#{{ req.id }}</td>
+                                <td class="vehicle-id">{{ forloop.counter }}</td>
                                 <td class="fw-bold text-dark">{{ req.vehicle_number }}</td>
                                 <td>{{ req.driver_name }}</td>
                                 {% if is_manager %}
@@ -293,9 +292,7 @@
                                     </div>
                                 </td>
                                 {% endif %}
-                                <td style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ req.issue_description }}">
-                                    {{ req.issue_description }}
-                                </td>
+                                <!-- Issue summary removed -->
                                 <td>
                                     {% if req.status == 'Pending' %}
                                     <span class="status-badge bg-warning"><i class="fas fa-clock"></i> Pending</span>
@@ -316,7 +313,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="{% if is_manager %}8{% else %}7{% endif %}" class="empty-state">
+                                <td colspan="{% if is_manager %}7{% else %}6{% endif %}" class="empty-state">
                                     <i class="fas fa-folder-open fa-4x"></i>
                                     <h4>No Requisitions Found</h4>
                                     <p>There are currently no vehicle requisitions to display.</p>

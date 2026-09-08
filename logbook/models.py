@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from core.models import VehicleRequisition
+from core.models import VehicleRequisition, Zone
 
 
 # =========================================================
@@ -10,25 +10,29 @@ from core.models import VehicleRequisition
 class Vehicle(models.Model):
     STATUS_CHOICES = (
         ("Active", "Active"),
-        ("Maintenance", "Maintenance"),
         ("Inactive", "Inactive"),
     )
 
-    vehicle_number = models.CharField(
-        max_length=50,
-        unique=True
-    )
-
-    registration_number = models.CharField(
+    vehicle_id_number = models.CharField(
+        "Vehicle ID",
         max_length=100,
         blank=True,
         null=True
     )
 
-    zone = models.CharField(
+    vehicle_name = models.CharField(
         max_length=100,
+        unique=True,
+        help_text="Name/identifier of the vehicle"
+    )
+
+    zone = models.ForeignKey(
+        Zone,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        null=True
+        related_name="vehicles",
+        help_text="Zone this vehicle belongs to"
     )
 
     vehicle_type = models.CharField(
@@ -37,8 +41,10 @@ class Vehicle(models.Model):
         null=True
     )
 
-    current_meter_reading = models.PositiveIntegerField(
-        default=0
+    category = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
     )
 
     status = models.CharField(
@@ -55,14 +61,6 @@ class Vehicle(models.Model):
         related_name="assigned_vehicles"
     )
 
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="created_vehicles"
-    )
-
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -72,12 +70,12 @@ class Vehicle(models.Model):
     )
 
     class Meta:
-        ordering = ["vehicle_number"]
+        ordering = ["vehicle_name"]
         verbose_name = "Vehicle"
         verbose_name_plural = "Vehicles"
 
     def __str__(self):
-        return self.vehicle_number
+        return self.vehicle_name
 
 
 # =========================================================
@@ -114,14 +112,6 @@ class Driver(models.Model):
         default=True
     )
 
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="created_drivers"
-    )
-
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -144,7 +134,7 @@ class LogBook(models.Model):
         blank=True
     )
 
-    vehicle_number = models.CharField(
+    vehicle_name = models.CharField(
         max_length=50
     )
 
@@ -184,12 +174,12 @@ class LogBook(models.Model):
     )
 
     class Meta:
-        ordering = ["vehicle_number"]
+        ordering = ["vehicle_name"]
         verbose_name = "Log Book"
         verbose_name_plural = "Log Books"
 
     def __str__(self):
-        return f"{self.vehicle_number} - Log Book"
+        return f"{self.vehicle_name} - Log Book"
 
 
 # =========================================================
@@ -433,24 +423,10 @@ class LogBookEntry(models.Model):
 
         super().save(*args, **kwargs)
 
-        # Update vehicle's current meter if meter_reading_to is provided
-        if self.logbook and self.logbook.vehicle and self.meter_reading_to is not None:
-            vehicle = self.logbook.vehicle
-            if self.meter_reading_to > (vehicle.current_meter_reading or 0):
-                vehicle.current_meter_reading = (
-                    self.meter_reading_to
-                )
-                vehicle.save(
-                    update_fields=[
-                        "current_meter_reading",
-                        "updated_at"
-                    ]
-                )
-
     def __str__(self):
 
         return (
-            f"{self.logbook.vehicle_number} - "
+            f"{self.logbook.vehicle_name} - "
             f"{self.date}"
         )
 

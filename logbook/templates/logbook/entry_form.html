@@ -136,7 +136,7 @@
       <span class="lb-eyebrow"><i class="fas fa-plus-circle"></i> Log Book Entry</span>
       <h1>{{ target_page_title|default:"Add Entry" }}</h1>
       <div class="lb-meta">
-        <span class="lb-chip"><i class="fas fa-car-side"></i> Vehicle No. {{ vehicle.vehicle_number }}</span>
+        <span class="lb-chip"><i class="fas fa-car-side"></i> Vehicle No. {{ vehicle.vehicle_name }}</span>
         <span class="lb-chip"><i class="fas fa-file-lines"></i> {% if is_first_entry %}Page 1{% else %}Page {{ target_page_num }}{% endif %}</span>
       </div>
     </header>

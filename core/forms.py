@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models import Q
 from .models import Commitment, Task, Notesheet, Remark, Profile, VehicleRequisition
 
 # =========================================================
@@ -28,7 +29,9 @@ class CommitmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('manager', kwargs.pop('user', None))
         super().__init__(*args, **kwargs)
-        self.fields['invited_managers'].queryset = User.objects.filter(profile__role__in=['HR', 'GM', 'Manager']).order_by('username')
+        self.fields['invited_managers'].queryset = User.objects.filter(
+            Q(profile__role__category__in=['HR', 'GM', 'Manager']) | Q(profile__role__code__in=['HR', 'GM', 'Manager'])
+        ).order_by('username')
         if self.instance and self.instance.commitment_date:
             self.initial['commitment_date'] = self.instance.commitment_date.strftime('%Y-%m-%dT%H:%M')
 
@@ -63,7 +66,7 @@ class InitiateNotesheetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.manager = kwargs.pop('manager', None)
         super().__init__(*args, **kwargs)
-        qs = User.objects.exclude(profile__role='HR')
+        qs = User.objects.exclude(Q(profile__role__category='HR') | Q(profile__role__code='HR'))
         if self.manager:
             qs = qs.exclude(id=self.manager.id)
         self.fields['forward_to_user'].queryset = qs
@@ -139,7 +142,7 @@ class VehicleRequisitionForm(forms.ModelForm):
         fields = [
             'zone', 'uc_route', 'vehicle_number', 'issue_description', 
             'previous_issue_date', 'estimated_cost', 'driver_name', 
-            'driver_mobile', 'driver_cnic'
+            'driver_mobile', 'driver_cnic', 'is_first_time'
         ]
         widgets = {
             'zone': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Zone'}),

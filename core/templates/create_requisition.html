@@ -230,7 +230,7 @@
     
     .signature-box {
         text-align: center;
-        width: 300px;
+        width: 340px;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -245,13 +245,13 @@
     }
 
     .sig-pad-container {
-        border: 1px dashed #ccc;
+        border: 1.5px dashed #b0b0b0;
         background: #fafafa;
         border-radius: 8px;
         margin-bottom: 10px;
         cursor: crosshair;
         width: 100%;
-        height: 120px;
+        height: 140px;
         position: relative;
     }
     .sig-pad-container canvas {
@@ -260,7 +260,9 @@
         display: block;
     }
     .clear-btn-wrap {
-        text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 15px;
     }
 
@@ -318,6 +320,34 @@
         box-shadow: 0 0 0 3px rgba(5,150,105,.15);
     }
 
+    @media print {
+        body * {
+            visibility: hidden !important;
+        }
+        .paper-form, .paper-form * {
+            visibility: visible !important;
+        }
+        .paper-form {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-shadow: none;
+            border: none;
+        }
+        /* Make sure borders stay visible in print */
+        .form-input-line, .issue-input, .signature-line {
+            border-bottom: 1.5px solid #000 !important;
+        }
+        .sig-pad-container {
+            border: 1px solid #ccc !important;
+        }
+        .clear-btn-wrap {
+            display: none !important;
+        }
+    }
 </style>
 
 <div class="req-page-wrapper">
@@ -345,21 +375,36 @@
                         <table style="width:100%;border-collapse:collapse;margin-bottom:12pt;">
                             <tr>
                                 <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-                                    <img src="{% static 'images/wssp_logo_new.png' %}"
+                                    <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}"
                                         alt="WSSP" style="width:95px;height:95px;max-width:100%;object-fit:contain;">
                                 </td>
                                 <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
-                                    <h4 style="font-weight:700;font-size:24px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR</h4>
-                                    
-                                    <p style="font-size:20px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
-                                    <p style="font-size:19px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-                                    <p style="font-size:11pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
-                                        <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
-                                        &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219074
-                                    </p>
+                                    {% if request.user.profile.zone %}
+                                        <h4 style="font-weight:900;font-size:clamp(15px, 1.6vw, 22px);margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#0d1b2a;line-height:1.25;text-transform:uppercase;letter-spacing:0.3px;">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</h4>
+                                        <p style="font-size:19px;font-weight:800;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;letter-spacing:0.2px;">{{ request.user.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
+                                        <p style="font-size:18px;font-weight:700;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;">{{ request.user.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
+                                        {% if request.user.profile.zone.address %}
+                                        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">{{ request.user.profile.zone.address }}</p>
+                                        {% endif %}
+                                        <p style="font-size:17px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">
+                                            {% if request.user.profile.zone.phone %}
+                                            Phone-No. {{ request.user.profile.zone.phone }}
+                                            {% else %}
+                                            Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
+                                            {% endif %}
+                                        </p>
+                                    {% else %}
+                                        <h4 style="font-weight:900;font-size:clamp(15px, 1.6vw, 22px);margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#0d1b2a;line-height:1.25;text-transform:uppercase;letter-spacing:0.3px;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</h4>
+                                        <p style="font-size:19px;font-weight:800;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;letter-spacing:0.2px;">WATER AND SANITATION SERVICES PESHAWAR</p>
+                                        <p style="font-size:18px;font-weight:700;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
+                                        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                                        <p style="font-size:17px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">
+                                            Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
+                                        </p>
+                                    {% endif %}
                                 </td>
                                 <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-                                    <img src="{% static 'images/kpk_emblem.png' %}"
+                                    <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url }}{% else %}{% static 'images/kpk_emblem.png' %}{% endif %}"
                                         alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
                                 </td>
                             </tr>
@@ -413,11 +458,80 @@
                         </div>
 
                         <div class="form-paragraph mb-4" style="font-size: 18px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%;"></div>
-                                <span>The above-mentioned problem(s) have occurred for the first time in this vehicle.</span>
-                            </div>
+                            <!-- No 'for' attribute — prevents native label-checkbox double toggle -->
+                            <label onclick="toggleFirstTime()" style="
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                cursor: pointer;
+                                user-select: none;
+                            ">
+                                <!-- Hidden real checkbox (no id binding to label) -->
+                                <input type="checkbox"
+                                       name="is_first_time"
+                                       id="id_is_first_time"
+                                       style="display: none;"
+                                       {% if form.is_first_time.value %}checked{% endif %}>
+
+                                <!-- Styled circle -->
+                                <span id="circle-check" style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 22px;
+                                    height: 22px;
+                                    border: 2px solid #000;
+                                    border-radius: 50%;
+                                    flex-shrink: 0;
+                                    transition: all 0.2s ease;
+                                    background: #fff;
+                                    pointer-events: none;
+                                ">
+                                    <svg id="circle-tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"
+                                         width="12" height="12"
+                                         style="display:none; pointer-events:none;">
+                                        <path d="M1.5 6l3 3 6-6" stroke="#059669" stroke-width="2"
+                                              fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+
+                                <span style="pointer-events: none;">
+                                    The above-mentioned problem(s) have occurred for the first time in this vehicle.
+                                </span>
+                            </label>
                         </div>
+
+                        <script>
+                            function toggleFirstTime() {
+                                const cb     = document.getElementById('id_is_first_time');
+                                const circle = document.getElementById('circle-check');
+                                const tick   = document.getElementById('circle-tick');
+                                cb.checked = !cb.checked;
+                                updateCircle(cb.checked, circle, tick);
+                            }
+
+                            function updateCircle(checked, circle, tick) {
+                                if (checked) {
+                                    circle.style.borderColor     = '#059669';
+                                    circle.style.backgroundColor = '#d1fae5';
+                                    tick.style.display           = 'block';
+                                } else {
+                                    circle.style.borderColor     = '#000';
+                                    circle.style.backgroundColor = '#fff';
+                                    tick.style.display           = 'none';
+                                }
+                            }
+
+                            // Sync visual state on page load
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const cb     = document.getElementById('id_is_first_time');
+                                const circle = document.getElementById('circle-check');
+                                const tick   = document.getElementById('circle-tick');
+                                if (cb && circle && tick) {
+                                    updateCircle(cb.checked, circle, tick);
+                                }
+                            });
+                        </script>
                         
                         <div class="form-paragraph mb-5" style="font-size: 18px;">
                             <strong>Estimated Cost (if any):</strong> 
@@ -457,7 +571,15 @@
                                     <canvas id="driver-signature-pad"></canvas>
                                 </div>
                                 <div class="clear-btn-wrap">
-                                    <button type="button" id="clear-driver-signature" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 13px;">Clear Pad</button>
+                                    <div>
+                                        <label for="driver-signature-upload" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 13px; margin:0; cursor:pointer;">
+                                            <i class="fas fa-upload me-1"></i> Upload Image
+                                        </label>
+                                        <input type="file" id="driver-signature-upload" accept="image/*" style="display:none;">
+                                    </div>
+                                    <button type="button" id="clear-driver-signature" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 13px;">
+                                        <i class="fas fa-eraser me-1"></i> Clear Pad
+                                    </button>
                                 </div>
                                 <input type="hidden" name="driver_signature_data" id="driver_signature_data">
                                 <div class="signature-line">Driver Signature / Thumb</div>
@@ -509,12 +631,12 @@
                                 onfocus="this.style.borderColor='#059669'; this.style.boxShadow='0 0 0 3px rgba(5,150,105,.15)'"
                                 onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
                                 <option value="" disabled selected>Select recipient...</option>
-                                {% for u in manager_admin_users %}
+                                {% for u in recipient_list %}
                                 <option value="{{ u.id }}">
-                                    {{ u.get_full_name|default:u.username|title }} (Manager)
+                                    {{ u.display_label }} — {{ u.get_full_name|default:u.username }}
                                 </option>
                                 {% empty %}
-                                <option value="" disabled>No Manager Admin found</option>
+                                <option value="" disabled>No recipients found in system</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -531,27 +653,52 @@
                         <span style="font-size:.85rem; color:#6b7280;">
                             <i class="fas fa-info-circle me-1"></i>All fields are required to proceed.
                         </span>
-                        <button type="submit" id="submit-btn" style="
-                            background: linear-gradient(135deg, #0d2b1e 0%, #059669 100%);
-                            color: #fff;
-                            font-weight: 700;
-                            font-size: .97rem;
-                            border: none;
-                            border-radius: 12px;
-                            padding: 13px 36px;
-                            box-shadow: 0 4px 14px rgba(5,150,105,.35);
-                            cursor: pointer;
-                            transition: all .2s ease;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            letter-spacing: 0.02em;
-                        "
-                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 22px rgba(5,150,105,.45)'"
-                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(5,150,105,.35)'">
-                            <i class="fas fa-paper-plane"></i>
-                            Submit Requisition
-                        </button>
+                        
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button type="button" onclick="window.print()" style="
+                                background: #ef4444;
+                                color: #ffffff;
+                                font-weight: 700;
+                                font-size: .97rem;
+                                border: none;
+                                border-radius: 12px;
+                                padding: 13px 28px;
+                                box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+                                cursor: pointer;
+                                transition: all .2s ease;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 8px;
+                                letter-spacing: 0.02em;
+                            "
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 22px rgba(239, 68, 68, 0.45)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(239, 68, 68, 0.35)'">
+                                <i class="fas fa-print"></i>
+                                Print
+                            </button>
+                            
+                            <button type="submit" id="submit-btn" style="
+                                background: linear-gradient(135deg, #0d2b1e 0%, #059669 100%);
+                                color: #fff;
+                                font-weight: 700;
+                                font-size: .97rem;
+                                border: none;
+                                border-radius: 12px;
+                                padding: 13px 36px;
+                                box-shadow: 0 4px 14px rgba(5,150,105,.35);
+                                cursor: pointer;
+                                transition: all .2s ease;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 8px;
+                                letter-spacing: 0.02em;
+                            "
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 22px rgba(5,150,105,.45)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(5,150,105,.35)'">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Requisition
+                            </button>
+                        </div>
                     </div>
                 </form>
 
@@ -567,7 +714,9 @@
         const canvas = document.getElementById('driver-signature-pad');
         const hiddenDataField = document.getElementById('driver_signature_data');
         const clearBtn = document.getElementById('clear-driver-signature');
+        const uploadInput = document.getElementById('driver-signature-upload');
         const form = document.querySelector('form');
+        let isImageUploaded = false;
 
         const signaturePad = new SignaturePad(canvas, {
             penColor: "rgb(15, 57, 43)",
@@ -584,17 +733,61 @@
             signaturePad.clear();
             if (data) signaturePad.fromData(data);
         }
+        
+        // Initial resize
         resizeCanvas();
         window.addEventListener("resize", resizeCanvas);
 
+        // Clear button
         clearBtn.addEventListener('click', function () {
             signaturePad.clear();
             hiddenDataField.value = "";
+            isImageUploaded = false;
+            uploadInput.value = "";
         });
 
+        // Handle Image Upload
+        uploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const ctx = canvas.getContext('2d');
+                        signaturePad.clear();
+                        isImageUploaded = true;
+                        
+                        // Need to respect pixel ratio scaling
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        
+                        const hRatio = (canvas.width / ratio) / img.width;
+                        const vRatio = (canvas.height / ratio) / img.height;
+                        const scale  = Math.min(hRatio, vRatio) * 0.9; // 90% to leave small padding
+                        
+                        const centerShift_x = ((canvas.width / ratio) - img.width * scale) / 2;
+                        const centerShift_y = ((canvas.height / ratio) - img.height * scale) / 2;  
+                        
+                        ctx.drawImage(img, 0, 0, img.width, img.height, centerShift_x, centerShift_y, img.width * scale, img.height * scale);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Track manual drawing to mark pad as used
+        signaturePad.addEventListener("beginStroke", () => {
+            if(isImageUploaded) {
+                // If they start drawing over an uploaded image, we don't clear it, 
+                // but we should know there's content on the canvas
+            }
+        });
+
+        // Submit form
         form.addEventListener('submit', function (e) {
-            if (!signaturePad.isEmpty()) {
-                hiddenDataField.value = signaturePad.toDataURL("image/png");
+            if (!signaturePad.isEmpty() || isImageUploaded) {
+                hiddenDataField.value = canvas.toDataURL("image/png");
             }
         });
     });

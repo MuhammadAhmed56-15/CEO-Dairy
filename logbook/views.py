@@ -28,6 +28,22 @@ def is_manager(user):
     )
 
 
+def is_admin_or_ceo(user):
+    """Returns True if user has global access (CEO, Manager, GM, PS, etc.)"""
+    if user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin']:
+        return True
+    if hasattr(user, 'profile') and user.profile.role in ['CEO', 'Manager', 'GM', 'PS']:
+        return True
+    return False
+
+
+def get_user_zone(user):
+    """Returns the Zone object for this user, or None."""
+    if hasattr(user, 'profile') and user.profile.zone:
+        return user.profile.zone
+    return None
+
+
 # =========================================================
 # LOG BOOK LIST
 # =========================================================
@@ -37,10 +53,15 @@ def logbook_list(request):
 
     logbooks = (
         LogBook.objects
-        .select_related("vehicle")
+        .select_related("vehicle", "vehicle__zone")
         .prefetch_related("entries")
-        .order_by("vehicle_number")
+        .order_by("vehicle_name")
     )
+
+    # Zone-based filtering: only show logbooks for vehicles in user's zone
+    user_zone = get_user_zone(request.user)
+    if not is_admin_or_ceo(request.user) and user_zone:
+        logbooks = logbooks.filter(vehicle__zone=user_zone)
 
     return render(
         request,
@@ -138,20 +159,111 @@ def logbook_detail(request, logbook_id):
 
 import io
 import os
-from PIL import Image
+import shutil
+import time
+from PIL import Image, ImageOps
 import pypdf
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+
+
+def convert_image_to_a4_pdf(image_file_obj):
+    """
+    Converts an uploaded image (JPG, PNG, WEBP, etc.) into a PDF page matching standard A4 width (595.27 pt).
+    Zero empty margin so the image fills 100% of its page bounds cleanly without white boxes.
+    """
+    image_file_obj.seek(0)
+    img = Image.open(image_file_obj)
+
+    try:
+        img = ImageOps.exif_transpose(img)
+    except Exception:
+        pass
+
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+
+    img_w, img_h = img.size
+    target_w = 595.27  # Standard A4 width in points
+
+    # Calculate proportional height matching image aspect ratio
+    target_h = target_w * (float(img_h) / float(img_w))
+
+    pdf_buffer = io.BytesIO()
+    c = canvas.Canvas(pdf_buffer, pagesize=(target_w, target_h))
+
+    temp_img_buf = io.BytesIO()
+    img.save(temp_img_buf, format='JPEG', quality=95)
+    temp_img_buf.seek(0)
+
+    img_reader = ImageReader(temp_img_buf)
+    c.drawImage(img_reader, 0, 0, width=target_w, height=target_h)
+    c.showPage()
+    c.save()
+
+    pdf_buffer.seek(0)
+    return pdf_buffer
+
+
+def normalize_entire_pdf_to_a4(target_pdf_path):
+    """
+    Ensures every page in target_pdf_path has width <= 595.27pt.
+    Scales page width proportionally so documents fit standard A4 width cleanly.
+    """
+    if not target_pdf_path or not os.path.exists(target_pdf_path):
+        return False
+    try:
+        with open(target_pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+
+        reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
+        writer = pypdf.PdfWriter()
+
+        modified = False
+        target_w = 595.27
+
+        for page in reader.pages:
+            w = float(page.mediabox.width)
+            if w > target_w + 5:
+                scale = target_w / w
+                page.scale_by(scale)
+                modified = True
+            writer.add_page(page)
+
+        if modified:
+            temp_path = target_pdf_path + ".tmp"
+            with open(temp_path, "wb") as f_out:
+                writer.write(f_out)
+
+            try:
+                os.replace(temp_path, target_pdf_path)
+            except Exception:
+                shutil.copyfile(temp_path, target_pdf_path)
+                if os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except Exception:
+                        pass
+        return True
+    except Exception as err:
+        print(f"Error normalizing PDF: {err}")
+        return False
+
 
 def append_file_to_existing_pdf(target_pdf_path, new_file_obj):
     """
     Prepends new uploaded PDF or Image file pages to target_pdf_path so newest page is on top.
+    Normalizes all pages to standard A4 size so PDF viewer maintains 67% optimal zoom.
     """
     if not target_pdf_path or not os.path.exists(target_pdf_path):
         return False
 
     try:
         writer = pypdf.PdfWriter()
+        target_w, target_h = 595.27, 841.89
 
-        # 1. First add new file pages (newest upload on top)
+        # 1. Add new uploaded file pages (newest upload on top)
         file_name = getattr(new_file_obj, 'name', '').lower()
 
         if file_name.endswith('.pdf'):
@@ -159,32 +271,47 @@ def append_file_to_existing_pdf(target_pdf_path, new_file_obj):
             new_bytes = io.BytesIO(new_file_obj.read())
             new_reader = pypdf.PdfReader(new_bytes)
             for page in new_reader.pages:
+                w = float(page.mediabox.width)
+                if w > target_w + 5:
+                    scale = target_w / w
+                    page.scale_by(scale)
                 writer.add_page(page)
         else:
-            # Image file (.jpg, .jpeg, .png, .webp) -> convert to PDF page
-            new_file_obj.seek(0)
-            img = Image.open(new_file_obj)
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-            img_bytes = io.BytesIO()
-            img.save(img_bytes, format='PDF')
-            img_bytes.seek(0)
-            img_reader = pypdf.PdfReader(img_bytes)
+            # Image file (.jpg, .jpeg, .png, .webp) -> convert to standard A4 PDF page
+            pdf_bytes_io = convert_image_to_a4_pdf(new_file_obj)
+            img_reader = pypdf.PdfReader(pdf_bytes_io)
             for page in img_reader.pages:
                 writer.add_page(page)
 
-        # 2. Next add existing PDF pages (older pages below)
+        # 2. Read existing PDF bytes entirely into memory so disk handle is closed immediately
         with open(target_pdf_path, "rb") as f:
-            existing_reader = pypdf.PdfReader(f)
-            for page in existing_reader.pages:
-                writer.add_page(page)
+            existing_bytes = f.read()
 
-        # Write to temporary file and replace atomically
+        existing_reader = pypdf.PdfReader(io.BytesIO(existing_bytes))
+        for page in existing_reader.pages:
+            w = float(page.mediabox.width)
+            if w > target_w + 5:
+                scale = target_w / w
+                page.scale_by(scale)
+            writer.add_page(page)
+
+        # Write to temporary file and replace/copy atomically
         temp_path = target_pdf_path + ".tmp"
         with open(temp_path, "wb") as f_out:
             writer.write(f_out)
 
-        os.replace(temp_path, target_pdf_path)
+        # On Windows, os.replace can fail if target file is locked by a process.
+        # Fallback to copyfile + remove to guarantee target update.
+        try:
+            os.replace(temp_path, target_pdf_path)
+        except Exception:
+            shutil.copyfile(temp_path, target_pdf_path)
+            if os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
+
         return True
     except Exception as err:
         print(f"Error prepending to PDF: {err}")
@@ -198,7 +325,10 @@ def remove_pages_from_pdf(target_pdf_path, start_page_1based, end_page_1based):
     if not target_pdf_path or not os.path.exists(target_pdf_path):
         return False
     try:
-        reader = pypdf.PdfReader(target_pdf_path)
+        with open(target_pdf_path, "rb") as f:
+            existing_bytes = f.read()
+
+        reader = pypdf.PdfReader(io.BytesIO(existing_bytes))
         writer = pypdf.PdfWriter()
 
         remove_start = start_page_1based - 1
@@ -218,7 +348,16 @@ def remove_pages_from_pdf(target_pdf_path, start_page_1based, end_page_1based):
         temp_path = target_pdf_path + ".tmp"
         with open(temp_path, "wb") as f_out:
             writer.write(f_out)
-        os.replace(temp_path, target_pdf_path)
+
+        try:
+            os.replace(temp_path, target_pdf_path)
+        except Exception:
+            shutil.copyfile(temp_path, target_pdf_path)
+            if os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
         return True
     except Exception as err:
         print(f"Error removing pages from PDF: {err}")
@@ -251,15 +390,19 @@ def resequence_logbook(logbook):
 
 @login_required
 def vehicle_logbook(request, vehicle_id):
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
+    if is_admin_or_ceo(request.user):
         vehicle = get_object_or_404(Vehicle, id=vehicle_id)
     else:
-        vehicle = get_object_or_404(Vehicle, id=vehicle_id, created_by=request.user)
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            vehicle = get_object_or_404(Vehicle, id=vehicle_id, zone=user_zone)
+        else:
+            from django.http import Http404
+            raise Http404("No Vehicle matches the given query.")
     logbook, _ = LogBook.objects.get_or_create(
         vehicle=vehicle,
         defaults={
-            'vehicle_number': vehicle.vehicle_number,
-            'opening_meter_reading': vehicle.current_meter_reading
+            'vehicle_name': vehicle.vehicle_name,
         }
     )
 
@@ -288,6 +431,9 @@ def vehicle_logbook(request, vehicle_id):
     total_entries_in_logbook = sum(p.entries.count() for p in pages)
 
     main_pdf_entry = logbook.entries.filter(signed_requisition__isnull=False).exclude(signed_requisition='').first()
+    if main_pdf_entry and main_pdf_entry.signed_requisition and os.path.exists(main_pdf_entry.signed_requisition.path):
+        normalize_entire_pdf_to_a4(main_pdf_entry.signed_requisition.path)
+
     total_pdf_pages = get_entry_pdf_page_count(main_pdf_entry) if main_pdf_entry else 0
 
     # Auto-adjust initial page 1 pdf_page_count if initial upload had multiple pages
@@ -313,13 +459,13 @@ def vehicle_logbook(request, vehicle_id):
 
     target_page = request.GET.get('page')
 
-    sum_db_pages = sum(p.pdf_pages_count for p in pages)
+    # Calculate PDF timestamp for cache busting
+    pdf_timestamp = int(time.time())
     if main_pdf_entry and main_pdf_entry.signed_requisition and os.path.exists(main_pdf_entry.signed_requisition.path):
-        pdf_path = main_pdf_entry.signed_requisition.path
-        if total_pdf_pages > sum_db_pages:
-            excess = total_pdf_pages - sum_db_pages
-            remove_pages_from_pdf(pdf_path, 1, excess)
-            total_pdf_pages = get_entry_pdf_page_count(main_pdf_entry)
+        try:
+            pdf_timestamp = int(os.path.getmtime(main_pdf_entry.signed_requisition.path))
+        except Exception:
+            pdf_timestamp = int(time.time())
 
     # Display newest page at the top, oldest (Page 1) at the bottom
     pages.reverse()
@@ -338,6 +484,7 @@ def vehicle_logbook(request, vehicle_id):
             "target_page": target_page,
             "main_pdf_entry": main_pdf_entry,
             "total_pdf_pages": total_pdf_pages,
+            "pdf_timestamp": pdf_timestamp,
             "is_manager": is_manager(request.user),
         }
     )
@@ -477,23 +624,32 @@ def add_page_entry(request, page_id):
                     success = append_file_to_existing_pdf(target_path, uploaded_file)
                     if success:
                         entry.signed_requisition = existing_pdf_entry.signed_requisition
-                        logbook.entries.filter(signed_requisition__isnull=True).update(signed_requisition=existing_pdf_entry.signed_requisition)
                     else:
                         entry.signed_requisition = uploaded_file
                 else:
-                    entry.signed_requisition = uploaded_file
+                    fname = getattr(uploaded_file, 'name', '').lower()
+                    if not fname.endswith('.pdf'):
+                        pdf_io = convert_image_to_a4_pdf(uploaded_file)
+                        base_name = os.path.splitext(os.path.basename(getattr(uploaded_file, 'name', 'logbook_page.jpg')))[0]
+                        from django.core.files.base import ContentFile
+                        entry.signed_requisition.save(f"{base_name}_a4.pdf", ContentFile(pdf_io.read()), save=False)
+                    else:
+                        entry.signed_requisition = uploaded_file
             else:
                 if existing_pdf_entry:
                     entry.signed_requisition = existing_pdf_entry.signed_requisition
 
             entry.save()
 
-            if entry.meter_reading_to and entry.meter_reading_to > vehicle.current_meter_reading:
-                vehicle.current_meter_reading = entry.meter_reading_to
-                vehicle.save(update_fields=['current_meter_reading'])
+            if entry.signed_requisition:
+                logbook.entries.all().update(signed_requisition=entry.signed_requisition)
+
+            if entry.meter_reading_to and entry.meter_reading_to > vehicle.meter_reading:
+                vehicle.meter_reading = entry.meter_reading_to
+                vehicle.save(update_fields=['meter_reading'])
 
             msg_txt = "Entry added" if is_first_entry else f"Page {target_page_num} added"
-            messages.success(request, f"{msg_txt} for Vehicle {vehicle.vehicle_number}!")
+            messages.success(request, f"{msg_txt} for Vehicle {vehicle.vehicle_name}!")
             return redirect(f"/logbook/vehicles/{vehicle.id}/logbook/?page={page.page_number}")
     else:
         last_entry = page.entries.order_by("-id").first() or logbook.entries.order_by("-id").first()
@@ -502,7 +658,7 @@ def add_page_entry(request, page_id):
             initial["meter_reading_from"] = last_entry.meter_reading_to
             initial["driver_name"] = last_entry.driver_name
         else:
-            initial["meter_reading_from"] = vehicle.current_meter_reading or logbook.opening_meter_reading
+            initial["meter_reading_from"] = logbook.opening_meter_reading
             driver = vehicle.drivers.filter(is_active=True).first()
             if driver:
                 initial["driver_name"] = driver.name
@@ -687,10 +843,14 @@ def manager_error_redirect(request, redirect_name):
 
 @login_required
 def vehicle_list(request):
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
-        vehicles = Vehicle.objects.select_related('driver').all().order_by('vehicle_number')
+    if is_admin_or_ceo(request.user):
+        vehicles = Vehicle.objects.select_related('driver', 'zone').all().order_by('vehicle_name')
     else:
-        vehicles = Vehicle.objects.select_related('driver').filter(created_by=request.user).order_by('vehicle_number')
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            vehicles = Vehicle.objects.select_related('driver', 'zone').filter(zone=user_zone).order_by('vehicle_name')
+        else:
+            vehicles = Vehicle.objects.none()
 
     return render(request, "logbook/vehicle_list.html", {
         "vehicles": vehicles,
@@ -704,7 +864,6 @@ def vehicle_create(request):
         form = VehicleForm(request.POST, user=request.user)
         if form.is_valid():
             vehicle = form.save(commit=False)
-            vehicle.created_by = request.user
             vehicle.save()
             form.save_m2m()
             if vehicle.driver:
@@ -719,10 +878,14 @@ def vehicle_create(request):
 @login_required
 def vehicle_edit(request, pk):
     if error := manager_error_redirect(request, 'vehicle_list'): return error
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
+    if is_admin_or_ceo(request.user):
         vehicle = get_object_or_404(Vehicle, pk=pk)
     else:
-        vehicle = get_object_or_404(Vehicle, pk=pk, created_by=request.user)
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            vehicle = get_object_or_404(Vehicle, pk=pk, zone=user_zone)
+        else:
+            return redirect('vehicle_list')
 
     if request.method == "POST":
         form = VehicleForm(request.POST, instance=vehicle, user=request.user)
@@ -735,15 +898,19 @@ def vehicle_edit(request, pk):
             return redirect('vehicle_list')
     else:
         form = VehicleForm(instance=vehicle, user=request.user)
-    return render(request, "logbook/generic_form.html", {"form": form, "title": f"Edit Vehicle {vehicle.vehicle_number}", "back_url": "vehicle_list"})
+    return render(request, "logbook/generic_form.html", {"form": form, "title": f"Edit Vehicle {vehicle.vehicle_name}", "back_url": "vehicle_list"})
 
 @login_required
 def vehicle_delete(request, pk):
     if error := manager_error_redirect(request, 'vehicle_list'): return error
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
+    if is_admin_or_ceo(request.user):
         vehicle = get_object_or_404(Vehicle, pk=pk)
     else:
-        vehicle = get_object_or_404(Vehicle, pk=pk, created_by=request.user)
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            vehicle = get_object_or_404(Vehicle, pk=pk, zone=user_zone)
+        else:
+            return redirect('vehicle_list')
 
     if request.method == "POST":
         vehicle.delete()
@@ -758,10 +925,16 @@ def vehicle_delete(request, pk):
 
 @login_required
 def driver_list(request):
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
-        drivers = Driver.objects.select_related('vehicle').all().order_by('name')
+    if is_admin_or_ceo(request.user):
+        drivers = Driver.objects.select_related('vehicle', 'vehicle__zone').all().order_by('name')
     else:
-        drivers = Driver.objects.select_related('vehicle').filter(created_by=request.user).order_by('name')
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            drivers = Driver.objects.select_related('vehicle', 'vehicle__zone').filter(
+                vehicle__zone=user_zone
+            ).distinct().order_by('name')
+        else:
+            drivers = Driver.objects.none()
 
     return render(request, "logbook/driver_list.html", {
         "drivers": drivers,
@@ -775,7 +948,6 @@ def driver_create(request):
         form = DriverForm(request.POST, user=request.user)
         if form.is_valid():
             driver = form.save(commit=False)
-            driver.created_by = request.user
             driver.save()
             messages.success(request, "Driver created successfully.")
             return redirect('driver_list')
@@ -786,10 +958,14 @@ def driver_create(request):
 @login_required
 def driver_edit(request, pk):
     if error := manager_error_redirect(request, 'driver_list'): return error
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
+    if is_admin_or_ceo(request.user):
         driver = get_object_or_404(Driver, pk=pk)
     else:
-        driver = get_object_or_404(Driver, pk=pk, created_by=request.user)
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            driver = get_object_or_404(Driver, pk=pk, vehicle__zone=user_zone)
+        else:
+            return redirect('driver_list')
 
     if request.method == "POST":
         form = DriverForm(request.POST, instance=driver, user=request.user)
@@ -804,10 +980,14 @@ def driver_edit(request, pk):
 @login_required
 def driver_delete(request, pk):
     if error := manager_error_redirect(request, 'driver_list'): return error
-    if request.user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(request.user, 'profile') and request.user.profile.role in ['CEO', 'Manager', 'GM', 'PS']):
+    if is_admin_or_ceo(request.user):
         driver = get_object_or_404(Driver, pk=pk)
     else:
-        driver = get_object_or_404(Driver, pk=pk, created_by=request.user)
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            driver = get_object_or_404(Driver, pk=pk, vehicle__zone=user_zone)
+        else:
+            return redirect('driver_list')
 
     if request.method == "POST":
         driver.delete()

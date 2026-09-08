@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import Q
-
+from core.models import Zone
 from .models import (
     Vehicle,
     Driver,
@@ -19,35 +19,42 @@ class VehicleForm(forms.ModelForm):
         model = Vehicle
 
         fields = [
-            "vehicle_number",
-            "registration_number",
+            "vehicle_id_number",
+            "vehicle_name",
             "zone",
             "vehicle_type",
+            "category",
             "driver",
             "status",
         ]
 
         widgets = {
 
-            "vehicle_number": forms.TextInput(
+            "vehicle_id_number": forms.TextInput(
                 attrs={
                     "class": "form-control"
                 }
             ),
 
-            "registration_number": forms.TextInput(
+            "vehicle_name": forms.TextInput(
                 attrs={
                     "class": "form-control"
                 }
             ),
 
-            "zone": forms.TextInput(
+            "zone": forms.Select(
                 attrs={
                     "class": "form-control"
                 }
             ),
 
             "vehicle_type": forms.TextInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "category": forms.TextInput(
                 attrs={
                     "class": "form-control"
                 }
@@ -69,11 +76,29 @@ class VehicleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        # Auto-set zone from user's profile if creating new vehicle
+        if user and not self.instance.pk:
+            if hasattr(user, 'profile') and user.profile.zone:
+                self.initial['zone'] = user.profile.zone.pk
+
         if 'driver' in self.fields:
             self.fields['driver'].label = "Assigned Driver"
             self.fields['driver'].empty_label = "-- Select Driver --"
             if user and not (user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(user, 'profile') and user.profile.role in ['CEO', 'Manager', 'GM', 'PS'])):
-                self.fields['driver'].queryset = Driver.objects.filter(Q(created_by=user) | Q(created_by__isnull=True))
+                if hasattr(user, 'profile') and user.profile.zone:
+                    self.fields['driver'].queryset = Driver.objects.filter(Q(vehicle__zone=user.profile.zone) | Q(vehicle__isnull=True))
+                else:
+                    self.fields['driver'].queryset = Driver.objects.none()
+
+        if 'zone' in self.fields:
+            self.fields['zone'].empty_label = "-- Select Zone --"
+            if user and not (user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(user, 'profile') and user.profile.role in ['CEO', 'Manager', 'GM', 'PS'])):
+                if hasattr(user, 'profile') and user.profile.zone:
+                    self.fields['zone'].queryset = Zone.objects.filter(id=user.profile.zone.id)
+                    self.initial['zone'] = user.profile.zone.id
+                else:
+                    self.fields['zone'].queryset = Zone.objects.none()
 
 
 # =========================================================
@@ -130,7 +155,10 @@ class DriverForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user and not (user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(user, 'profile') and user.profile.role in ['CEO', 'Manager', 'GM', 'PS'])):
-            self.fields['vehicle'].queryset = Vehicle.objects.filter(created_by=user)
+            if hasattr(user, 'profile') and user.profile.zone:
+                self.fields['vehicle'].queryset = Vehicle.objects.filter(zone=user.profile.zone)
+            else:
+                self.fields['vehicle'].queryset = Vehicle.objects.none()
 
 
 # =========================================================
@@ -144,7 +172,7 @@ class LogBookForm(forms.ModelForm):
 
         fields = [
             "vehicle",
-            "vehicle_number",
+            "vehicle_name",
             "serial_number",
             "average_to_litre",
             "opening_meter_reading",
@@ -158,7 +186,7 @@ class LogBookForm(forms.ModelForm):
                 }
             ),
 
-            "vehicle_number": forms.TextInput(
+            "vehicle_name": forms.TextInput(
                 attrs={
                     "class": "form-control"
                 }

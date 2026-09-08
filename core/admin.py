@@ -1,10 +1,13 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.auth.models import User
 from .models import (
-    Profile, Commitment, Employee, Task, Remark, 
+    Role, Profile, Commitment, Task, Remark, 
     File, Notesheet, NotesheetForward, NotesheetAgenda,
     UserHierarchy, NotesheetReturn, NotesheetAttachment,
-    LetterFile, Letter, DraftLetter, Notification, VehicleRequisition
+    LetterFile, Letter, DraftLetter, Notification, VehicleRequisition,
+    Zone
 )
 
 # =========================================================
@@ -22,6 +25,149 @@ class FileAdmin(admin.ModelAdmin):
     search_fields = ('file_name', 'file_number')
     list_filter = ('created_at',)
     ordering = ('-created_at',)
+
+# =========================================================
+# 🌍 ZONE ADMIN
+# =========================================================
+class ZoneAdminForm(forms.ModelForm):
+    users_in_zone = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all().order_by('first_name', 'last_name', 'username'),
+        required=False,
+        widget=admin.widgets.FilteredSelectMultiple('Users', is_stacked=False),
+        label='Assign Users to Zone',
+        help_text="Select users to assign to this zone. This will automatically update their Profile."
+    )
+
+    class Meta:
+        model = Zone
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['users_in_zone'].initial = User.objects.filter(
+                profile__zone=self.instance
+            )
+        self.fields['users_in_zone'].label_from_instance = lambda obj: (
+            f"{obj.get_full_name()} ({obj.username})" if obj.get_full_name().strip() else obj.username
+        )
+
+
+@admin.register(Zone)
+class ZoneAdmin(admin.ModelAdmin):
+    form = ZoneAdminForm
+    list_display = ('name', 'title', 'subtitle', 'province', 'phone', 'get_users_count')
+    search_fields = ('name', 'title', 'subtitle', 'province', 'address')
+
+    def get_users_count(self, obj):
+        count = obj.users.count()
+        color = '#059669' if count > 0 else '#9ca3af'
+        return format_html('<span style="color:{};font-weight:700;">{}</span>', color, count)
+    get_users_count.short_description = 'Assigned Users'
+
+    def save_model(self, request, obj, form, change):
+        """Save the Zone object first, then handle user assignments."""
+        super().save_model(request, obj, form, change)
+
+        selected_users = form.cleaned_data.get('users_in_zone', [])
+
+        # Remove zone from users who were unselected
+        Profile.objects.filter(zone=obj).exclude(user__in=selected_users).update(zone=None)
+
+        # Assign zone to selected users
+        for user in selected_users:
+            profile, _ = Profile.objects.get_or_create(user=user)
+            if profile.zone_id != obj.pk:
+                profile.zone = obj
+                profile.save(update_fields=['zone'])
+
+        from django.contrib import messages as msg
+        msg.success(request, f'✅ Zone saved! {len(list(selected_users))} user(s) assigned to {obj.name}.')
+
+# =========================================================
+# 🏷️ ROLE ADMIN
+# =========================================================
+class RoleAdminForm(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'user' in self.fields:
+            self.fields['user'].queryset = User.objects.order_by('first_name', 'last_name', 'username')
+            self.fields['user'].label_from_instance = lambda obj: (
+                f"{obj.get_full_name()} ({obj.username})" if obj.get_full_name().strip() else obj.username
+            )
+            self.fields['user'].label = "User Name"
+
+            import json
+            from django.utils.safestring import mark_safe
+
+            users_dict = {
+                str(u.id): {
+                    'username': u.username,
+                    'full_name': u.get_full_name().strip() or u.username
+                }
+                for u in User.objects.all()
+            }
+            users_json = json.dumps(users_dict)
+
+            js_script = mark_safe(f"""
+            <span style="display:block; font-size:12px; color:#9ca3af; margin-top:4px;">
+              Select the assigned user. Dropdown displays <strong>Full Name (username)</strong>.
+            </span>
+            <script>
+            (function() {{
+                var userData = {users_json};
+                function attachAutoFill() {{
+                    var userSelect = document.getElementById('id_user');
+                    var codeInput = document.getElementById('id_code');
+                    var nameInput = document.getElementById('id_name');
+                    if (userSelect) {{
+                        userSelect.addEventListener('change', function() {{
+                            var uid = this.value;
+                            if (uid && userData[uid]) {{
+                                if (codeInput && !codeInput.value) {{
+                                    codeInput.value = userData[uid].username;
+                                }}
+                                if (nameInput && !nameInput.value) {{
+                                    nameInput.value = userData[uid].full_name;
+                                }}
+                            }}
+                        }});
+                    }}
+                }}
+                if (document.readyState === 'loading') {{
+                    document.addEventListener('DOMContentLoaded', attachAutoFill);
+                }} else {{
+                    attachAutoFill();
+                }}
+            }})();
+            </script>
+            """)
+            self.fields['user'].help_text = js_script
+
+
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+    form = RoleAdminForm
+    fields = ('code', 'name', 'category', 'user')
+    list_display = ('code', 'name', 'category', 'get_assigned_users')
+    list_filter = ('category',)
+    search_fields = ('code', 'name', 'category', 'user__first_name', 'user__last_name', 'user__username')
+    ordering = ('category', 'code')
+
+    def get_assigned_users(self, obj):
+        u = obj.user or (obj.profiles.first().user if obj.profiles.exists() else None)
+        if u:
+            full_name = u.get_full_name().strip()
+            display = full_name if full_name else u.username
+            return format_html('<span style="color: #059669; font-weight: 700; font-size: 13px;">{}</span>', display)
+        return format_html('<span style="color: #9ca3af; font-style: italic;">Unassigned</span>')
+    get_assigned_users.short_description = 'Assigned Person / User Name'
+
 
 # =========================================================
 # 👤 PROFILE ADMIN — Dual Signature Widget (Draw + Upload)
@@ -148,31 +294,62 @@ class SignaturePadWidget(forms.Widget):
     }});
   }}
 
-  window.sigClear = window.sigClear || function(id) {{
-    if (id !== wid) return;
-    sp.clear();
-    drawn.value = "";
-    statusEl.textContent = "Draw your signature using mouse or touch";
-    statusEl.style.color = "#9ca3af";
+  window.sigPads = window.sigPads || {{}};
+  window.sigPads[wid] = sp;
+
+  window.sigClear = function(id) {{
+    if (window.sigPads[id]) {{
+      var pad = window.sigPads[id];
+      var c = document.getElementById(id + "-canvas");
+      if (c) {{
+          var ctx = c.getContext("2d");
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, c.width, c.height);
+          var r = window.devicePixelRatio || 1;
+          ctx.scale(r, r);
+      }}
+      pad.clear();
+    }}
+    var d = document.getElementById(id + "-drawn");
+    if (d) d.value = "";
+    var s = document.getElementById(id + "-status");
+    if (s) {{
+      s.textContent = "Draw your signature using mouse or touch";
+      s.style.color = "#9ca3af";
+    }}
   }};
 
-  window.sigTabSwitch = window.sigTabSwitch || function(id, tab) {{
-    if (id !== wid) return;
+  window.sigTabSwitch = function(id, tab) {{
     var pd = document.getElementById(id + "-panel-draw");
     var pu = document.getElementById(id + "-panel-upload");
     var td = document.getElementById(id + "-tab-draw");
     var tu = document.getElementById(id + "-tab-upload");
+    if (!pd || !pu || !td || !tu) return;
+
     if (tab === "draw") {{
       pd.style.display = ""; pu.style.display = "none";
       td.style.background = "linear-gradient(135deg,#0d2b1e,#059669)"; td.style.color = "#fff";
       tu.style.background = "#f9fafb"; tu.style.color = "#374151";
-      setTimeout(resize, 50);
+      if (window.sigPads[id]) {{
+          // Slight delay to allow DOM to render before resizing canvas
+          setTimeout(function() {{
+              var canvas = document.getElementById(id + "-canvas");
+              var sp = window.sigPads[id];
+              var r = window.devicePixelRatio || 1;
+              var d = sp.isEmpty() ? null : sp.toData();
+              canvas.width  = canvas.offsetWidth  * r;
+              canvas.height = canvas.offsetHeight * r;
+              canvas.getContext("2d").scale(r, r);
+              sp.clear();
+              if (d) sp.fromData(d);
+          }}, 50);
+      }}
     }} else {{
       pd.style.display = "none"; pu.style.display = "";
       tu.style.background = "linear-gradient(135deg,#0d2b1e,#059669)"; tu.style.color = "#fff";
       td.style.background = "#f9fafb"; td.style.color = "#374151";
-      // clear drawn value if switching to upload so we don't save both by mistake
-      drawn.value = "";
+      var drawn = document.getElementById(id + "-drawn");
+      if (drawn) drawn.value = "";
     }}
   }};
 }})();
@@ -208,13 +385,13 @@ class ProfileAdminForm(forms.ModelForm):
 class ProfileAdmin(admin.ModelAdmin):
     form = ProfileAdminForm
 
-    list_display = ('user', 'role', 'department', 'employee', 'signature_preview')
-    list_filter = ('role', 'department')
-    search_fields = ('user__username', 'department', 'user__first_name', 'user__last_name')
+    list_display = ('user', 'role', 'zone', 'department', 'signature_preview')
+    list_filter = ('role', 'zone', 'department')
+    search_fields = ('user__username', 'department', 'user__first_name', 'user__last_name', 'zone__name')
     ordering = ('role', 'user__username')
 
     readonly_fields = ('signature_detail_preview',)
-    fields = ('user', 'role', 'employee', 'department', 'signature', 'signature_detail_preview')
+    fields = ('user', 'role', 'zone', 'department', 'signature', 'signature_detail_preview')
 
     def save_model(self, request, obj, form, change):
         """
@@ -289,15 +466,6 @@ class CommitmentAdmin(admin.ModelAdmin):
     ordering = ('-commitment_date',)
     readonly_fields = ('created_at', 'updated_at')
 
-# =========================================================
-# 👷 EMPLOYEE ADMIN
-# =========================================================
-@admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('emp_id', 'name', 'department', 'designation')
-    search_fields = ('emp_id', 'name', 'department', 'designation')
-    list_filter = ('department', 'designation')
-    ordering = ('emp_id',)
 
 # =========================================================
 # 📝 TASK ADMIN (NOTESHEET)

@@ -171,65 +171,69 @@
     .letterhead-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 18px;
-        padding: 0;
-        border: none;
-        border-bottom: 3px double #0d2b1e;
-        padding-bottom: 16px;
+        margin-bottom: 12pt;
     }
 
     .letterhead-logo-cell {
-        width: 145px;
+        width: 16%;
         text-align: center;
         vertical-align: middle;
-        padding: 12px 10px;
+        padding: 6pt 4pt;
     }
 
     .letterhead-logo-cell img {
-        width: 135px;
-        height: 135px;
+        width: 95px;
+        height: 95px;
+        max-width: 100%;
         object-fit: contain;
     }
 
     .letterhead-center {
+        width: 68%;
         text-align: center;
         vertical-align: middle;
-        padding: 12px 20px;
-        border-left: 1px solid #d8dee5;
-        border-right: 1px solid #d8dee5;
+        padding: 6pt 8pt;
     }
 
-    .letterhead-title {
+    .letterhead-title-main {
         font-weight: 900;
-        font-size: 15pt;
-        margin: 0 0 4px;
+        font-size: clamp(15px, 1.6vw, 22px);
+        margin: 0 0 5pt 0;
         font-family: Calibri, Arial, sans-serif;
-        color: #2d3748;
-        letter-spacing: .4px;
-        line-height: 1.4;
+        color: #0d1b2a;
+        line-height: 1.25;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .letterhead-subtitle {
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 2pt 0;
+        font-family: Calibri, Arial, sans-serif;
+        color: #1a2a3a;
+        line-height: 1.35;
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
     }
 
     .letterhead-address {
-        font-size: 12pt;
-        font-weight: bold;
-        margin: 0 0 4px;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 5pt 0;
         font-family: Calibri, Arial, sans-serif;
-        color: #1a202c;
-        line-height: 1.4;
+        color: #1a2a3a;
+        line-height: 1.35;
+        text-transform: uppercase;
     }
 
     .letterhead-contact {
-        font-size: 12pt;
-        font-weight: bold;
+        font-size: 17px;
+        font-weight: 700;
         margin: 0;
         font-family: Calibri, Arial, sans-serif;
-        color: #1a202c;
-        line-height: 1.4;
-    }
-
-    .letterhead-contact u {
-        color: #1d4ed8;
-        text-decoration: underline;
+        color: #1a2a3a;
+        line-height: 1.35;
     }
 
     /* Plain-text style inputs sitting on the letterhead */
@@ -435,30 +439,42 @@
                 <table class="letterhead-table">
                     <tr>
                         <td class="letterhead-logo-cell">
-                            <img src="{% static 'images/wssp_logo.png' %}" alt="WSSP Logo"
-                                onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
+                            <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}" alt="WSSP Logo"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
                         </td>
-
                         <td class="letterhead-center">
-                            <p class="letterhead-title"> WATER &amp;
-                                SANITATION SERVICES PESHAWAR,</p>
-                            <p class="letterhead-title"> LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-                            <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,
-                            </p>
-                            <p class="letterhead-contact">
-                                <strong>Email:
-                                </strong><u>wsspeshawar@gmail.com</u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Phone #</strong>
-                                091-9219621-23
-                            </p>
+                            {% if request.user.profile.zone %}
+                                <h4 class="letterhead-title-main">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</h4>
+                                <p class="letterhead-subtitle">{{ request.user.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
+                                <p class="letterhead-address">{{ request.user.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
+                                {% if request.user.profile.zone.address %}
+                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">{{ request.user.profile.zone.address }}</p>
+                                {% endif %}
+                                <p class="letterhead-contact">
+                                    {% if request.user.profile.zone.phone %}
+                                    Phone-No. {{ request.user.profile.zone.phone }}
+                                    {% else %}
+                                    Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219621-23
+                                    {% endif %}
+                                </p>
+                            {% else %}
+                                <h4 class="letterhead-title-main">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</h4>
+                                <p class="letterhead-subtitle">WATER AND SANITATION SERVICES PESHAWAR</p>
+                                <p class="letterhead-address">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
+                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                                <p class="letterhead-contact">
+                                    Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
+                                </p>
+                            {% endif %}
                         </td>
-
                         <td class="letterhead-logo-cell">
-                            <img src="{% static 'images/kp_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
-                                onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
-                                style="width: 135px; height: 135px; object-fit: contain;">
+                            <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url }}{% else %}{% static 'images/kpk_emblem.png' %}{% endif %}" alt="Government of Khyber Pakhtunkhwa Emblem"
+                                 onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
+                                 style="width: 72px; height: 72px; object-fit: contain;">
                         </td>
                     </tr>
                 </table>
+                <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
 
                 <!-- Ref No & Date -->
 
@@ -659,8 +675,7 @@
                     <select name="receiver" class="form-select" id="receiverSelect">
                         <option value="">-- Select System Recipient --</option>
                         {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.username }} ({% if u.profile %}{{ u.profile.role }}{% endif %})
-                        </option>
+                        <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({% if u.profile %}{{ u.profile.get_role_with_department }}{% endif %})</option>
                         {% endfor %}
                     </select>
                     <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i>Optional if saving as Draft</small>

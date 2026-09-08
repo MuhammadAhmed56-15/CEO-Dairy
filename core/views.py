@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Count
+from django.db.models import Count, Q, Case, When, Value, IntegerField
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from .models import Profile, Commitment, Task, NotesheetAttachment, UserHierarchy, Notification  # Saare models aik saath
@@ -30,11 +30,11 @@ def login_view(request):
                 return redirect("ps_dashboard")
             elif profile.role == "GM":
                 return redirect("gm_dashboard")
-            elif profile.role in ["Manager", "ZM", "AM", "IT", "CFO", "HR", "Auditor"]:
+            elif profile.role in ["Manager", "ZM", "AM", "IT", "CFO", "HR", "Auditor", "Officer"]:
                 return redirect("manager_dashboard")
             else:
-                messages.error(request, "Role not recognized")
-                return redirect("login")
+                # Fallback: redirect to manager_dashboard for any other role
+                return redirect("manager_dashboard")
         else:
             messages.error(request, "Invalid username or password")
     return render(request, "login.html")
@@ -511,9 +511,8 @@ def add_commitment(request):
     profile = get_object_or_404(Profile, user=request.user)
 
     managers = User.objects.filter(
-        profile__role="Manager",
-        profile__employee__isnull=False
-    ).select_related("profile__employee")
+        Q(profile__role__category="Manager") | Q(profile__role__code="Manager")
+    ).select_related("profile")
 
     if request.method == "POST":
         form = CommitmentForm(request.POST, user=request.user)
@@ -1122,9 +1121,14 @@ def manager_dashboard(request):
     req_approved_list = []
     req_completed_list = []
     
-    if request.user.username == 'Fleet_Manager':
+    is_fleet_staff = "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.username in ["Manager_Admin", "MngrFleet", "Fleet_Manager"]
+    if is_fleet_staff:
         from .models import VehicleRequisition
-        req_qs = VehicleRequisition.objects.all()
+        if request.user.username in ['Manager_Admin', 'Fleet_Manager', 'MngrFleet']:
+            req_qs = VehicleRequisition.objects.all()
+        else:
+            req_qs = VehicleRequisition.objects.filter(fleet_officer=request.user)
+            
         req_total_count = req_qs.count()
         req_pending_count = req_qs.filter(status='Pending').count()
         req_approved_count = req_qs.filter(status='Approved').count()
@@ -1438,13 +1442,13 @@ def initiate_notesheet(request):
     from django.db.models import Case, When, Value, IntegerField
     all_users = User.objects.exclude(id=request.user.id).annotate(
         role_order=Case(
-            When(profile__role='CEO', then=Value(1)),
-            When(profile__role='PS', then=Value(2)),
-            When(profile__role='GM', then=Value(3)),
-            When(profile__role='Manager', then=Value(4)),
-            When(profile__role='ZM', then=Value(5)),
-            When(profile__role='Field Manager', then=Value(6)),
-            When(profile__role='IT', then=Value(7)),
+            When(Q(profile__role__category='CEO') | Q(profile__role__code='CEO'), then=Value(1)),
+            When(Q(profile__role__category='PS') | Q(profile__role__code='PS'), then=Value(2)),
+            When(Q(profile__role__category='GM') | Q(profile__role__code='GM'), then=Value(3)),
+            When(Q(profile__role__category='Manager') | Q(profile__role__code='Manager'), then=Value(4)),
+            When(Q(profile__role__category='ZM') | Q(profile__role__code='ZM'), then=Value(5)),
+            When(Q(profile__role__category='Field Manager') | Q(profile__role__code='Field Manager'), then=Value(6)),
+            When(Q(profile__role__category='IT') | Q(profile__role__code='IT'), then=Value(7)),
             default=Value(99),
             output_field=IntegerField(),
         )
@@ -1643,13 +1647,13 @@ def initiate_notesheet(request):
     from django.db.models import Case, When, Value, IntegerField
     all_users = User.objects.exclude(id=request.user.id).annotate(
         role_order=Case(
-            When(profile__role='CEO', then=Value(1)),
-            When(profile__role='PS', then=Value(2)),
-            When(profile__role='GM', then=Value(3)),
-            When(profile__role='Manager', then=Value(4)),
-            When(profile__role='ZM', then=Value(5)),
-            When(profile__role='Field Manager', then=Value(6)),
-            When(profile__role='IT', then=Value(7)),
+            When(Q(profile__role__category='CEO') | Q(profile__role__code='CEO'), then=Value(1)),
+            When(Q(profile__role__category='PS') | Q(profile__role__code='PS'), then=Value(2)),
+            When(Q(profile__role__category='GM') | Q(profile__role__code='GM'), then=Value(3)),
+            When(Q(profile__role__category='Manager') | Q(profile__role__code='Manager'), then=Value(4)),
+            When(Q(profile__role__category='ZM') | Q(profile__role__code='ZM'), then=Value(5)),
+            When(Q(profile__role__category='Field Manager') | Q(profile__role__code='Field Manager'), then=Value(6)),
+            When(Q(profile__role__category='IT') | Q(profile__role__code='IT'), then=Value(7)),
             default=Value(99),
             output_field=IntegerField(),
         )
@@ -1994,13 +1998,13 @@ def forward_notesheet(request, pk):
     from django.db.models import Case, When, Value, IntegerField
     users = User.objects.exclude(id=request.user.id).annotate(
         role_order=Case(
-            When(profile__role='CEO', then=Value(1)),
-            When(profile__role='PS', then=Value(2)),
-            When(profile__role='GM', then=Value(3)),
-            When(profile__role='Manager', then=Value(4)),
-            When(profile__role='ZM', then=Value(5)),
-            When(profile__role='Field Manager', then=Value(6)),
-            When(profile__role='IT', then=Value(7)),
+            When(Q(profile__role__category='CEO') | Q(profile__role__code='CEO'), then=Value(1)),
+            When(Q(profile__role__category='PS') | Q(profile__role__code='PS'), then=Value(2)),
+            When(Q(profile__role__category='GM') | Q(profile__role__code='GM'), then=Value(3)),
+            When(Q(profile__role__category='Manager') | Q(profile__role__code='Manager'), then=Value(4)),
+            When(Q(profile__role__category='ZM') | Q(profile__role__code='ZM'), then=Value(5)),
+            When(Q(profile__role__category='Field Manager') | Q(profile__role__code='Field Manager'), then=Value(6)),
+            When(Q(profile__role__category='IT') | Q(profile__role__code='IT'), then=Value(7)),
             default=Value(99),
             output_field=IntegerField(),
         )
@@ -2777,8 +2781,20 @@ def mark_notification_as_read(request, notification_id):
 @login_required
 def requisition_list(request):
     from .models import VehicleRequisition
-    if request.user.username in ['Manager_Admin', 'Fleet_Manager']:
-        requisitions = VehicleRequisition.objects.all().order_by('-created_at')
+    
+    RECIPIENT_USERNAMES = [
+        'Manager_Admin',  # Legacy
+        'Fleet_Manager',  # Legacy
+        'MngrFleet',      # Manager Fleet
+        'MngrA_AZoneA',   # Accounts/Admin Zone A
+        'MngrA_AZoneB',   # Accounts/Admin Zone B
+        'MngrA_AZoneC',   # Accounts/Admin Zone C
+        'MngrA_AZoneD',   # Accounts/Admin Zone D
+        'MngrA_AZoneE',   # Accounts/Admin Zone E
+    ]
+    
+    if request.user.username in RECIPIENT_USERNAMES:
+        requisitions = VehicleRequisition.objects.filter(manager_admin=request.user).order_by('-created_at')
         is_manager = True
     else:
         requisitions = VehicleRequisition.objects.filter(fleet_officer=request.user).order_by('-created_at')
@@ -2794,7 +2810,31 @@ def create_requisition(request):
     from .models import VehicleRequisition
     from .forms import VehicleRequisitionForm
     from django.contrib.auth.models import User
-    
+
+    # --- Build the curated recipient list ---
+    RECIPIENT_USERNAMES = [
+        'MngrFleet',      # Manager Fleet
+        'MngrA_AZoneA',   # Accounts/Admin Zone A
+        'MngrA_AZoneB',   # Accounts/Admin Zone B
+        'MngrA_AZoneC',   # Accounts/Admin Zone C
+        'MngrA_AZoneD',   # Accounts/Admin Zone D
+        'MngrA_AZoneE',   # Accounts/Admin Zone E
+    ]
+    RECIPIENT_LABELS = {
+        'MngrFleet':    'Manager Fleet',
+        'MngrA_AZoneA': 'Manager Accounts/Admin — Zone A',
+        'MngrA_AZoneB': 'Manager Accounts/Admin — Zone B',
+        'MngrA_AZoneC': 'Manager Accounts/Admin — Zone C',
+        'MngrA_AZoneD': 'Manager Accounts/Admin — Zone D',
+        'MngrA_AZoneE': 'Manager Accounts/Admin — Zone E',
+    }
+    recipient_users = User.objects.filter(username__in=RECIPIENT_USERNAMES)
+    # Attach a display label to each user object for the template
+    recipient_list = []
+    for u in sorted(recipient_users, key=lambda x: RECIPIENT_USERNAMES.index(x.username) if x.username in RECIPIENT_USERNAMES else 99):
+        u.display_label = RECIPIENT_LABELS.get(u.username, u.get_full_name() or u.username)
+        recipient_list.append(u)
+
     if request.method == "POST":
         # Combine the 4 separate issue fields into one issue_description
         post_data = request.POST.copy()
@@ -2805,19 +2845,24 @@ def create_requisition(request):
                 issues.append(f'({i}) {val}')
         if issues:
             post_data['issue_description'] = '\n'.join(issues)
-        
+
         form = VehicleRequisitionForm(post_data)
         if form.is_valid():
             req = form.save(commit=False)
             req.fleet_officer = request.user
-            # Fetch Manager Admin
+
+            # Fetch the selected recipient from the dropdown
+            recipient_id = request.POST.get('send_to_manager')
             try:
-                manager = User.objects.get(username='Manager_Admin')
-                req.manager_admin = manager
-            except User.DoesNotExist:
-                messages.error(request, "Manager Admin not found in the system.")
-                return redirect('requisition_list')
-            
+                recipient = User.objects.get(id=recipient_id)
+                req.manager_admin = recipient
+            except (User.DoesNotExist, TypeError, ValueError):
+                messages.error(request, "Please select a valid recipient.")
+                return render(request, 'create_requisition.html', {
+                    'form': form,
+                    'recipient_list': recipient_list,
+                })
+
             # Handle Signatures
             import base64
             from django.core.files.base import ContentFile
@@ -2825,47 +2870,54 @@ def create_requisition(request):
 
             driver_sig_data = request.POST.get('driver_signature_data')
             if driver_sig_data:
-                format, imgstr = driver_sig_data.split(';base64,')
-                ext = format.split('/')[-1]
+                fmt, imgstr = driver_sig_data.split(';base64,')
+                ext = fmt.split('/')[-1]
                 req.driver_signature = ContentFile(base64.b64decode(imgstr), name=f'driver_sig_{uuid.uuid4()}.{ext}')
 
             fleet_sig_data = request.POST.get('fleet_officer_signature_data')
             if fleet_sig_data:
-                format, imgstr = fleet_sig_data.split(';base64,')
-                ext = format.split('/')[-1]
+                fmt, imgstr = fleet_sig_data.split(';base64,')
+                ext = fmt.split('/')[-1]
                 req.fleet_officer_signature = ContentFile(base64.b64decode(imgstr), name=f'fleet_sig_{uuid.uuid4()}.{ext}')
             elif hasattr(request.user, 'profile') and request.user.profile.signature:
-                # If no fresh signature was drawn, use their saved profile signature
                 req.fleet_officer_signature = request.user.profile.signature
-            
+
             req.save()
-            
-            # Send Notification to Manager Admin
+
+            # Send Notification to selected recipient
             create_notification(
-                recipient=manager,
+                recipient=recipient,
                 sender=request.user,
                 title="New Vehicle Requisition",
-                message=f"{request.user.username} submitted a requisition for vehicle {req.vehicle_number}.",
+                message=f"{request.user.get_full_name() or request.user.username} submitted a requisition for vehicle {req.vehicle_number}.",
                 link=f"/requisitions/",
                 notification_type='notesheet'
             )
-            
+
             messages.success(request, "Requisition form submitted successfully.")
             return redirect('requisition_list')
     else:
         form = VehicleRequisitionForm()
-        
-    # Fetch only Manager Admin users for the "Send To" dropdown
-    manager_admin_users = User.objects.filter(username='Manager_Admin')
+
     return render(request, 'create_requisition.html', {
         'form': form,
-        'manager_admin_users': manager_admin_users,
+        'recipient_list': recipient_list,
     })
 
 @login_required
 def update_requisition_status(request, pk):
     from .models import VehicleRequisition
-    if request.method == "POST" and request.user.username in ['Manager_Admin', 'Fleet_Manager']:
+    RECIPIENT_USERNAMES = [
+        'Manager_Admin',
+        'Fleet_Manager',
+        'MngrFleet',
+        'MngrA_AZoneA',
+        'MngrA_AZoneB',
+        'MngrA_AZoneC',
+        'MngrA_AZoneD',
+        'MngrA_AZoneE',
+    ]
+    if request.method == "POST" and request.user.username in RECIPIENT_USERNAMES:
         req = get_object_or_404(VehicleRequisition, pk=pk)
         new_status = request.POST.get('status')
         if new_status in dict(VehicleRequisition.STATUS_CHOICES):
@@ -2890,8 +2942,18 @@ def view_requisition(request, pk):
     from .models import VehicleRequisition
     req = get_object_or_404(VehicleRequisition, pk=pk)
     
-    # Only allow the fleet officer who created it, or Manager_Admin/Fleet_Manager to view it
-    is_manager = request.user.username in ['Manager_Admin', 'Fleet_Manager']
+    # Only allow the fleet officer who created it, or managers to view it
+    RECIPIENT_USERNAMES = [
+        'Manager_Admin',
+        'Fleet_Manager',
+        'MngrFleet',
+        'MngrA_AZoneA',
+        'MngrA_AZoneB',
+        'MngrA_AZoneC',
+        'MngrA_AZoneD',
+        'MngrA_AZoneE',
+    ]
+    is_manager = request.user.username in RECIPIENT_USERNAMES
     if req.fleet_officer != request.user and not is_manager:
         messages.error(request, "You are not authorized to view this requisition.")
         return redirect('requisition_list')
@@ -2904,6 +2966,7 @@ def view_requisition(request, pk):
 # =========================================================
 # LOG BOOK HISTORY ATTACHMENT APIs
 # =========================================================
+import os
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.http import JsonResponse, HttpResponse
@@ -2917,15 +2980,24 @@ def api_get_logbook_history(request):
     Returns page-based digital logbook data for the selected vehicle.
     """
     from logbook.models import Vehicle, LogBook, LogBookPage
+    from logbook.views import is_admin_or_ceo, get_user_zone
 
-    vehicles_qs = Vehicle.objects.all().order_by('vehicle_number')
+    if is_admin_or_ceo(request.user):
+        vehicles_qs = Vehicle.objects.all().order_by('vehicle_number')
+    else:
+        user_zone = get_user_zone(request.user)
+        if user_zone:
+            vehicles_qs = Vehicle.objects.filter(zone=user_zone).order_by('vehicle_number')
+        else:
+            vehicles_qs = Vehicle.objects.none()
+
     vehicles_data = [
         {
             'id': v.id,
             'vehicle_number': v.vehicle_number,
             'registration_number': v.registration_number or '',
             'type': v.vehicle_type or '',
-            'zone': v.zone or '',
+            'zone': v.zone.title if v.zone else '',
             'current_meter': v.current_meter_reading,
         }
         for v in vehicles_qs
@@ -2981,7 +3053,11 @@ def api_get_logbook_history(request):
                 'purpose': e.purpose_of_journey or '-',
                 'details': e.details_of_journey or '-',
                 'remarks': e.remarks or '-',
-                'file_url': e.signed_requisition.url if e.signed_requisition else '',
+                'file_url': (
+                    f"{e.signed_requisition.url}?v={int(os.path.getmtime(e.signed_requisition.path))}"
+                    if e.signed_requisition and os.path.exists(e.signed_requisition.path)
+                    else (e.signed_requisition.url if e.signed_requisition else '')
+                ),
             }
             for e in entries_qs
         ]

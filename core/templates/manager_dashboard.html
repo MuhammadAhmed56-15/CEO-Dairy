@@ -922,7 +922,7 @@
             <option value="notesheet" selected>Notesheet</option>
             <option value="task">Tasks</option>
             <option value="letter">Letters</option>
-            {% if request.user.username == 'Fleet_Manager' %}
+            {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.username in "Manager_Admin MngrFleet Fleet_Manager" %}
             <option value="requisition">Requisitions</option>
             {% endif %}
         </select>
@@ -1325,7 +1325,7 @@
                     {% endfor %}
                 ]
             }
-        }{% if request.user.username == 'Fleet_Manager' %},
+        }{% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.username in "Manager_Admin MngrFleet Fleet_Manager" %},
         requisition: {
             title: 'Requisition Overview',
             subtext: "Here's your Requisitions overview for today",
@@ -1392,6 +1392,7 @@
         {% endif %}
     };
 
+    let isFleetRelated = {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username %}true{% else %}false{% endif %};
     let activeSection = 'notesheet';
     let pieChartInstance;
     let dailyChartInstance;
@@ -1640,8 +1641,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         initCharts();
         
-        // Trigger initial Notesheet view rendering
-        onSectionChange('notesheet');
+        // Match the dropdown to the activeSection
+        const selector = document.getElementById('dashboardSectionSelector');
+        if (selector) selector.value = activeSection;
+
+        // Trigger initial view rendering
+        onSectionChange(activeSection);
 
         // Initialize FullCalendar
         const calendarEl = document.getElementById('calendar');

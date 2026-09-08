@@ -288,12 +288,30 @@
                             The above-mentioned problem(s) was resolved before on 
                             <span class="form-value-text text-center">{{ req.previous_issue_date|date:"d M Y" }}</span>. 
                             Therefore, you are requested to kindly issue orders to resolve the above-mentioned problem(s).
-                        {% else %}
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 20px; height: 20px; border: 2px solid #000; border-radius: 50%; background: #000;"></div>
-                                <span>The above-mentioned problem(s) have occurred for the first time in this vehicle.</span>
-                            </div>
                         {% endif %}
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                            <span style="
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                width: 22px;
+                                height: 22px;
+                                border: 2px solid {% if req.is_first_time %}#059669{% else %}#000{% endif %};
+                                border-radius: 50%;
+                                flex-shrink: 0;
+                                background: {% if req.is_first_time %}#d1fae5{% else %}#fff{% endif %};
+                            ">
+                                {% if req.is_first_time %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12">
+                                    <path d="M1.5 6l3 3 6-6" stroke="#059669" stroke-width="2"
+                                          fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                {% endif %}
+                            </span>
+                            <span style="{% if req.is_first_time %}color: #059669; font-weight: 600;{% endif %}">
+                                The above-mentioned problem(s) have occurred for the first time in this vehicle.
+                            </span>
+                        </div>
                     </div>
                     
                     <div style="font-size: 18px; margin-bottom: 40px;">
@@ -340,7 +358,7 @@
                 </div> <!-- End Paper Form -->
 
                 <!-- Manager Action Section -->
-                {% if is_manager %}
+                {% if is_manager and req.status == 'Pending' %}
                 <div class="action-section" style="background: #ffffff; border: none; border-radius: 16px; padding: 2.5rem; margin-top: 3.5rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden;">
                     <!-- Top accent line -->
                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #059669, #10b981);"></div>
@@ -352,38 +370,21 @@
                         Update Requisition Status
                     </h3>
                     
-                    <form action="{% url 'update_requisition_status' req.id %}" method="POST" class="row align-items-end g-4">
+                    <form action="{% url 'update_requisition_status' req.id %}" method="POST" class="d-flex flex-column flex-md-row align-items-md-center gap-4 mt-2">
                         {% csrf_token %}
-                        <div class="col-md-5">
-                            <label class="form-label fw-bold text-slate-500 mb-2" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Current Status</label>
-                            <div class="d-flex align-items-center px-4" style="height: 54px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 600; font-size: 1.05rem;">
-                                {% if req.status == 'Pending' %}
-                                <span class="text-warning"><i class="fas fa-clock me-2"></i> Pending</span>
-                                {% elif req.status == 'Approved' %}
-                                <span class="text-primary"><i class="fas fa-check-circle me-2"></i> Approved</span>
-                                {% elif req.status == 'Rejected' %}
-                                <span class="text-danger"><i class="fas fa-times-circle me-2"></i> Rejected</span>
-                                {% elif req.status == 'Completed' %}
-                                <span class="text-success"><i class="fas fa-check-double me-2"></i> Completed</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-5">
+                        <div class="position-relative" style="min-width: 280px; max-width: 320px;">
                             <label for="statusSelect" class="form-label fw-bold mb-2" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Change Status To</label>
-                            <div style="position: relative;">
-                                <select name="status" id="statusSelect" class="form-select" style="height: 54px; padding-left: 20px; font-size: 1.05rem; font-weight: 500; color: #334155; border: 1px solid #cbd5e1; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); appearance: none; cursor: pointer; transition: all 0.2s ease;">
-                                    <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>⏳ Pending</option>
-                                    <option value="Approved" {% if req.status == 'Approved' %}selected{% endif %}>✅ Approved</option>
-                                    <option value="Rejected" {% if req.status == 'Rejected' %}selected{% endif %}>❌ Rejected</option>
-                                    <option value="Completed" {% if req.status == 'Completed' %}selected{% endif %}>🏁 Completed</option>
-                                </select>
-                            </div>
+                            <select name="status" id="statusSelect" class="form-select" style="height: 54px; padding-left: 20px; font-size: 1.05rem; font-weight: 600; color: #1e293b; border: 2px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); appearance: none; cursor: pointer; transition: all 0.2s ease;">
+                                <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Approved" {% if req.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                <option value="Rejected" {% if req.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
                         </div>
                         
-                        <div class="col-md-2">
-                            <button type="submit" class="btn w-100 text-white" style="height: 54px; background: linear-gradient(135deg, #0284c7, #0ea5e9); border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(14, 165, 233, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(14, 165, 233, 0.4)';">
-                                Update
+                        <div class="ms-md-auto" style="min-width: 200px;">
+                            <label class="form-label d-none d-md-block mb-2">&nbsp;</label>
+                            <button type="submit" class="btn w-100 text-white d-flex align-items-center justify-content-center gap-2" style="height: 54px; background: linear-gradient(135deg, #059669, #10b981); border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(16, 185, 129, 0.3)';">
+                                <i class="fas fa-sync-alt"></i> Update Status
                             </button>
                         </div>
                     </form>

@@ -539,23 +539,23 @@
             <table class="letterhead-table">
                 <tr>
                     <td class="letterhead-logo-cell">
-                        <img src="{% static 'images/wssp_logo.png' %}" alt="WSSP Logo"
+                        <img src="{% static 'images/wssp_logo_new.png' %}" alt="WSSP Logo"
                             onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
                     </td>
 
                     <td class="letterhead-center">
-                        <p class="letterhead-title">WATER &amp; SANITATION SERVICES PESHAWAR,</p>
-                        <p class="letterhead-title">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-                        <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
+                        <p class="letterhead-title">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</p>
+                        <p class="letterhead-address" style="font-size:13pt;">Local Government Complex, Khyber Pakhtunkhwa</p>
+                        <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
                         <p class="letterhead-contact">
-                            <strong>Email: </strong><u>wsspeshawar@gmail.com</u>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <strong>Phone #</strong> 091-9219621-23
+                            <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <strong>Phone:</strong> 091-9219074
                         </p>
                     </td>
 
                     <td class="letterhead-logo-cell">
-                        <img src="{% static 'images/kp_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
+                        <img src="{% static 'images/kpk_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
                             onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
                             style="width: 135px; height: 135px; object-fit: contain;">
                     </td>
@@ -663,7 +663,7 @@
                     <select name="receiver" class="form-select" required style="border: 1px solid #dbe3ec; border-radius: 10px; padding: 11px 14px; font-size: .9rem; background-color: #fbfcfe;">
                         <option value="">-- Select System Recipient --</option>
                         {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.username }} ({% if u.profile %}{{ u.profile.role }}{% endif %})</option>
+                        <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({% if u.profile %}{{ u.profile.get_role_with_department }}{% endif %})</option>
                         {% endfor %}
                     </select>
                 </div>
