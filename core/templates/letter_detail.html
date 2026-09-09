@@ -672,7 +672,7 @@
                         <span style="width: 20px; height: 20px; border-radius: 50%; background: #ecfdf5; color: #059669; font-size: .7rem; display: inline-flex; align-items: center; justify-content: center; font-weight: 800;">2</span>
                         SEND TO (SYSTEM USER INBOX)
                     </div>
-                    <select name="receiver" class="form-select" required style="border: 1px solid #dbe3ec; border-radius: 10px; padding: 11px 14px; font-size: .9rem; background-color: #fbfcfe;">
+                    <select name="receiver" class="form-select" required style="width: max-content; max-width: 100%; border: 1px solid #dbe3ec; border-radius: 10px; padding: 11px 14px; font-size: .9rem; background-color: #fbfcfe;">
                         <option value="">-- Select System Recipient --</option>
                         {% for u in users %}
                         <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({% if u.profile %}{{ u.profile.get_role_with_department }}{% endif %})</option>
