@@ -235,55 +235,81 @@
     /* ============================================
        MANAGEMENT WORKSPACE DATA TABLE
        ============================================ */
-    .table-container {
-        background: #ffffff !important;
-        border-radius: 14px !important;
-        border: 2px solid #0d2b1e !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    .table-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
         overflow: hidden;
     }
 
-    .custom-table {
-        margin: 0;
-        width: 100%;
-        border-collapse: separate !important;
-        border-spacing: 0 !important;
+    .table-header-custom {
+        background: linear-gradient(135deg, #0f3e2e 0%, #059669 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
     }
 
-    .custom-table thead {
-        background: linear-gradient(135deg, #0d2b1e 0%, #047857 100%) !important;
-        color: #ffffff !important;
+    .table-title-custom {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .table-title-custom i {
+        color: #a7f3d0;
+    }
+
+    .custom-table {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
     }
 
     .custom-table thead th {
-        padding: 20px 18px !important;
-        font-weight: 800 !important;
-        font-size: 14px !important;
+        background: #f9fafb !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
+        font-size: 0.75rem !important;
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
-        border: none !important;
+        padding: 1rem 1.25rem !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        border-top: none !important;
+        white-space: nowrap;
+    }
+
+    .custom-table thead th i {
+        color: #374151;
+        margin-right: 0.5rem;
+        font-size: 0.875rem;
     }
 
     .custom-table tbody td {
-        padding: 18px !important;
+        padding: 1.25rem !important;
+        border-bottom: 1px solid #f3f4f6 !important;
         vertical-align: middle;
-        font-size: 18px !important;
-        font-weight: 600 !important;
-        color: #0f172a !important;
-        border-bottom: 2px solid #f1f5f9 !important;
+        color: #374151 !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
     }
 
     .custom-table tbody tr {
-        transition: background-color 0.2s ease !important;
+        transition: all 0.2s ease;
+        background: #ffffff;
     }
 
     .custom-table tbody tr:hover {
-        background-color: #f8fafc !important;
-        transform: none !important;
-    }
-
-    .custom-table tbody tr:last-child td {
-        border-bottom: none !important;
+        background: #f9fafb !important;
     }
 
     /* ============================================
@@ -292,76 +318,80 @@
     .status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 8px !important;
-        padding: 8px 16px !important;
-        border-radius: 30px !important;
-        font-size: 13px !important;
-        font-weight: 800 !important;
+        gap: 0.375rem !important;
+        padding: 0.25rem 0.75rem !important;
+        border-radius: 9999px !important;
+        font-weight: 500 !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap;
+        border: none !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        border: 1.5px solid transparent !important;
+        letter-spacing: normal !important;
     }
 
     .status-pending {
         background: #fef3c7 !important;
-        color: #d97706 !important;
-        border-color: #fcd34d !important;
+        color: #92400e !important;
     }
 
     .status-progress {
-        background: #d1fae5 !important;
-        color: #059669 !important;
-        border-color: #93c5fd !important;
+        background: #dbeafe !important;
+        color: #1e40af !important;
     }
 
     .status-completed {
         background: #d1fae5 !important;
-        color: #059669 !important;
-        border-color: #6ee7b7 !important;
+        color: #065f46 !important;
+    }
+
+    .status-badge i {
+        font-size: 0.75rem !important;
     }
 
     /* Feedback Button Styling */
     .btn-action-feedback {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-        color: #ffffff !important;
-        padding: 8px 16px !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+        border: 1px solid #a7f3d0 !important;
+        padding: 0.375rem 0.75rem !important;
+        border-radius: 6px !important;
+        font-size: 0.8125rem !important;
+        font-weight: 500 !important;
         text-decoration: none !important;
         display: inline-flex;
         align-items: center;
-        gap: 6px !important;
+        gap: 0.375rem !important;
         transition: all 0.2s ease !important;
-        box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2) !important;
+        box-shadow: none !important;
     }
 
     .btn-action-feedback:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4) !important;
-        color: #ffffff !important;
+        background: #d1fae5 !important;
+        color: #047857 !important;
+        transform: none !important;
     }
 
     /* View Feedback Button Styling */
     .btn-action-view-feedback {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-        color: #ffffff !important;
-        padding: 8px 16px !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #bfdbfe !important;
+        padding: 0.375rem 0.75rem !important;
+        border-radius: 6px !important;
+        font-size: 0.8125rem !important;
+        font-weight: 500 !important;
         text-decoration: none !important;
         display: inline-flex;
         align-items: center;
-        gap: 6px !important;
+        gap: 0.375rem !important;
         transition: all 0.2s ease !important;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2) !important;
+        box-shadow: none !important;
     }
 
     .btn-action-view-feedback:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
-        color: #ffffff !important;
+        background: #dbeafe !important;
+        color: #1d4ed8 !important;
+        transform: none !important;
     }
 
     /* Empty Architecture Frame Blueprint */
@@ -377,57 +407,71 @@
     }
 
     .empty-state h4 {
-        color: #0f172a !important;
+        color: #111827 !important;
         margin-bottom: 12px !important;
-        font-size: 24px !important;
-        font-weight: 800 !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
     }
 
     .empty-state p {
-        color: #475569 !important;
-        font-size: 18px !important;
-        font-weight: 600 !important;
+        color: #6b7280 !important;
+        font-size: 1rem !important;
+        font-weight: 400 !important;
     }
 
     /* Core Data Formatting Modifiers */
     .task-title {
-        font-weight: 700 !important;
-        color: #0d2b1e !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        color: #111827 !important;
     }
 
     .task-description {
-        color: #475569 !important;
-        font-weight: 500 !important;
+        color: #6b7280 !important;
+        font-size: 0.875rem !important;
+        font-weight: 400 !important;
     }
 
     .assigned-by {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 16px !important;
-        background: #f1f5f9 !important;
-        border: 1.5px solid #cbd5e1 !important;
-        border-radius: 20px !important;
-        color: #334155 !important;
-        font-weight: 700 !important;
-        font-size: 14px !important;
+        gap: 0.75rem;
     }
 
-    .assigned-by i {
-        color: #059669 !important;
+    .assigned-by .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .assigned-by .owner-name {
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: #374151;
     }
 
     .due-date {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: #334155 !important;
-        font-weight: 700 !important;
-        font-size: 16px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
     }
 
-    .due-date i {
-        color: #ea580c !important;
+    .due-date-primary {
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        color: #374151 !important;
+    }
+
+    .due-date-secondary {
+        font-size: 0.75rem !important;
+        color: #6b7280 !important;
     }
 
     /* ============================================
@@ -500,7 +544,7 @@
         }
     }
 
-    .table-container {
+    .table-card {
         animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 </style>
@@ -573,17 +617,22 @@
 
 
 <!-- Tasks Table -->
-<div class="table-container">
+<div class="table-card" style="margin-top: 1rem;">
+    <div class="table-header-custom">
+        <h2 class="table-title-custom">
+            <i class="fas fa-list-alt"></i> Task Inbox
+        </h2>
+    </div>
     <div class="table-responsive">
-        <table class="table custom-table" id="tasksTable">
+        <table class="table custom-table mb-0" id="tasksTable">
             <thead>
                 <tr>
-                    <th><i class="fas fa-heading me-2"></i>Title</th>
-                    <th><i class="fas fa-align-left me-2"></i>Description</th>
-                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
-                    <th><i class="fas fa-calendar-alt me-2"></i>Due Date</th>
-                    <th><i class="fas fa-user-tie me-2"></i>Assigned By</th>
-                    <th class="text-center"><i class="fas fa-paper-plane me-2"></i>Action</th>
+                    <th><i class="fas fa-heading"></i>Title</th>
+                    <th><i class="fas fa-align-left"></i>Description</th>
+                    <th><i class="fas fa-info-circle"></i>Status</th>
+                    <th><i class="fas fa-calendar-alt"></i>Due Date</th>
+                    <th><i class="fas fa-user-tie"></i>Assigned By</th>
+                    <th class="text-center"><i class="fas fa-cog"></i>Action</th>
                 </tr>
             </thead>
             <tbody id="tasksTableBody">
@@ -598,23 +647,20 @@
                         <span class="task-title">{{ task.title }}</span>
                     </td>
                     <td>
-                        <span class="task-description">{{ task.description|truncatewords:12 }}</span>
+                        <div class="task-description" title="{{ task.description }}">{{ task.description|truncatewords:12 }}</div>
                     </td>
                     <td>
                         {% if task.status == "Pending" %}
                             <span class="status-badge status-pending">
-                                <i class="fas fa-clock"></i>
-                                Pending
+                                <i class="fas fa-clock"></i> Pending
                             </span>
                         {% elif task.status == "In Progress" %}
                             <span class="status-badge status-progress">
-                                <i class="fas fa-spinner"></i>
-                                In Progress
+                                <i class="fas fa-spinner"></i> In Progress
                             </span>
                         {% elif task.status == "Completed" %}
                             <span class="status-badge status-completed">
-                                <i class="fas fa-check-circle"></i>
-                                Completed
+                                <i class="fas fa-check-circle"></i> Completed
                             </span>
                         {% else %}
                             <span class="status-badge status-pending">
@@ -623,16 +669,15 @@
                         {% endif %}
                     </td>
                     <td>
-                        <span class="due-date">
-                            <i class="fas fa-calendar"></i>
-                            {{ task.due_date|date:"M d, Y" }}
-                        </span>
+                        <div class="due-date">
+                            <span class="due-date-primary">{{ task.due_date|date:"d M, Y" }}</span>
+                        </div>
                     </td>
                     <td>
-                        <span class="assigned-by">
-                            <i class="fas fa-user-circle"></i>
-                            {{ task.assigned_by.username }}
-                        </span>
+                        <div class="assigned-by">
+                            <div class="avatar">{{ task.assigned_by.username|slice:":1"|upper }}</div>
+                            <span class="owner-name">{{ task.assigned_by.username }}</span>
+                        </div>
                     </td>
                     <td class="text-center">
                         {% if task.remarks.exists %}

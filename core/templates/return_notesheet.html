@@ -1506,6 +1506,7 @@
             const currentContent = editor.getContent({ format: 'text' }).trim();
             if (!currentContent) {
               {% if request.user.profile.zone %}
+                const isZoneUser = true;
                 const zoneTitle = '{{ request.user.profile.zone.title|escapejs|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}';
                 const zoneSubtitle = '{{ request.user.profile.zone.subtitle|escapejs|default:"WATER AND SANITATION SERVICES PESHAWAR" }}';
                 const zoneProvince = '{{ request.user.profile.zone.province|escapejs|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}';
@@ -1514,31 +1515,37 @@
                 const wsspLogo = '{% if request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url|escapejs }}{% else %}/static/images/wssp_logo_new.png{% endif %}?v=' + Date.now();
                 const kpkLogo = '{% if request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url|escapejs }}{% else %}/static/images/kpk_emblem.png{% endif %}?v=' + Date.now();
               {% else %}
-                const zoneTitle = 'OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR';
-                const zoneSubtitle = 'WATER AND SANITATION SERVICES PESHAWAR';
-                const zoneProvince = 'GOVERNMENT OF KHYBER PAKHTUNKHWA';
+                const isZoneUser = false;
+                const zoneTitle = 'WATER AND SANITATION SERVICES PESHAWAR';
+                const zoneSubtitle = 'LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.';
+                const zoneProvince = '';
                 const zoneAddress = 'Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad';
-                const zonePhone = '091-9219074';
+                const zonePhone = '';
                 const wsspLogo = '/static/images/wssp_logo_new.png?v=' + Date.now();
                 const kpkLogo = '/static/images/kpk_emblem.png?v=' + Date.now();
               {% endif %}
+
+              const imgFilter = '';
+              const titleHtml = isZoneUser
+                  ? '<u style="text-decoration: underline; text-underline-offset: 4px;">' + zoneTitle + '</u>'
+                  : zoneTitle;
 
               editor.setContent(
                 '<div class="mceNonEditable" contenteditable="false" style="user-select:none;-webkit-user-select:none;pointer-events:none;cursor:default;">' +
                 '<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">' +
                 '<tr>' +
                 '<td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">' +
-                '<img src="' + wsspLogo + '" onerror="this.style.display=\'none\'" alt="Left Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">' +
+                '<img src="' + wsspLogo + '" onerror="this.style.display=\'none\'" alt="Left Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;' + imgFilter + '">' +
                 '</td>' +
                 '<td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">' +
-                '<h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">' + zoneTitle + '</u></h4>' +
-                '<p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">' + zoneSubtitle + '</p>' +
-                '<p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">' + zoneProvince + '</p>' +
-                (zoneAddress ? '<p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;word-wrap:break-word;">' + zoneAddress + '</p>' : '') +
+                '<h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;">' + titleHtml + '</h4>' +
+                (zoneSubtitle ? '<p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">' + zoneSubtitle + '</p>' : '') +
+                (zoneProvince ? '<p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">' + zoneProvince + '</p>' : '') +
+                (zoneAddress ? '<p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">' + zoneAddress + '</p>' : '') +
                 (zonePhone ? '<p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: ' + zonePhone + '</p>' : '') +
                 '</td>' +
                 '<td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">' +
-                '<img src="' + kpkLogo + '" onerror="this.style.display=\'none\'" alt="Right Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;">' +
+                '<img src="' + kpkLogo + '" onerror="this.style.display=\'none\'" alt="Right Logo" style="width:135px;height:135px;max-width:100%;object-fit:contain;' + imgFilter + '">' +
                 '</td>' +
                 '</tr>' +
                 '</table>' +

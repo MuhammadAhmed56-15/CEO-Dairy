@@ -440,11 +440,12 @@
                     <tr>
                         <td class="letterhead-logo-cell">
                             <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}" alt="WSSP Logo"
-                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';"
+                                 style="">
                         </td>
                         <td class="letterhead-center">
                             {% if request.user.profile.zone %}
-                                <h4 class="letterhead-title-main">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</h4>
+                                <h4 class="letterhead-title-main"><u style="text-decoration: underline; text-underline-offset: 4px;">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</u></h4>
                                 <p class="letterhead-subtitle">{{ request.user.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
                                 <p class="letterhead-address">{{ request.user.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
                                 {% if request.user.profile.zone.address %}
@@ -458,13 +459,9 @@
                                     {% endif %}
                                 </p>
                             {% else %}
-                                <h4 class="letterhead-title-main">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</h4>
-                                <p class="letterhead-subtitle">WATER AND SANITATION SERVICES PESHAWAR</p>
-                                <p class="letterhead-address">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
-                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-                                <p class="letterhead-contact">
-                                    Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
-                                </p>
+                                <h4 class="letterhead-title-main" style="color: #6b7280; font-size: 26px;">WATER AND SANITATION SERVICES PESHAWAR</h4>
+                                <p class="letterhead-subtitle" style="color: #6b7280;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
                             {% endif %}
                         </td>
                         <td class="letterhead-logo-cell">
