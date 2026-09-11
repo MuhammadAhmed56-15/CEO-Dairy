@@ -547,3 +547,37 @@ class VehicleRequisition(models.Model):
 
     def __str__(self):
         return f"{self.vehicle_number} - {self.driver_name}"
+
+
+# =====================================================================
+# VEHICLE REQUISITION ATTACHMENT
+# =====================================================================
+class VehicleRequisitionAttachment(models.Model):
+    requisition = models.ForeignKey(
+        VehicleRequisition,
+        on_delete=models.CASCADE,
+        related_name='attachments'
+    )
+    file = models.FileField(upload_to='requisition_attachments/')
+    original_name = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attachment for Requisition #{self.requisition.id} - {self.original_name}"
+
+    @property
+    def file_extension(self):
+        import os
+        _, ext = os.path.splitext(self.original_name)
+        return ext.lower().lstrip('.')
+
+    @property
+    def is_image(self):
+        return self.file_extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']
+
+    @property
+    def is_pdf(self):
+        return self.file_extension == 'pdf'
+
+    class Meta:
+        ordering = ['uploaded_at']

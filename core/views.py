@@ -2782,20 +2782,13 @@ def mark_notification_as_read(request, notification_id):
 def requisition_list(request):
     from .models import VehicleRequisition
     
-    RECIPIENT_USERNAMES = [
-        'Manager_Admin',  # Legacy
-        'Fleet_Manager',  # Legacy
-        'MngrFleet',      # Manager Fleet
-        'MngrA_AZoneA',   # Accounts/Admin Zone A
-        'MngrA_AZoneB',   # Accounts/Admin Zone B
-        'MngrA_AZoneC',   # Accounts/Admin Zone C
-        'MngrA_AZoneD',   # Accounts/Admin Zone D
-        'MngrA_AZoneE',   # Accounts/Admin Zone E
-    ]
-    
-    if request.user.username in RECIPIENT_USERNAMES:
+    is_manager = False
+    if hasattr(request.user, 'profile') and request.user.profile.role:
+        if request.user.profile.role.category in ['ZM', 'Manager', 'GM', 'CEO'] or request.user.profile.role.code in ['Manager_Admin', 'Fleet_Manager', 'MngrFleet']:
+            is_manager = True
+            
+    if is_manager:
         requisitions = VehicleRequisition.objects.filter(manager_admin=request.user).order_by('-created_at')
-        is_manager = True
     else:
         requisitions = VehicleRequisition.objects.filter(fleet_officer=request.user).order_by('-created_at')
         is_manager = False
@@ -2811,28 +2804,30 @@ def create_requisition(request):
     from .forms import VehicleRequisitionForm
     from django.contrib.auth.models import User
 
-    # --- Build the curated recipient list ---
-    RECIPIENT_USERNAMES = [
-        'MngrFleet',      # Manager Fleet
-        'MngrA_AZoneA',   # Accounts/Admin Zone A
-        'MngrA_AZoneB',   # Accounts/Admin Zone B
-        'MngrA_AZoneC',   # Accounts/Admin Zone C
-        'MngrA_AZoneD',   # Accounts/Admin Zone D
-        'MngrA_AZoneE',   # Accounts/Admin Zone E
-    ]
-    RECIPIENT_LABELS = {
-        'MngrFleet':    'Manager Fleet',
-        'MngrA_AZoneA': 'Manager Accounts/Admin — Zone A',
-        'MngrA_AZoneB': 'Manager Accounts/Admin — Zone B',
-        'MngrA_AZoneC': 'Manager Accounts/Admin — Zone C',
-        'MngrA_AZoneD': 'Manager Accounts/Admin — Zone D',
-        'MngrA_AZoneE': 'Manager Accounts/Admin — Zone E',
-    }
-    recipient_users = User.objects.filter(username__in=RECIPIENT_USERNAMES)
-    # Attach a display label to each user object for the template
+    from django.db.models import Q
+    
+    # --- Build the dynamic recipient list based on User Zone ---
+    user_zone = request.user.profile.zone if hasattr(request.user, 'profile') else None
+    
+    if user_zone:
+        recipient_users = User.objects.filter(
+            Q(profile__zone=user_zone, profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+        ).distinct()
+    else:
+        recipient_users = User.objects.filter(
+            Q(profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+        ).distinct()
+
     recipient_list = []
-    for u in sorted(recipient_users, key=lambda x: RECIPIENT_USERNAMES.index(x.username) if x.username in RECIPIENT_USERNAMES else 99):
-        u.display_label = RECIPIENT_LABELS.get(u.username, u.get_full_name() or u.username)
+    for u in recipient_users:
+        if hasattr(u, 'profile') and u.profile.role:
+            role_name = u.profile.role.name
+            zone_name = f" — {u.profile.zone.name}" if u.profile.zone else ""
+            u.display_label = f"{role_name}{zone_name}"
+        else:
+            u.display_label = u.get_full_name() or u.username
         recipient_list.append(u)
 
     if request.method == "POST":
@@ -2846,7 +2841,7 @@ def create_requisition(request):
         if issues:
             post_data['issue_description'] = '\n'.join(issues)
 
-        form = VehicleRequisitionForm(post_data)
+        form = VehicleRequisitionForm(post_data, request.FILES)
         if form.is_valid():
             req = form.save(commit=False)
             req.fleet_officer = request.user
@@ -2858,9 +2853,19 @@ def create_requisition(request):
                 req.manager_admin = recipient
             except (User.DoesNotExist, TypeError, ValueError):
                 messages.error(request, "Please select a valid recipient.")
+                from .models import Zone
+                from logbook.models import Vehicle
+                import json
+                _zones = Zone.objects.all().order_by('name')
+                _vbz = {}
+                for _v in Vehicle.objects.select_related('zone','driver').filter(status='Active'):
+                    _zid = str(_v.zone_id) if _v.zone_id else '0'
+                    _vbz.setdefault(_zid, []).append({'id':_v.id,'vehicle_name':_v.vehicle_name,'vehicle_id_number':_v.vehicle_id_number or '','driver_name':_v.driver.name if _v.driver else '','driver_mobile':_v.driver.mobile if _v.driver else '','driver_cnic':_v.driver.cnic if _v.driver else ''})
                 return render(request, 'create_requisition.html', {
                     'form': form,
                     'recipient_list': recipient_list,
+                    'zones': _zones,
+                    'vehicles_by_zone_json': json.dumps(_vbz),
                 })
 
             # Handle Signatures
@@ -2884,6 +2889,16 @@ def create_requisition(request):
 
             req.save()
 
+            # Handle multiple file attachments
+            from .models import VehicleRequisitionAttachment
+            attachment_files = request.FILES.getlist('requisition_attachments')
+            for attachment_file in attachment_files:
+                VehicleRequisitionAttachment.objects.create(
+                    requisition=req,
+                    file=attachment_file,
+                    original_name=attachment_file.name
+                )
+
             # Send Notification to selected recipient
             create_notification(
                 recipient=recipient,
@@ -2899,25 +2914,41 @@ def create_requisition(request):
     else:
         form = VehicleRequisitionForm()
 
+    from .models import Zone
+    from logbook.models import Vehicle
+    zones = Zone.objects.all().order_by('name')
+    # Pre-build vehicles grouped by zone as JSON for JS
+    import json
+    vehicles_by_zone = {}
+    for v in Vehicle.objects.select_related('zone', 'driver').filter(status='Active'):
+        zid = str(v.zone_id) if v.zone_id else '0'
+        if zid not in vehicles_by_zone:
+            vehicles_by_zone[zid] = []
+        vehicles_by_zone[zid].append({
+            'id': v.id,
+            'vehicle_name': v.vehicle_name,
+            'vehicle_id_number': v.vehicle_id_number or '',
+            'driver_name': v.driver.name if v.driver else '',
+            'driver_mobile': v.driver.mobile if v.driver else '',
+            'driver_cnic': v.driver.cnic if v.driver else '',
+        })
     return render(request, 'create_requisition.html', {
         'form': form,
         'recipient_list': recipient_list,
+        'zones': zones,
+        'vehicles_by_zone_json': json.dumps(vehicles_by_zone),
+        'user_zone_id': user_zone.id if user_zone else None,
     })
 
 @login_required
 def update_requisition_status(request, pk):
     from .models import VehicleRequisition
-    RECIPIENT_USERNAMES = [
-        'Manager_Admin',
-        'Fleet_Manager',
-        'MngrFleet',
-        'MngrA_AZoneA',
-        'MngrA_AZoneB',
-        'MngrA_AZoneC',
-        'MngrA_AZoneD',
-        'MngrA_AZoneE',
-    ]
-    if request.method == "POST" and request.user.username in RECIPIENT_USERNAMES:
+    is_manager = False
+    if hasattr(request.user, 'profile') and request.user.profile.role:
+        if request.user.profile.role.category in ['ZM', 'Manager', 'GM', 'CEO'] or request.user.profile.role.code in ['Manager_Admin', 'Fleet_Manager', 'MngrFleet']:
+            is_manager = True
+            
+    if request.method == "POST" and is_manager:
         req = get_object_or_404(VehicleRequisition, pk=pk)
         new_status = request.POST.get('status')
         if new_status in dict(VehicleRequisition.STATUS_CHOICES):
@@ -2943,24 +2974,150 @@ def view_requisition(request, pk):
     req = get_object_or_404(VehicleRequisition, pk=pk)
     
     # Only allow the fleet officer who created it, or managers to view it
-    RECIPIENT_USERNAMES = [
-        'Manager_Admin',
-        'Fleet_Manager',
-        'MngrFleet',
-        'MngrA_AZoneA',
-        'MngrA_AZoneB',
-        'MngrA_AZoneC',
-        'MngrA_AZoneD',
-        'MngrA_AZoneE',
-    ]
-    is_manager = request.user.username in RECIPIENT_USERNAMES
+    is_manager = False
+    if hasattr(request.user, 'profile') and request.user.profile.role:
+        if request.user.profile.role.category in ['ZM', 'Manager', 'GM', 'CEO'] or request.user.profile.role.code in ['Manager_Admin', 'Fleet_Manager', 'MngrFleet']:
+            is_manager = True
+            
     if req.fleet_officer != request.user and not is_manager:
         messages.error(request, "You are not authorized to view this requisition.")
         return redirect('requisition_list')
         
     return render(request, 'view_requisition.html', {
         'req': req,
-        'is_manager': is_manager
+        'is_manager': is_manager,
+        'attachments': req.attachments.all(),
+    })
+
+
+@login_required
+def edit_requisition(request, pk):
+    req = get_object_or_404(VehicleRequisition, pk=pk)
+    
+    # 1. Sirf wahi Fleet Officer edit kar sakta hai jisne requisition create ki ho
+    if req.fleet_officer != request.user:
+        messages.error(request, "You are not authorized to edit this requisition.")
+        return redirect('requisition_list')
+        
+    # 2. Strict Check: Agar status 'Pending' NAHI hai, to edit blocked hoga
+    if req.status != 'Pending':
+        messages.error(request, f"Cannot edit this requisition. It is already '{req.status}'.")
+        return redirect('requisition_list')
+
+    # Build recipient list for manager selection (Same as create_requisition)
+    user_zone = request.user.profile.zone if hasattr(request.user, 'profile') else None
+    if user_zone:
+        recipient_users = User.objects.filter(
+            Q(profile__zone=user_zone, profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+        ).distinct()
+    else:
+        recipient_users = User.objects.filter(
+            Q(profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+        ).distinct()
+
+    recipient_list = []
+    for u in recipient_users:
+        if hasattr(u, 'profile') and u.profile.role:
+            role_name = u.profile.role.name
+            zone_name = f" — {u.profile.zone.name}" if u.profile.zone else ""
+            u.display_label = f"{role_name}{zone_name}"
+        else:
+            u.display_label = u.get_full_name() or u.username
+        recipient_list.append(u)
+
+    if request.method == "POST":
+        post_data = request.POST.copy()
+        
+        # Combine issues 1 to 4
+        issues = []
+        for i in range(1, 5):
+            val = post_data.get(f'issue_{i}', '').strip()
+            if val:
+                issues.append(f'({i}) {val}')
+        if issues:
+            post_data['issue_description'] = '\n'.join(issues)
+
+        form = VehicleRequisitionForm(post_data, request.FILES, instance=req)
+        if form.is_valid():
+            updated_req = form.save(commit=False)
+
+            # Update Recipient Manager if changed
+            recipient_id = request.POST.get('send_to_manager')
+            if recipient_id:
+                try:
+                    updated_req.manager_admin = User.objects.get(id=recipient_id)
+                except User.DoesNotExist:
+                    pass
+
+            # Handle Signatures Update
+            import base64
+            from django.core.files.base import ContentFile
+            import uuid
+
+            driver_sig_data = request.POST.get('driver_signature_data')
+            if driver_sig_data:
+                fmt, imgstr = driver_sig_data.split(';base64,')
+                ext = fmt.split('/')[-1]
+                updated_req.driver_signature = ContentFile(base64.b64decode(imgstr), name=f'driver_sig_{uuid.uuid4()}.{ext}')
+
+            fleet_sig_data = request.POST.get('fleet_officer_signature_data')
+            if fleet_sig_data:
+                fmt, imgstr = fleet_sig_data.split(';base64,')
+                ext = fmt.split('/')[-1]
+                updated_req.fleet_officer_signature = ContentFile(base64.b64decode(imgstr), name=f'fleet_sig_{uuid.uuid4()}.{ext}')
+
+            updated_req.save()
+
+            # Handle New File Attachments
+            attachment_files = request.FILES.getlist('requisition_attachments')
+            for attachment_file in attachment_files:
+                VehicleRequisitionAttachment.objects.create(
+                    requisition=updated_req,
+                    file=attachment_file,
+                    original_name=attachment_file.name
+                )
+
+            messages.success(request, "Requisition updated successfully.")
+            return redirect('requisition_list')
+    else:
+        form = VehicleRequisitionForm(instance=req)
+
+    from .models import Zone
+    from logbook.models import Vehicle
+    zones = Zone.objects.all().order_by('name')
+    import json
+    vehicles_by_zone = {}
+    for v in Vehicle.objects.select_related('zone', 'driver').filter(status='Active'):
+        zid = str(v.zone_id) if v.zone_id else '0'
+        if zid not in vehicles_by_zone:
+            vehicles_by_zone[zid] = []
+        vehicles_by_zone[zid].append({
+            'id': v.id,
+            'vehicle_name': v.vehicle_name,
+            'vehicle_id_number': v.vehicle_id_number or '',
+            'driver_name': v.driver.name if v.driver else '',
+            'driver_mobile': v.driver.mobile if v.driver else '',
+            'driver_cnic': v.driver.cnic if v.driver else '',
+        })
+    # For edit, use the requisition's zone id to pre-select
+    edit_zone_id = req.zone if req.zone else None
+    # Try to parse it as int (zone name stored as string in old records)
+    try:
+        from .models import Zone as ZoneModel
+        zone_obj = ZoneModel.objects.filter(name=edit_zone_id).first() or ZoneModel.objects.filter(id=edit_zone_id).first()
+        pre_zone_id = zone_obj.id if zone_obj else (user_zone.id if user_zone else None)
+    except Exception:
+        pre_zone_id = user_zone.id if user_zone else None
+    return render(request, 'create_requisition.html', {
+        'form': form,
+        'req': req,
+        'recipient_list': recipient_list,
+        'is_edit': True,
+        'zones': zones,
+        'vehicles_by_zone_json': json.dumps(vehicles_by_zone),
+        'user_zone_id': pre_zone_id,
     })
 
 # =========================================================
@@ -3450,4 +3607,46 @@ def view_document_inline(request):
         response = HttpResponse(f.read(), content_type=content_type)
         response['Content-Disposition'] = f'inline; filename="{os.path.basename(full_path)}"'
         response['X-Frame-Options'] = 'ALLOWALL'
-        return response
+        return response
+
+
+
+@login_required
+def get_vehicles_by_zone(request):
+    """Returns active vehicles for a given zone as JSON for the requisition form dropdown."""
+    from logbook.models import Vehicle
+    zone_id = request.GET.get('zone_id')
+    if not zone_id:
+        return JsonResponse({'vehicles': []})
+    vehicles = Vehicle.objects.filter(
+        zone_id=zone_id, status='Active'
+    ).select_related('driver').order_by('vehicle_name')
+    data = []
+    for v in vehicles:
+        data.append({
+            'id': v.id,
+            'vehicle_name': v.vehicle_name,
+            'vehicle_id_number': v.vehicle_id_number or '',
+            'driver_name': v.driver.name if v.driver else '',
+            'driver_mobile': v.driver.mobile if v.driver else '',
+            'driver_cnic': v.driver.cnic if v.driver else '',
+        })
+    return JsonResponse({'vehicles': data})
+
+
+@login_required
+def get_vehicle_logbook(request):
+    """Returns logbook info for a given vehicle."""
+    from logbook.models import Vehicle, LogBook
+    vehicle_id = request.GET.get('vehicle_id')
+    try:
+        vehicle = Vehicle.objects.get(pk=vehicle_id)
+        logbook = vehicle.logbook  # OneToOne relation
+        data = {
+            'has_logbook': True,
+            'logbook_id': logbook.id,
+            'title': str(logbook),
+        }
+    except (Vehicle.DoesNotExist, LogBook.DoesNotExist, Exception):
+        data = {'has_logbook': False}
+    return JsonResponse(data)

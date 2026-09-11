@@ -7,6 +7,7 @@ from .models import (
     File, Notesheet, NotesheetForward, NotesheetAgenda,
     UserHierarchy, NotesheetReturn, NotesheetAttachment,
     LetterFile, Letter, DraftLetter, Notification, VehicleRequisition,
+    VehicleRequisitionAttachment,
     Zone
 )
 
@@ -633,3 +634,11 @@ class VehicleRequisitionAdmin(admin.ModelAdmin):
     search_fields = ('vehicle_number', 'driver_name', 'fleet_officer__username')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'updated_at')
+
+
+@admin.register(VehicleRequisitionAttachment)
+class VehicleRequisitionAttachmentAdmin(admin.ModelAdmin):
+    list_display = ('requisition', 'original_name', 'uploaded_at')
+    list_filter = ('uploaded_at',)
+    search_fields = ('original_name', 'requisition__vehicle_number')
+    ordering = ('-uploaded_at',)

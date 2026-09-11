@@ -292,7 +292,6 @@
                                     </div>
                                 </td>
                                 {% endif %}
-                                <!-- Issue summary removed -->
                                 <td>
                                     {% if req.status == 'Pending' %}
                                     <span class="status-badge bg-warning"><i class="fas fa-clock"></i> Pending</span>
@@ -306,9 +305,19 @@
                                 </td>
                                 <td>{{ req.created_at|date:"d M Y, h:i A" }}</td>
                                 <td class="text-end">
-                                    <a href="{% url 'view_requisition' req.id %}" class="btn action-btn text-white" style="background: #0ea5e9; border: none; box-shadow: 0 2px 8px rgba(14,165,233,0.3); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
+                                    <div class="d-inline-flex gap-2 justify-content-end">
+                                        <!-- View Button -->
+                                        <a href="{% url 'view_requisition' req.id %}" class="btn action-btn text-white" style="background: #0ea5e9; border: none; box-shadow: 0 2px 8px rgba(14,165,233,0.3); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+
+                                        <!-- Edit Button: Only for Fleet Officer AND when Status is Pending -->
+                                        {% if not is_manager and req.status == 'Pending' %}
+                                        <a href="{% url 'edit_requisition' req.id %}" class="btn action-btn text-white" style="background: #f59e0b; border: none; box-shadow: 0 2px 8px rgba(245,158,11,0.3); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% empty %}

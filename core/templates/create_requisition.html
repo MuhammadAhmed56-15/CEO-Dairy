@@ -164,6 +164,24 @@
         line-height: 1.2;
     }
 
+    /* Inline select styling to match form-input-line dashed underline look */
+    select.form-input-line {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: 0;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 2px center;
+        background-size: 14px;
+        padding-right: 20px;
+    }
+    select.form-input-line:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
     .issue-row {
         display: flex;
         align-items: flex-end;
@@ -320,6 +338,25 @@
         box-shadow: 0 0 0 3px rgba(5,150,105,.15);
     }
 
+    /* Logbook alert box */
+    .logbook-alert-box {
+        border-radius: 10px;
+        border: 1px solid #b6effb;
+        background: #eaf7fc;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        color: #0c5464;
+    }
+    .logbook-alert-box .btn-outline-primary {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 8px;
+    }
+
     @media print {
         body * {
             visibility: hidden !important;
@@ -367,7 +404,7 @@
 
 
 
-                <form action="{% url 'create_requisition' %}" method="POST">
+                <form action="{% url 'create_requisition' %}" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="paper-form">
                         
@@ -412,7 +449,16 @@
                         <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
                         
                         <div class="text-center" style="font-size: 18px; margin-top: 15px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            To, &nbsp;&nbsp;&nbsp;The Zonal Manager, Water & Sanitation Services, <span style="display: inline-block; width: 120px;">{{ form.zone }}</span>, Peshawar.
+                            To, &nbsp;&nbsp;&nbsp;The Zonal Manager, Water & Sanitation Services,
+                            <span style="display: inline-block; width: 200px;">
+                                <select id="id_zone" name="zone" class="form-input-line" required>
+                                    <option value="">-- Select Zone --</option>
+                                    {% for z in zones %}
+                                        <option value="{{ z.id }}" {% if z.id == user_zone_id %}selected{% endif %}>{{ z.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+                            , Peshawar.
                         </div>
                         
                         <div class="text-center mb-4 mt-1" style="font-size: 18px; font-weight: bold;">
@@ -422,10 +468,28 @@
                         <!-- Line 1: vehicle number + UC route -->
                         <div style="display:flex; align-items:flex-end; gap:8px; font-size:18px; margin-bottom:6px; flex-wrap:nowrap;">
                             <span style="white-space:nowrap; flex-shrink:0;">It is respectfully submitted that vehicle number</span>
-                            <span style="flex: 2 1 200px; min-width:160px;">{{ form.vehicle_number }}</span>
+                            <span style="flex: 2 1 200px; min-width:160px;">
+                                <select id="id_vehicle_select" name="vehicle_number" class="form-input-line" required>
+                                    <option value="">-- Select Zone First --</option>
+                                </select>
+                            </span>
                             <span style="white-space:nowrap; flex-shrink:0;">serving in U.C / Route</span>
                             <span style="flex: 2 1 200px; min-width:160px;">{{ form.uc_route }}</span>
                         </div>
+
+                        <!-- Dynamic LogBook Attachment Alert -->
+                        <div id="logbook_container" class="mb-3" style="display: none;">
+                            <div class="logbook-alert-box">
+                                <div>
+                                    <i class="fas fa-book me-2"></i> <strong>Logbook Found:</strong> Auto-attaching to requisition
+                                </div>
+                                <a id="logbook_download_btn" href="#" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View Logbook
+                                </a>
+                            </div>
+                            <input type="hidden" name="auto_logbook_id" id="id_auto_logbook">
+                        </div>
+
                         <!-- Line 2: has the following issues -->
                         <div style="font-size:18px; margin-bottom:18px;">
                             has the following issues:
@@ -596,9 +660,78 @@
                         </div>
                         
                     </div>
+
+                <!-- ===== ATTACHMENTS SECTION ===== -->
+                <div id="attachments-section" style="
+                    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+                    border: 1.5px dashed #10b981;
+                    border-radius: 16px;
+                    padding: 1.5rem 2rem;
+                    margin: 24px 0 0 0;
+                ">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+                        <div style="
+                            width:36px; height:36px;
+                            border-radius:10px;
+                            background: linear-gradient(135deg,#059669,#10b981);
+                            display:flex; align-items:center; justify-content:center;
+                            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+                            flex-shrink:0;
+                        ">
+                            <i class="fas fa-paperclip" style="color:#fff; font-size:15px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.97rem; color:#065f46; font-family:var(--font-sans);">Attachments</div>
+                            <div style="font-size:0.78rem; color:#059669; font-family:var(--font-sans); margin-top:1px;">Attach supporting documents (images, PDFs, Word files, etc.)</div>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zone -->
+                    <div id="attach-drop-zone" style="
+                        border: 2px dashed #a7f3d0;
+                        border-radius: 12px;
+                        background: #fff;
+                        padding: 2rem 1.5rem;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.25s ease;
+                        position: relative;
+                    "
+                    onclick="document.getElementById('requisition_attachments').click()"
+                    ondragover="attachDragOver(event)"
+                    ondragleave="attachDragLeave(event)"
+                    ondrop="attachDrop(event)">
+                        <div id="attach-drop-inner">
+                            <div style="margin-bottom:10px;">
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin:0 auto;display:block;">
+                                    <circle cx="24" cy="24" r="24" fill="#d1fae5"/>
+                                    <path d="M24 15v14M24 15l-5 5M24 15l5 5" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 33h20" stroke="#059669" stroke-width="2.2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <p style="font-family:var(--font-sans); font-weight:600; color:#065f46; font-size:0.97rem; margin:0 0 4px;">Drag &amp; drop files here</p>
+                            <p style="font-family:var(--font-sans); font-size:0.8rem; color:#6b7280; margin:0;">or <span style="color:#059669;font-weight:600;text-decoration:underline;cursor:pointer;">click to browse</span></p>
+                            <p style="font-family:var(--font-sans); font-size:0.75rem; color:#9ca3af; margin:6px 0 0;">Images, PDFs, Word, Excel &mdash; Max 10MB per file</p>
+                        </div>
+                        <input type="file" name="requisition_attachments" id="requisition_attachments"
+                               multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip"
+                               style="display:none;"
+                               onchange="attachHandleFiles(this.files)">
+                    </div>
+
+                    <!-- File Preview Grid -->
+                    <div id="attach-preview-grid" style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                        gap: 12px;
+                        margin-top: 14px;
+                    "></div>
+                </div>
+
                     
                     <!-- Forward To — matches initiate notesheet style exactly -->
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+
 
                     <div style="margin-bottom: 24px;">
                         <label for="sendToSelect" style="
@@ -791,5 +924,226 @@
             }
         });
     });
+</script>
+
+<!-- Zone -> Vehicle -> Auto-fill Driver Script -->
+<script>
+(function() {
+    // Pre-fetched data from Django view (no API call needed)
+    const VEHICLES_BY_ZONE = {{ vehicles_by_zone_json|safe }};
+
+    const zoneSelect   = document.getElementById('id_zone');
+    const vehicleSelect = document.getElementById('id_vehicle_select');
+    const logbookContainer = document.getElementById('logbook_container');
+
+    // Driver auto-fill fields
+    const driverNameField   = document.querySelector('[name="driver_name"]');
+    const driverMobileField = document.querySelector('[name="driver_mobile"]');
+    const driverCnicField   = document.querySelector('[name="driver_cnic"]');
+
+    function populateVehicles(zoneId) {
+        vehicleSelect.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+
+        if (!zoneId) {
+            placeholder.textContent = '— Select Zone First —';
+            vehicleSelect.appendChild(placeholder);
+            vehicleSelect.disabled = true;
+            if (logbookContainer) logbookContainer.style.display = 'none';
+            return;
+        }
+
+        const vehicles = VEHICLES_BY_ZONE[String(zoneId)] || [];
+        if (vehicles.length === 0) {
+            placeholder.textContent = '— No vehicles in this zone —';
+            vehicleSelect.appendChild(placeholder);
+            vehicleSelect.disabled = true;
+        } else {
+            placeholder.textContent = '— Select Vehicle —';
+            vehicleSelect.appendChild(placeholder);
+            vehicles.forEach(function(v) {
+                const opt = document.createElement('option');
+                opt.value = v.vehicle_name;
+                opt.textContent = v.vehicle_id_number
+                    ? `${v.vehicle_name}  (${v.vehicle_id_number})`
+                    : v.vehicle_name;
+                opt.dataset.driverName   = v.driver_name;
+                opt.dataset.driverMobile = v.driver_mobile;
+                opt.dataset.driverCnic   = v.driver_cnic;
+                opt.dataset.vehicleId    = v.id;
+                vehicleSelect.appendChild(opt);
+            });
+            vehicleSelect.disabled = false;
+        }
+    }
+
+    function autoFillDriver(opt) {
+        if (!opt || !opt.value) return;
+        if (driverNameField   && opt.dataset.driverName)   driverNameField.value   = opt.dataset.driverName;
+        if (driverMobileField && opt.dataset.driverMobile) driverMobileField.value = opt.dataset.driverMobile;
+        if (driverCnicField   && opt.dataset.driverCnic)   driverCnicField.value   = opt.dataset.driverCnic;
+    }
+
+    // Zone change
+    if (zoneSelect) {
+        zoneSelect.addEventListener('change', function() {
+            populateVehicles(this.value);
+            if (logbookContainer) logbookContainer.style.display = 'none';
+            // Clear driver fields when zone changes
+            if (driverNameField)   driverNameField.value   = '';
+            if (driverMobileField) driverMobileField.value = '';
+            if (driverCnicField)   driverCnicField.value   = '';
+        });
+    }
+
+    // Vehicle change → auto-fill driver
+    if (vehicleSelect) {
+        vehicleSelect.addEventListener('change', function() {
+            const selectedOpt = this.options[this.selectedIndex];
+            autoFillDriver(selectedOpt);
+        });
+    }
+
+    // On page load: auto-select user's zone and populate vehicles immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        if (zoneSelect && zoneSelect.value) {
+            populateVehicles(zoneSelect.value);
+            // Restore vehicle selection in edit mode
+            const currentVehicle = vehicleSelect.dataset.currentVehicle || '';
+            if (currentVehicle) {
+                for (let i = 0; i < vehicleSelect.options.length; i++) {
+                    if (vehicleSelect.options[i].value === currentVehicle) {
+                        vehicleSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        } else {
+            populateVehicles(null); // disable with placeholder
+        }
+    });
+})();
+</script>
+
+<script>
+/* ===== ATTACHMENT DRAG & DROP ===== */
+let attachedFiles = [];
+
+function attachDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = document.getElementById('attach-drop-zone');
+    zone.style.borderColor = '#059669';
+    zone.style.background = '#f0fdf4';
+    zone.style.transform = 'scale(1.01)';
+}
+
+function attachDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = document.getElementById('attach-drop-zone');
+    zone.style.borderColor = '#a7f3d0';
+    zone.style.background = '#fff';
+    zone.style.transform = 'scale(1)';
+}
+
+function attachDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    attachDragLeave(e);
+    const files = e.dataTransfer.files;
+    if (files.length) attachHandleFiles(files);
+}
+
+function attachHandleFiles(files) {
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].size > 10 * 1024 * 1024) {
+            alert(`File "${files[i].name}" exceeds 10MB limit and was skipped.`);
+            continue;
+        }
+        attachedFiles.push(files[i]);
+    }
+    renderAttachPreviews();
+    syncFileInput();
+}
+
+function renderAttachPreviews() {
+    const grid = document.getElementById('attach-preview-grid');
+    grid.innerHTML = '';
+
+    attachedFiles.forEach((file, idx) => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const isImg = ['jpg','jpeg','png','gif','bmp','webp','svg'].includes(ext);
+        const isPdf = ext === 'pdf';
+        const isWord = ['doc','docx'].includes(ext);
+        const isExcel = ['xls','xlsx'].includes(ext);
+
+        // Icon/preview
+        let previewHtml = '';
+        if (isImg) {
+            const url = URL.createObjectURL(file);
+            previewHtml = `<img src="${url}" alt="${file.name}" style="width:100%;height:90px;object-fit:cover;border-radius:8px 8px 0 0;">`;
+        } else {
+            let iconColor = '#6b7280', iconClass = 'fa-file';
+            if (isPdf) { iconColor = '#ef4444'; iconClass = 'fa-file-pdf'; }
+            else if (isWord) { iconColor = '#2563eb'; iconClass = 'fa-file-word'; }
+            else if (isExcel) { iconColor = '#16a34a'; iconClass = 'fa-file-excel'; }
+            previewHtml = `
+                <div style="height:90px;display:flex;align-items:center;justify-content:center;background:#f9fafb;border-radius:8px 8px 0 0;">
+                    <i class="fas ${iconClass}" style="font-size:2.2rem;color:${iconColor};"></i>
+                </div>`;
+        }
+
+        const sizeKb = (file.size / 1024).toFixed(1);
+        const displayName = file.name.length > 20 ? file.name.substring(0,18) + '…' : file.name;
+
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background:#fff;
+            border:1.5px solid #d1fae5;
+            border-radius:10px;
+            overflow:hidden;
+            box-shadow:0 2px 8px rgba(0,0,0,0.06);
+            position:relative;
+            transition:transform 0.2s ease;
+        `;
+        card.innerHTML = `
+            ${previewHtml}
+            <div style="padding:8px 10px;">
+                <div style="font-size:0.78rem;font-weight:600;color:#1f2937;font-family:var(--font-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${file.name}">${displayName}</div>
+                <div style="font-size:0.7rem;color:#9ca3af;font-family:var(--font-sans);margin-top:2px;">${sizeKb} KB</div>
+            </div>
+            <button type="button" onclick="removeAttachment(${idx})" style="
+                position:absolute;top:6px;right:6px;
+                width:22px;height:22px;
+                border-radius:50%;
+                background:rgba(239,68,68,0.9);
+                border:none;cursor:pointer;
+                display:flex;align-items:center;justify-content:center;
+                color:#fff;font-size:11px;
+                transition:background 0.2s;
+            " title="Remove" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='rgba(239,68,68,0.9)'">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        card.addEventListener('mouseenter', () => card.style.transform = 'translateY(-2px)');
+        card.addEventListener('mouseleave', () => card.style.transform = 'translateY(0)');
+        grid.appendChild(card);
+    });
+}
+
+function removeAttachment(idx) {
+    attachedFiles.splice(idx, 1);
+    renderAttachPreviews();
+    syncFileInput();
+}
+
+function syncFileInput() {
+    const input = document.getElementById('requisition_attachments');
+    const dt = new DataTransfer();
+    attachedFiles.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+}
 </script>
 {% endblock %}
