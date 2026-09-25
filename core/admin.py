@@ -30,60 +30,10 @@ class FileAdmin(admin.ModelAdmin):
 # =========================================================
 # 🌍 ZONE ADMIN
 # =========================================================
-class ZoneAdminForm(forms.ModelForm):
-    users_in_zone = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all().order_by('first_name', 'last_name', 'username'),
-        required=False,
-        widget=admin.widgets.FilteredSelectMultiple('Users', is_stacked=False),
-        label='Assign Users to Zone',
-        help_text="Select users to assign to this zone. This will automatically update their Profile."
-    )
-
-    class Meta:
-        model = Zone
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['users_in_zone'].initial = User.objects.filter(
-                profile__zone=self.instance
-            )
-        self.fields['users_in_zone'].label_from_instance = lambda obj: (
-            f"{obj.get_full_name()} ({obj.username})" if obj.get_full_name().strip() else obj.username
-        )
-
-
 @admin.register(Zone)
 class ZoneAdmin(admin.ModelAdmin):
-    form = ZoneAdminForm
-    list_display = ('name', 'title', 'subtitle', 'province', 'phone', 'get_users_count')
+    list_display = ('name', 'title', 'subtitle', 'province', 'phone')
     search_fields = ('name', 'title', 'subtitle', 'province', 'address')
-
-    def get_users_count(self, obj):
-        count = obj.users.count()
-        color = '#059669' if count > 0 else '#9ca3af'
-        return format_html('<span style="color:{};font-weight:700;">{}</span>', color, count)
-    get_users_count.short_description = 'Assigned Users'
-
-    def save_model(self, request, obj, form, change):
-        """Save the Zone object first, then handle user assignments."""
-        super().save_model(request, obj, form, change)
-
-        selected_users = form.cleaned_data.get('users_in_zone', [])
-
-        # Remove zone from users who were unselected
-        Profile.objects.filter(zone=obj).exclude(user__in=selected_users).update(zone=None)
-
-        # Assign zone to selected users
-        for user in selected_users:
-            profile, _ = Profile.objects.get_or_create(user=user)
-            if profile.zone_id != obj.pk:
-                profile.zone = obj
-                profile.save(update_fields=['zone'])
-
-        from django.contrib import messages as msg
-        msg.success(request, f'✅ Zone saved! {len(list(selected_users))} user(s) assigned to {obj.name}.')
 
 # =========================================================
 # 🏷️ ROLE ADMIN
@@ -561,13 +511,35 @@ class NotesheetAgendaAdmin(admin.ModelAdmin):
 # =========================================================
 @admin.register(UserHierarchy)
 class UserHierarchyAdmin(admin.ModelAdmin):
-    list_display = ('boss', 'get_subordinates_count')
+    list_display = ('boss',)
     search_fields = ('boss__username',)
-    filter_horizontal = ('subordinates',)
-
-    def get_subordinates_count(self, obj):
-        return obj.subordinates.count()
-    get_subordinates_count.short_description = 'Number of Subordinates'
+    filter_horizontal = ('requisition_subs', 'notesheet_subs', 'task_subs', 'letter_subs')
+    
+    fieldsets = (
+        ('User', {
+            'fields': ('boss',)
+        }),
+        ('Requisition Form — Forwarding List', {
+            'fields': ('requisition_subs',),
+            'classes': ('collapse',),
+            'description': 'Select users who should appear in the Requisition Form forwarding list for this user.'
+        }),
+        ('Notesheet — Forwarding List', {
+            'fields': ('notesheet_subs',),
+            'classes': ('collapse',),
+            'description': 'Select users who should appear in the Notesheet forwarding list for this user.'
+        }),
+        ('Task — Forwarding List', {
+            'fields': ('task_subs',),
+            'classes': ('collapse',),
+            'description': 'Select users who should appear in the Task forwarding list for this user.'
+        }),
+        ('Letter — Forwarding List', {
+            'fields': ('letter_subs',),
+            'classes': ('collapse',),
+            'description': 'Select users who should appear in the Letter forwarding list for this user.'
+        }),
+    )
 
 # =========================================================
 # 📩 LETTER SYSTEM ADMINS (UPDATED & ENHANCED)

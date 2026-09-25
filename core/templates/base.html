@@ -939,8 +939,9 @@ font-size: 0.85rem;
         data-bs-toggle="collapse" href="#commitmentCollapse" role="button"
         aria-expanded="{% if 'commitment' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
         aria-controls="commitmentCollapse">
-        <i class="fas fa-handshake"></i> <span>Commitments</span>
-        <i class="fas fa-chevron-down ms-auto dropdown-icon"
+        <i class="fas fa-handshake me-2"></i> <span>Commitments</span>
+        <span class="sidebar-badge-parent ms-auto me-2" id="commitment-parent-badge" style="{% if unread_commitments_count == 0 or not unread_commitments_count %}display: none;{% endif %}">{{ unread_commitments_count|default:0 }}</span>
+        <i class="fas fa-chevron-down dropdown-icon {% if unread_commitments_count > 0 %}{% else %}ms-auto{% endif %}" id="commitment-chevron"
             style="font-size: 0.8em; margin-top: 5px;"></i>
     </a>
     <div class="collapse {% if 'commitment' in request.resolver_match.url_name %}show{% endif %}"
@@ -959,7 +960,8 @@ font-size: 0.85rem;
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'commitment_list' %}active{% endif %}"
                     href="{% url 'commitment_list' %}">
-                    <i class="fas fa-list-alt"></i> <span>My Commitments</span>
+                    <i class="fas fa-list-alt me-2"></i> <span>My Commitments</span>
+                    <span class="sidebar-badge ms-auto" id="commitment-inbox-badge" style="{% if unread_commitments_count == 0 or not unread_commitments_count %}display: none;{% endif %}">{{ unread_commitments_count|default:0 }}</span>
                 </a>
             </li>
 
@@ -976,14 +978,16 @@ font-size: 0.85rem;
 </li>
 {% endif %}
 
+{% comment %}
                    <!-- Task Dropdown -->
 <li class="nav-item">
     <a class="nav-link {% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}{% else %}collapsed{% endif %}"
         data-bs-toggle="collapse" href="#taskCollapse" role="button"
         aria-expanded="{% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
         aria-controls="taskCollapse">
-        <i class="fas fa-tasks"></i> <span>Task</span>
-        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 0.8em; margin-top: 5px;"></i>
+        <i class="fas fa-tasks me-2"></i> <span>Task</span>
+        <span class="sidebar-badge-parent ms-auto me-2" id="task-parent-badge" style="{% if unread_tasks_count == 0 or not unread_tasks_count %}display: none;{% endif %}">{{ unread_tasks_count|default:0 }}</span>
+        <i class="fas fa-chevron-down dropdown-icon {% if unread_tasks_count > 0 %}{% else %}ms-auto{% endif %}" id="task-chevron" style="font-size: 0.8em; margin-top: 5px;"></i>
     </a>
     <div class="collapse {% if 'task' in request.resolver_match.url_name or 'feedback' in request.resolver_match.url_name or 'remark' in request.resolver_match.url_name %}show{% endif %}"
         id="taskCollapse">
@@ -1001,7 +1005,8 @@ font-size: 0.85rem;
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'manager_tasks' or request.resolver_match.url_name == 'my_tasks' %}active{% endif %}"
                     href="{% url 'manager_tasks' %}">
-                    <i class="fas fa-inbox"></i> <span>Inbox</span>
+                    <i class="fas fa-inbox me-2"></i> <span>Inbox</span>
+                    <span class="sidebar-badge ms-auto" id="task-inbox-badge" style="{% if unread_tasks_count == 0 or not unread_tasks_count %}display: none;{% endif %}">{{ unread_tasks_count|default:0 }}</span>
                 </a>
             </li>
 
@@ -1018,6 +1023,7 @@ font-size: 0.85rem;
         </ul>
     </div>
 </li>
+{% endcomment %}
 
                     <!-- Notesheet Dropdown -->
 <li class="nav-item">
@@ -1077,8 +1083,9 @@ font-size: 0.85rem;
                             data-bs-toggle="collapse" href="#lettersCollapse" role="button"
                             aria-expanded="{% if 'letter' in request.resolver_match.url_name or 'inbox' in request.resolver_match.url_name or 'outbox' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
                             aria-controls="lettersCollapse">
-                            <i class="fas fa-envelope-open-text"></i> <span>Letter</span>
-                            <i class="fas fa-chevron-down ms-auto dropdown-icon"
+                            <i class="fas fa-envelope-open-text me-2"></i> <span>Letter</span>
+                            <span class="sidebar-badge-parent ms-auto me-2" id="letter-parent-badge" style="{% if unread_letters_count == 0 or not unread_letters_count %}display: none;{% endif %}">{{ unread_letters_count|default:0 }}</span>
+                            <i class="fas fa-chevron-down dropdown-icon {% if unread_letters_count > 0 %}{% else %}ms-auto{% endif %}" id="letter-chevron"
                                 style="font-size: 0.8em; margin-top: 5px;"></i>
                         </a>
                         <div class="collapse {% if 'letter' in request.resolver_match.url_name or 'inbox' in request.resolver_match.url_name or 'outbox' in request.resolver_match.url_name %}show{% endif %}"
@@ -1087,7 +1094,7 @@ font-size: 0.85rem;
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name in 'letter_files_list create_letter_file' %}active{% endif %}"
                                         href="{% url 'letter_files_list' %}">
-                                        <i class="fas fa-folder-open"></i> <span>Letter Files</span>
+                                        <i class="fas fa-folder-open"></i> <span>Letter Titles</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1105,7 +1112,8 @@ font-size: 0.85rem;
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name == 'letter_inbox' %}active{% endif %}"
                                         href="{% url 'letter_inbox' %}">
-                                        <i class="fas fa-inbox"></i> <span>Inbox</span>
+                                        <i class="fas fa-inbox me-2"></i> <span>Inbox</span>
+                                        <span class="sidebar-badge ms-auto" id="letter-inbox-badge" style="{% if unread_letters_count == 0 or not unread_letters_count %}display: none;{% endif %}">{{ unread_letters_count|default:0 }}</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1118,21 +1126,20 @@ font-size: 0.85rem;
                         </div>
                     </li>
 
-                    {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.profile.role.code in "Manager_Admin MngrFleet Fleet_Manager" or request.user.profile.role.category in "ZM Manager GM CEO" %}
-
-                    <li class="nav-item">
+                    {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username or request.user.profile.role.code in "Manager_Admin MngrFleet Fleet_Manager" or request.user.profile.role.category in "ZM Manager GM" %}
                         <a class="nav-link {% if 'requisition' in request.resolver_match.url_name %}{% else %}collapsed{% endif %}"
                             data-bs-toggle="collapse" href="#requisitionCollapse" role="button"
                             aria-expanded="{% if 'requisition' in request.resolver_match.url_name %}true{% else %}false{% endif %}"
                             aria-controls="requisitionCollapse">
-                            <i class="fas fa-truck-pickup"></i> <span>Requisition Form</span>
-                            <i class="fas fa-chevron-down ms-auto dropdown-icon"
+                            <i class="fas fa-truck-pickup me-2"></i> <span>Requisition Form</span>
+                            <span class="sidebar-badge-parent ms-auto me-2" id="requisition-parent-badge" style="{% if unread_requisitions_count == 0 or not unread_requisitions_count %}display: none;{% endif %}">{{ unread_requisitions_count|default:0 }}</span>
+                            <i class="fas fa-chevron-down dropdown-icon {% if unread_requisitions_count > 0 %}{% else %}ms-auto{% endif %}" id="requisition-chevron"
                                 style="font-size: 0.8em; margin-top: 5px;"></i>
                         </a>
                         <div class="collapse {% if 'requisition' in request.resolver_match.url_name %}show{% endif %}"
                             id="requisitionCollapse">
                             <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
-                                {% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username %}
+                                {% if request.user.username not in "Manager_Admin Fleet_Manager MngrFleet MngrA_AZoneA MngrA_AZoneB MngrA_AZoneC MngrA_AZoneD MngrA_AZoneE" %}
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name == 'create_requisition' %}active{% endif %}"
                                         href="{% url 'create_requisition' %}">
@@ -1143,8 +1150,8 @@ font-size: 0.85rem;
                                 <li class="nav-item">
                                     <a class="nav-link {% if request.resolver_match.url_name == 'requisition_list' %}active{% endif %}"
                                         href="{% url 'requisition_list' %}">
-                                        <i class="fas fa-list-alt"></i> <span>{% if "fozone" in request.user.username or "Fleet" in request.user.username or "fleet" in request.user.username %}My Submitted Forms{% else %}Inbox{% endif %}</span>
-
+                                        <i class="fas fa-list-alt me-2"></i> <span>{% if request.user.username in "Manager_Admin Fleet_Manager MngrFleet MngrA_AZoneA MngrA_AZoneB MngrA_AZoneC MngrA_AZoneD MngrA_AZoneE" %}Inbox{% else %}Requisition Inbox{% endif %}</span>
+                                        <span class="sidebar-badge ms-auto" id="requisition-inbox-badge" style="{% if unread_requisitions_count == 0 or not unread_requisitions_count %}display: none;{% endif %}">{{ unread_requisitions_count|default:0 }}</span>
                                     </a>
                                 </li>
                             </ul>
@@ -1347,33 +1354,40 @@ font-size: 0.85rem;
     <!-- Real-time Sidebar Unread Badge Polling -->
     <script>
         (function() {
+            function updateBadge(prefix, count) {
+                const parentBadge = document.getElementById(prefix + '-parent-badge');
+                const inboxBadge = document.getElementById(prefix + '-inbox-badge');
+                const chevron = document.getElementById(prefix + '-chevron');
+
+                if (count > 0) {
+                    if (parentBadge) {
+                        parentBadge.textContent = count;
+                        parentBadge.style.display = 'inline-block';
+                    }
+                    if (inboxBadge) {
+                        inboxBadge.textContent = count;
+                        inboxBadge.style.display = 'inline-block';
+                    }
+                    if (chevron) {
+                        chevron.classList.remove('ms-auto');
+                    }
+                } else {
+                    if (parentBadge) parentBadge.style.display = 'none';
+                    if (inboxBadge) inboxBadge.style.display = 'none';
+                    if (chevron) chevron.classList.add('ms-auto');
+                }
+            }
+
             function updateSidebarUnreadCounts() {
                 fetch('/api/unread-counts/')
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            const nsCount = data.unread_notesheets_count || 0;
-                            const parentBadge = document.getElementById('notesheet-parent-badge');
-                            const inboxBadge = document.getElementById('notesheet-inbox-badge');
-                            const chevron = document.getElementById('notesheet-chevron');
-
-                            if (nsCount > 0) {
-                                if (parentBadge) {
-                                    parentBadge.textContent = nsCount;
-                                    parentBadge.style.display = 'inline-block';
-                                }
-                                if (inboxBadge) {
-                                    inboxBadge.textContent = nsCount;
-                                    inboxBadge.style.display = 'inline-block';
-                                }
-                                if (chevron) {
-                                    chevron.classList.remove('ms-auto');
-                                }
-                            } else {
-                                if (parentBadge) parentBadge.style.display = 'none';
-                                if (inboxBadge) inboxBadge.style.display = 'none';
-                                if (chevron) chevron.classList.add('ms-auto');
-                            }
+                            updateBadge('notesheet', data.unread_notesheets_count || 0);
+                            updateBadge('letter', data.unread_letters_count || 0);
+                            updateBadge('task', data.unread_tasks_count || 0);
+                            updateBadge('requisition', data.unread_requisitions_count || 0);
+                            updateBadge('commitment', data.unread_commitments_count || 0);
                         }
                     })
                     .catch(err => console.debug("Unread count poll skipped"));

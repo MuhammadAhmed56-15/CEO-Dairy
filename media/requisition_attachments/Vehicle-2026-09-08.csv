@@ -1,0 +1,485 @@
+vehicle_id,vehicle_name,location,vehicle_type,category,driver_name,status
+RL-17-C-NARS-125842,RL-17-C,C,Primary,Rickshaw Loader,,Active
+RL-16-C-NARS-125841,RL-16-C,C,Primary,Rickshaw Loader,,Active
+RL-15-C-NARS-125845,RL-15-C,C,Primary,Rickshaw Loader,,Active
+BL-14-C-163ML-8L100112,BL-14-C,C,Primary,Bike Loader,,Active
+BL-8-C-PKNACLFMX7J03917,BL-8-C,C,Primary,Bike Loader,,Active
+BL-7-C-NA,BL-7-C,C,Primary,Bike Loader,,Active
+BL-6-C-PKNACLFMX7J04301,BL-6-C,C,Primary,Bike Loader,,Active
+BL-5-C-163ML-8L100124,BL-5-C,C,Primary,Bike Loader,,Active
+BL-4-C-163ML-8L100118,BL-4-C,C,Primary,Bike Loader,,Active
+BL-3-C-163ML-8L100122,BL-3-C,C,Primary,Bike Loader,,Active
+BL-2-C-163ML-8L100125,BL-2-C,C,Primary,Bike Loader,,Active
+SU-M4-C-F8B-371530,SU-M4-C,C,Primary,Mini Tipper,,Active
+SU-129-D-PK-406795,SU-129-D,D,Primary,Mini Tipper,,Active
+SU-38-D-PK-406351,SU-38-D,D,Primary,Mini Tipper,,Active
+COM-192-E-40200064,COM-192-E,E,Primary,Compactor,,Active
+SU-153-E-PK-341261,SU-153-E,E,Primary,Mini Tipper,,Active
+SU-68-E-PK-355643,SU-68-E,E,Primary,Mini Tipper,,Active
+SU-115-E-PK-341231,SU-115-E,E,Primary,Mini Tipper,,Active
+SU-42-E-PK-406687,SU-42-E,E,Primary,Mini Tipper,,Active
+SU-106-E-PK-341301,SU-106-E,E,Primary,Mini Tipper,,Active
+SU-109-E-PK-341212,SU-109-E,E,Primary,Mini Tipper,,Active
+TRT-76-D-24737213F4,TRT-76-D,D,Primary,Tractor,,Active
+TRT-47-B-20523909N4,TRT-47-B,B,Primary,Tractor,,Active
+TRT-5/37-B-NOT AVALIBLE,TRT-5/37-B China,B,Primary,Tractor,,Active
+COM-91-B-JHHYFJ0H502000302,COM-91-B,B,Primary,Compactor,,Active
+BL-13-B-PKNACLFMX7103818,BL-13-B,B,Primary,Bike Loader,,Active
+BL-12-B-L6XHBM3B8L0000012,BL-12-B,B,Primary,Bike Loader,,Active
+BL-27-B,BL-27-B,B,Primary,Bike Loader,,Active
+BL-6-E-2L0000006,BL-6-E,E,Primary,Bike Loader,,Active
+RL-5-E-163ML-8L1000008,RL-5-E,E,Primary,Rickshaw Loader,,Active
+BL-21-E-9L0000021,BL-21-E,E,Primary,Bike Loader,,Active
+BL-13-E-L6XHBM3B0L000013,BL-13-E,E,Primary,Bike Loader,,Active
+BL-9-E-8L0000009,BL-9-E,E,Primary,Bike Loader,,Active
+BL-781-E-J03781,BL-781-E,E,Primary,Bike Loader,,Active
+BL-814-E-ZS162FMU-L8M322319,BL-814-E,E,Primary,Bike Loader,,Active
+BL-813-E-ZS162FMJ-LSM322049,BL-813-E,E,Primary,Bike Loader,,Active
+BL-7-E-4L60000007,BL-7-E,E,Primary,Bike Loader,,Active
+RL-3-D-124798,RL-3-D,D,Primary,Rickshaw Loader,,Active
+RL-20-D-125843,RL-20-D,D,Primary,Rickshaw Loader,,Active
+RL-19-D-125837,RL-19-D,D,Primary,Rickshaw Loader,,Active
+RL-18-D-125838,RL-18-D,D,Primary,Rickshaw Loader,,Active
+BL-23-D-Not-Avaiable,BL-23-D,D,Primary,Bike Loader,,Active
+RL-1-A-Not-Avaiable,RL-1-A-,A,Primary,Rickshaw Loader,,Active
+HARM-1-A-46220,HARM-1-A,A,Secondary,Compactor,,Active
+HARM-5-A-FMMFN62FM2J0000004,HARM-5-A,A,Secondary,Compactor,,Active
+SARM-2-A-JHHYJL0H402000737,SARM-2-A,A,Primary,Compactor,,Active
+SARM-11-A-802000739,SARM-11-A,A,Primary,Compactor,,Active
+SARM-15-A-JHHYJL04202000736,SARM-15-A,A,Primary,Compactor,,Active
+BL-14-A-PKNACLFMX7103811,BL-14-A,A,Primary,Bike Loader,,Active
+BL-16-A-PKNACLFMX7103315,BL-16-A,A,Primary,Bike Loader,,Active
+BL-24-A-L6XHBM3B4L0000024,BL-24-A,A,Primary,Bike Loader,,Active
+BL-25-A-L6XHBM8B9L0000001,BL-25-A,A,Primary,Bike Loader,,Active
+BL-26-A-L6XHBM369L0000002,BL-26-A,A,Primary,Bike Loader,,Active
+BL-27-A-L6XHBM89L0000003,BL-27-A,A,Primary,Bike Loader,,Active
+COM-177-A-JHHBFJ4H902000061,COM-177-A,A,Primary,Compactor,,Active
+COM-187-A-JHHBFJ4H002000045,COM-187-A,A,Primary,Compactor,,Active
+COM-23-A-MMC-04-CN01456,COM-23-A,A,Primary,Compactor,,Active
+COM-85-A-JHHY-FOH302000167,COM-85-A,A,Primary,Compactor,,Active
+COM-94-A-JHHYFJ0H002000305,COM-94-A,A,Primary,Compactor,,Active
+Exc-3-A-AACL5008912,Exc-3-A,A,Primary,EXCEVATOR,,Active
+PU-4023-A-KUN15R-9455408,PU-4023-A,A,Primary,PickUp,,Active
+JM-62-A-702000141,JM-62-A,A,Primary,Jetting Mechine,,Active
+MS-87-A-JHHYFJOH202000161,MS-87-A,A,Primary,Mechanical Sweeper,,Active
+HARM-2-D-47153,HARM-2-D,D,Secondary,Compactor,,Active
+FAW-4-A-AHFMPS121005732,FAW-4-A,A,Primary,Mini Tipper,,Active
+FAW-5-A-AHFMPS121CC005697,FAW-5-A,A,Primary,Mini Tipper,,Active
+FAW-6-A-AHFMPS117CC004069,FAW-6-A,A,Primary,Mini Tipper,,Active
+FAW-7-A-AHFMPS121CC005673,FAW-7-A,A,Primary,Mini Tipper,,Active
+FAW-8-A-AHFMPS120CC005395,FAW-8-A,A,Primary,Mini Tipper,,Active
+FAW-9-A-AHFMPS121CC005821,FAW-9-A,A,Primary,Mini Tipper,,Active
+FAW-10-A-AHFMPS121CC005727,FAW-10-A,A,Primary,Mini Tipper,,Active
+FAW-11-A-AHFMPS120CC005485,FAW-11-A,A,Primary,Mini Tipper,,Active
+FAW-12-A-AHFMPS121CC005671,FAW-12-A,A,Primary,Mini Tipper,,Active
+FAW-53-A-S119CC005253,FAW-53-A,A,Primary,Mini Tipper,,Active
+FAW-54-A-S119CC005254,FAW-54-A,A,Primary,Mini Tipper,,Active
+FAW-55-A-S119CC005255,FAW-55-A,A,Primary,Mini Tipper,,Active
+SU-3-A-PK-335673,SU-3-A,A,Primary,Mini Tipper,,Active
+SU-33-A-PK-406772,SU-33-A,A,Primary,Mini Tipper,,Active
+SU-34-A-PK-406792,SU-34-A,A,Primary,Mini Tipper,,Active
+SU-36-A-PK-406697,SU-36-A,A,Primary,Mini Tipper,,Active
+SU-37-A-PK-406625,SU-37-A,A,Primary,Mini Tipper,,Active
+SU-39-A-PK-406808,SU-39-A,A,Primary,Mini Tipper,,Active
+SU-41-A-PK-406779,SU-41-A,A,Primary,Mini Tipper,,Active
+SU-100-A-PK-341282,SU-100-A,A,Primary,Mini Tipper,,Active
+SU-102-A-PK-341286,SU-102-A,A,Primary,Mini Tipper,,Active
+SU-103-A-PK-341287,SU-103-A,A,Primary,Mini Tipper,,Active
+SU-107-A-PK-341302,SU-107-A,A,Primary,Mini Tipper,,Active
+SU-108-A-PK-341303,SU-108-A,A,Primary,Mini Tipper,,Active
+SU-110-A-PK-341292,SU-110-A,A,Primary,Mini Tipper,,Active
+SU-111-A-PK-341294,SU-111-A,A,Primary,Mini Tipper,,Active
+SU-114-A-PK-341232,SU-114-A,A,Primary,Mini Tipper,,Active
+SU-116-A-PK-341237,SU-116-A,A,Primary,Mini Tipper,,Active
+SU-117-A-PK-341238,SU-117-A,A,Primary,Mini Tipper,,Active
+SU-119-A-PK-341241,SU-119-A,A,Primary,Mini Tipper,,Active
+SU-120-A-PK-341243,SU-120-A,A,Primary,Mini Tipper,,Active
+SU-121-A-PK-341244,SU-121-A,A,Primary,Mini Tipper,,Active
+SU-122-A-PK-341267,SU-122-A,A,Primary,Mini Tipper,,Active
+SU-124-A-PK-341276,SU-124-A,A,Primary,Mini Tipper,,Active
+SU-126-A-PK-341272,SU-126-A,A,Primary,Mini Tipper,,Active
+SU-127-A-PK-341274,SU-127-A,A,Primary,Mini Tipper,,Active
+SU-128-A-PK-341276,SU-128-A,A,Primary,Mini Tipper,,Active
+SU-129-A-PK-341277,SU-129-A,A,Primary,Mini Tipper,,Active
+SU-130-A-PK-341279,SU-130-A,A,Primary,Mini Tipper,,Active
+SU-131-A-PK-341280,SU-131-A,A,Primary,Mini Tipper,,Active
+SU-134-A-PK-341245,SU-134-A,A,Primary,Mini Tipper,,Active
+SU-138-A-PK-341269,SU-138-A,A,Primary,Mini Tipper,,Active
+SU-141-A-PK-341228,SU-141-A,A,Primary,Mini Tipper,,Active
+SU-144-A-PK-341236,SU-144-A,A,Primary,Mini Tipper,,Active
+SU-145-A-PK-341234,SU-145-A,A,Primary,Mini Tipper,,Active
+SU-148-A-PK-341222,SU-148-A,A,Primary,Mini Tipper,,Active
+SU-152-A-PK-341263,SU-152-A,A,Primary,Mini Tipper,,Active
+SU-161-A-PK-341225,SU-161-A,A,Primary,Mini Tipper,,Active
+SU-163-A-PK-341250,SU-163-A,A,Primary,Mini Tipper,,Active
+SU-166-A-PK-341256,SU-166-A,A,Primary,Mini Tipper,,Active
+WB-1-A-PK442640,WB-1-A Water Bouzer,A,Primary,Water Tanker,,Active
+ML-21-A-MMC-04-CN01450,ML-21-A,A,Primary,Compactor,,Active
+RK-2-A-NIL,RK-2-A,A,Primary,Rickshaw Loader,,Active
+SUC-63-A-902000058,SUC-63-A,A,Primary,Sucking Mechine,,Active
+SU-M1-A-SR308PK-395339,SU-M1-A Malaria,A,Primary,Mini Tipper,,Active
+BL-7-D-322093,BL-7-D,D,Primary,Bike Loader,,Active
+BL-9-D-517501,BL-9-D,D,Primary,Bike Loader,,Active
+BL-19-D-8L000025,BL-19-D,D,Primary,Bike Loader,,Active
+TRT-10/42-A-NOT AVALIBLE,TRT-10/42-A China,A,Primary,Tractor,,Active
+TRT-77-A-22565513B4,TRT-77-A,A,Primary,Tractor,,Active
+Jeep-4156-A-BJ75-0002145,Jeep-4156-A,A,Primary,Jeep,,Active
+SARM-3-D-10823,SARM-3-D,D,Primary,Compactor,,Active
+SARM-4-D-302000726,SARM-4-D,D,Primary,Compactor,,Active
+SARM-5-D-702000733,SARM-5-D,D,Primary,Compactor,,Active
+SARM-23-D-MMC-04-CL01453,SARM-23-D,D,Primary,Compactor,,Active
+HARM-1-D-FMMFN62FM2J0008,HARM-1-D,D,Secondary,Compactor,,Active
+HARM-3-D-NA,HARM-3-D,D,Secondary,Compactor,,Active
+COM-2-D-20200001,COM-2-D,D,Primary,Compactor,,Active
+COM-176-D-56200056,COM-176-D,D,Primary,Compactor,,Active
+COM-95-D-902000304,COM-95-D,D,Primary,Compactor,,Active
+COM-29-D-MMC-04-CL01451,COM-29-D,D,Primary,Compactor,,Active
+TRTTS-1-E-NA,TRTTS-1-E,E,Primary,Tractor,,Active
+PU-AA0954-E-NA,PU-AA0954-E,E,Primary,PickUp,,Active
+ML-26-D-MMC04-CL01447,ML-26-D,D,Primary,Compactor,,Active
+MS-2-D-DN402000162,MS-2-D,D,Primary,Mechanical Sweeper,,Active
+SU-101-D-405339,SU-101-D,D,Primary,Mini Tipper,,Active
+SU-102-D-405360,SU-102-D,D,Primary,Mini Tipper,,Active
+SU-103-D-405370,SU-103-D,D,Primary,Mini Tipper,,Active
+SU-104-D-405350,SU-104-D,D,Primary,Mini Tipper,,Active
+SU-105-D-405342,SU-105-D,D,Primary,Mini Tipper,,Active
+SU-106-D-405368,SU-106-D,D,Primary,Mini Tipper,,Active
+SU-107-D-405168,SU-107-D,D,Primary,Mini Tipper,,Active
+SU-121-D-406771,SU-121-D,D,Primary,Mini Tipper,,Active
+SU-122-D-406777,SU-122-D,D,Primary,Mini Tipper,,Active
+SU-123-D-406798,SU-123-D,D,Primary,Mini Tipper,,Active
+SU-124-D-406764,SU-124-D,D,Primary,Mini Tipper,,Active
+SU-125-D-406731,SU-125-D,D,Primary,Mini Tipper,,Active
+SU-126-D-476191,SU-126-D,D,Primary,Mini Tipper,,Active
+SU-127-D-476212,SU-127-D,D,Primary,Mini Tipper,,Active
+SU-128-D-476203,SU-128-D,D,Primary,Mini Tipper,,Active
+SU-129-D-476209,SU-129-D,D,Primary,Mini Tipper,,Active
+SU-130-D-4761176,SU-130-D,D,Primary,Mini Tipper,,Active
+SU-131-D-476206,SU-131-D,D,Primary,Mini Tipper,,Active
+SU-132-D-476196,SU-132-D,D,Primary,Mini Tipper,,Active
+SU-133-D-476177,SU-133-D,D,Primary,Mini Tipper,,Active
+SU-112-D-341295,SU-112-D,D,Primary,Mini Tipper,,Active
+SU-2015-D-385188,SU-2015-D,D,Primary,Mini Tipper,,Active
+FAW-8-D-PS119CC005268,FAW-8-D,D,Primary,Mini Tipper,,Active
+FAW-9-D-PS119CC005272,FAW-9-D,D,Primary,Mini Tipper,,Active
+FAW-10-D-PS119CC005271,FAW-10-D,D,Primary,Mini Tipper,,Active
+Faw-11-D-PS119CC005267,Faw-11-D,D,Primary,Mini Tipper,,Active
+FAW-12-D-PS119CC005266,FAW-12-D,D,Primary,Mini Tipper,,Active
+FAW-13-D-PS119CC005270,FAW-13-D,D,Primary,Mini Tipper,,Active
+FAW-13A-B-AHFMPS119CC005234,FAW-13A-B,B,Primary,Mini Tipper,,Active
+FAW-14A-D-AHFMPS121CC005725,FAW-14A-D,D,Primary,Mini Tipper,,Active
+FAW-15-D-AHFMPS117CC004058,FAW-15-D,D,Primary,Mini Tipper,,Active
+FAW-14-D-PS119CC005267,FAW-14-D,D,Primary,Mini Tipper,,Active
+PU-4025-D-9455406,PU-4025-D,D,Primary,PickUp,,Active
+TRT-4-D-MILLAT M4,TRT-4-D,D,Primary,Tractor,,Active
+TRTSVL-4-D-92018,TRTSVL-4-D,D,Primary,Tractor,,Active
+TRT-37-D-5755907B4,TRT-37-D,D,Primary,Tractor,,Active
+TRT-57-D-20518109N4,TRT-57-D,D,Primary,Tractor,,Active
+TRT-15-D-487-12,TRT-15-D,D,Primary,Tractor,,Active
+TRT-5-D-GSH-4315088,TRT-5-D,D,Primary,Tractor,,Active
+TRT-6-D-GSH-4315053,TRT-6-D,D,Primary,Tractor,,Active
+TRT-7-D-GSH-4315046,TRT-7-D,D,Primary,Tractor,,Active
+TRT-8-D-GSH-4315060,TRT-8-D,D,Primary,Tractor,,Active
+TRTSVL-5-D-GSF8242D-T,TRTSVL-5-D,D,Primary,Tractor,,Active
+EXC-1-D-SY0061CC18028,EXC-1-D,D,Primary,EXCEVATOR,,Active
+WB-4-D-PK442846,WB-4-D,D,Primary,Water Tanker,,Active
+MWKSP-1-D-PK-476217,MWKSP-1-D,D,Primary,Mobile Workshop,,Active
+HARM-4-E-FM2J000006,HARM-4-E,E,Primary,Compactor,,Active
+BL-303-B,BL-303-B,B,Primary,Bike Loader,,Active
+HARM-2-E-AHFMC-28T6220149,HARM-2-D,E,Secondary,Compactor,,Active
+SARM-8-E-502001590,SARM-8-E,E,Primary,Compactor,,Active
+SARM-16-E-102000744,SARM-16-E,E,Primary,Compactor,,Active
+COM-188-E-JHHBFJ4H-302000055,COM-188-E,E,Primary,Compactor,,Active
+COM-186-E-JHHBFJ4H-602000065,COM-186-E,E,Primary,Compactor,,Active
+COM-178-E-J4H-802000066,COM-178-E,E,Primary,Compactor,,Active
+COM-190-E-702000060,COM-190-E,E,Primary,Compactor,,Active
+COM-80-E-502000171,COM-80-E,E,Primary,Compactor,,Active
+COM-84-E-702000169,COM-84-E,E,Primary,Compactor,,Active
+EXC-1-B-5007828,EXC-1-B,B,Primary,EXCEVATOR,,Active
+SU-144-E-PK-406809,SU-144-E,E,Primary,Mini Tipper,,Active
+SU-45-E-PK-406693,SU-45-E,E,Primary,Mini Tipper,,Active
+SU-47-E-PK-406750,SU-47-E,E,Primary,Mini Tipper,,Active
+SU-148-E-PK-406707,SU-148-E,E,Primary,Mini Tipper,,Active
+SU-72-E-SR308PK-335664,SU-72-E,E,Primary,Mini Tipper,,Active
+SU-157-E-SR308PK-341221,SU-157-E,E,Primary,Mini Tipper,,Active
+SU-142-E-SR308PK-341229,SU-142-E,E,Primary,Mini Tipper,,Active
+SU-149-E-SR308PK-341230,SU-149-E,E,Primary,Mini Tipper,,Active
+SU-146-E-341233,SU-146-E,E,Primary,Mini Tipper,,Active
+SU-123-E-SR308PK-341268,SU-123-E,E,Primary,Mini Tipper,,Active
+SU-159-E-SR308PK-341249,SU-159-E,E,Primary,Mini Tipper,,Active
+SU-139-E-SR308PK-3412478,SU-139-E,E,Primary,Mini Tipper,,Active
+SU-133-E-SR308PK-341189,SU-133-E,E,Primary,Mini Tipper,,Active
+SU-5-E-335658,SU-5-E,E,Primary,Mini Tipper,,Active
+SU-74-E-335662,SU-74-E,E,Primary,Mini Tipper,,Active
+SU-73-E-335660,SU-73-E,E,Primary,Mini Tipper,,Active
+SU-1-E-335650,SU-1-E,E,Primary,Mini Tipper,,Active
+SU-75-E-335651,SU-75-E,E,Primary,Mini Tipper,,Active
+SU-71-E-335656,SU-71-E,E,Primary,Mini Tipper,,Active
+FAW-32-E-AHFMPS121CC005695,FAW-32-E,E,Primary,Mini Tipper,,Active
+FAW-30-E-AHFMPS121CC005670,FAW-30-E,E,Primary,Mini Tipper,,Active
+FAW-28-E-AHFMPS121CC005731,FAW-28-E,E,Primary,Mini Tipper,,Active
+FAW-31-E-AHFMPS121CC004072,FAW-31-E,E,Primary,Mini Tipper,,Active
+FAW-33-E-AHFMPS121CC004055,FAW-33-E,E,Primary,Mini Tipper,,Active
+FAW-29-E-AHFMPS121CC005287,FAW-29-E,E,Primary,Mini Tipper,,Active
+TRT-11-E-NA,TRT-11-E,E,Primary,Tractor,,Active
+TRT-49-E-NA,TRT-49-E,E,Primary,Tractor,,Active
+TRT-52-E-NA,TRT-52-E,E,Primary,Tractor,,Active
+TRTSVL-63-E-NA,TRTSVL-63-E,E,Primary,Tractor,,Active
+BL-302-B,BL-302-B,B,Primary,Bike Loader,,Active
+TRT-2-E-10608069659,TRT-2-E,E,Primary,Tractor,,Active
+SARM-22-A-MMC-04CN-01449,SARM-22-A,A,Primary,Compactor,,Active
+Com-180-A-JHHBFJ4H802000052,Com-180-A,A,Primary,Compactor,,Active
+COM-79-A-JHHYFJ0H402000176,COM-79-A,A,Primary,Compactor,,Active
+COM-82-A-JHHYFJOH302000170,COM-82-A,A,Primary,Compactor,,Active
+COM-90-A-JHHYFJOH402000307,COM-90-A,A,Primary,Compactor,,Active
+COM-92-A-JHHYFJ0H202000306,COM-92-A,A,Primary,Compactor,,Active
+MS-81-A-JHHYFJOH802000164,MS-81-A,A,Primary,Mechanical Sweeper,,Active
+TRT-3-A-71763/01/13,TRT-3-A Skip,A,Primary,Tractor,,Active
+TRT-4-A-K71854/11/13,"TRT-4-A 	Skip",A,Primary,Tractor,,Active
+FAW-1-A-AHFMPS121CC005700,FAW-1-A,A,Primary,Mini Tipper,,Active
+FAW-2-A-AHFMPS121CC005806,FAW-2-A,A,Primary,Mini Tipper,,Active
+FAW-3-A-AHFMPS117CC003639,FAW-3-A,A,Primary,Mini Tipper,,Active
+SU-30-A-PK-406775,SU-30-A,A,Primary,Mini Tipper,,Active
+SU-31-A-PK-406784,SU-31-A,A,Primary,Mini Tipper,,Active
+SU-32-A-406768,SU-32-A,A,Primary,Mini Tipper,,Active
+SU-35-A-PK406665,SU-35-A,A,Primary,Mini Tipper,,Active
+SU-40-A-PK-406770,SU-40-A,A,Primary,Mini Tipper,,Active
+SU-43-A-PK-406700,SU-43-A,A,Primary,Mini Tipper,,Active
+SU-135-A-PK-341247,SU-135-A,A,Primary,Mini Tipper,,Active
+SU-137-A-PK-341266,SU-137-A,A,Primary,Mini Tipper,,Active
+SU-140-A-PK-341188,SU-140-A,A,Primary,Mini Tipper,,Active
+BL-11-A-L6XHBM3B8L0000011,BL-11-A,A,Primary,Bike Loader,,Active
+BL-28-A-L6XHBM3H9L0000026,BL-28-A,A,Primary,Bike Loader,,Active
+TRT-50-A-NOT AVALIBLE,TRT-50-A,A,Primary,Tractor,,Active
+TRT-1-A-84701/01/18,TRT-1-A SVL,A,Primary,Tractor,,Active
+TRT-59-A-NOT AVALIBLE,TRT-59-A SVL,A,Primary,Tractor,,Active
+TRTTS-2-A-24734513F4,TRTTS-2-A Sweeping,A,Primary,Tractor,,Active
+TRT-1-A-K73006/06/18,TRT-1-A MESSI,A,Primary,Tractor,,Active
+TRT-1-A-NOT AVALIBLE,TRT-1-A China,A,Primary,Tractor,,Active
+TRT-3-A-NOT AVALIBLE,TRT-3-A China,A,Primary,Tractor,,Active
+TRT-1-A-GSH-4315077,TRT-1-A New Holland,A,Primary,Tractor,,Active
+TRT-2-A-GSH-4315054,TRT-2-A New Holland,A,Primary,Tractor,,Active
+TRT-3-A-GSH-4315079,TRT-3-A New Holland,A,Primary,Tractor,,Active
+TRT-4-A-GSH-4315082,TRT-4-A New Holland,A,Primary,Tractor,,Active
+SVL-5-A-GSF-8243DT,SVL-5-A,A,Primary,Tractor Shavel,,Active
+EXC-6-A-SY0061CC16098,EXC-6-A,A,Primary,EXCEVATOR,,Active
+WB-4-A-NOT AVALIBLE,WB-4-A Water Tanker,A,Primary,Water Tanker,,Active
+HARM-2-A-NOT AVALIBLE,HARM-2-A,A,Secondary,Compactor,,Active
+HARM-3-A-,HARM-3-A,A,Secondary,Compactor,,Active
+HARM-5-B-,HARM-5-B,B,Primary,Compactor,,Active
+HARM-6-A-,HARM-6-A,A,Secondary,Compactor,,Active
+MTS-1-A-RJ000018,MTS-1-A,A,Primary,MTS,,Active
+HARM-1-B-FM8JNKD-46216,HARM-1-B,B,Secondary,Compactor,,Active
+HARM-2-B-UFM12850,HARM-2-B,B,Secondary,Compactor,,Active
+HARM-3-B-FM2J000005,HARM-3-B,B,Secondary,Compactor,,Active
+SARM-24-B-MMC-04-CN01457,SARM-24-B,B,Primary,Compactor,,Active
+SARM-25-B-MMC-04-1N01648,SARM-25-B,B,Primary,Compactor,,Active
+SARM-7-B-402000740,SARM-7-B,B,Primary,Compactor,,Active
+COM-97-B-341257,COM-97-B,B,Primary,Compactor,,Active
+SU-168-B-341257,SU-168-B,B,Primary,Mini Tipper,,Active
+COM-156-B-902000156,COM-156-B,B,Primary,Compactor,,Active
+SU-174-B-902000156,SU-174-B,B,Primary,Mini Tipper,,Active
+TRT-56-B-22904411F4,TRT-56-B,B,Primary,Tractor,,Active
+TRT-58-B-22904411F4,TRT-58-B,B,Primary,Tractor,,Active
+PICKUP-1201-B-N/A,PICKUP-1201-B,B,Primary,PickUp,,Active
+SU-2325-B-N/A,SU-2325-B,B,Primary,Mini Tipper,,Active
+RL-4-B,RL-4-B,B,Primary,Rickshaw Loader,,Active
+COM-175-B-902000044,COM-175-B,B,Primary,Compactor,,Active
+COM-181-B-2000062,COM-181-B,B,Primary,Compactor,,Active
+COM-182-B-2000053,COM-182-B,B,Primary,Compactor,,Active
+COM-183-B-702000057,COM-183-B,B,Primary,Compactor,,Active
+Com-184-B-2000059,Com-184-B,B,Primary,Compactor,,Active
+COM-185-B-402000047,COM-185-B,B,Primary,Compactor,,Active
+COM-189-B-102000054,COM-189-B,B,Primary,Compactor,,Active
+COM-191-B-902000058,COM-191-B,B,Primary,Compactor,,Active
+COM-193-B-202000046,COM-193-B,B,Primary,Compactor,,Active
+COM-1-B-J4H802000004,COM-1-B,B,Primary,Compactor,,Active
+RL-7-B,RL-7-B,B,Primary,Rickshaw Loader,,Active
+COM-174-B-200174,COM-174-B,B,Primary,Compactor,,Active
+BL-19-B,BL-19-B,B,Primary,Bike Loader,,Active
+Com-65-B-4034-N25360,Com-65-B,B,Primary,Compactor,,Active
+RL-14-B,RL-14-B,B,Primary,Rickshaw Loader,,Active
+COM-98-B-102000300,COM-98,B,Primary,Compactor,,Active
+COM-99-B-802000309,COM-99-B,B,Primary,Compactor,,Active
+BL-18-B,BL-18-B,B,Primary,Bike Loader,,Active
+EXC-EX 02-E-CEWAA-008911,EXC-EX 02-E,E,Primary,EXCEVATOR,,Active
+FEL-2-B-10019,FEL-2-B,B,Primary,Tractor Shavel,,Active
+PICKUP-1025-B-JM6UFY02300253855,PICKUP-1025-B,B,Primary,PickUp,,Active
+COM-64-B,COM-64-B,B,Primary,Compactor,,Active
+BL-15-B,BL-15-B,B,Primary,Bike Loader,,Active
+PU-4028-B-,PU-4028-B,B,Primary,PickUp,,Active
+JM-83-B-702000054,JM-83-B,B,Primary,Jetting Mechine,,Active
+MS-88-B,MS-88-B,B,Primary,Mechanical Sweeper,,Active
+FAW-56-B-AHFMPS119CC005256,FAW-56-B,B,Secondary,Mini Tipper,,Active
+SVL-61-B,SVL-61-B,B,Primary,Tractor Shavel,,Active
+CT-1/33-B,CT-1/33-B,B,Primary,Tractor,,Active
+WT-1-B,WT-1-B,B,Primary,Water Tanker,,Active
+FAW-58-B-AHFMPS119CC005258,FAW-58-B,B,Primary,Mini Tipper,,Active
+SU-1261-B-221749,SU-1261-B,B,Primary,Mini Tipper,,Active
+BL-815-B,BL-815-B,B,Primary,Bike Loader,,Active
+SU-67-B-335659,SU-67-B,B,Primary,Mini Tipper,,Active
+SU-70-B-335655,SU-70-B,B,Primary,Mini Tipper,,Active
+SU-158-B-341214,SU-158-B,B,Primary,Mini Tipper,,Active
+SU-150-B-341218,SU-150-B,B,Primary,Mini Tipper,,Active
+SU-113-B-341299,SU-113-B,B,Primary,Mini Tipper,,Active
+SU-171-B-341255,SU-171-B,B,Primary,Mini Tipper,,Active
+SU-147-B-341236,SU-147-B,B,Primary,Mini Tipper,,Active
+SU-132-B-341281,SU-132-B,B,Primary,Mini Tipper,,Active
+SU-118-B-341240,SU-118-B,B,Primary,Mini Tipper,,Active
+SU-177-B-341192,SU-177-B,B,Primary,Mini Tipper,,Active
+SU-167-B-341262,SU-167-B,B,Primary,Mini Tipper,,Active
+SU-173-B-341215,SU-173-B,B,Primary,Mini Tipper,,Active
+SU-179-B-341258,SU-179-B,B,Primary,Mini Tipper,,Active
+SU-160-B-341239,SU-160-B,B,Primary,Mini Tipper,,Active
+SU-178-B-341217,SU-178-B,B,Primary,Mini Tipper,,Active
+SU-104-B-341288,SU-104-B,B,Primary,Mini Tipper,,Active
+SU-176-B-341223,SU-176-B,B,Primary,Mini Tipper,,Active
+SU-172-B-341176,SU-172-B,B,Primary,Mini Tipper,,Active
+SU-182-B-341264,SU-182-B,B,Primary,Mini Tipper,,Active
+RL-6-B,RL-6-B,B,Primary,Rickshaw Loader,,Active
+SU-170-B-341220,SU-170-B,B,Primary,Mini Tipper,,Active
+SU-143-B-341227,SU-143-B,B,Primary,Mini Tipper,,Active
+SU-154-B-341260,SU-154-B,B,Primary,Mini Tipper,,Active
+SU-125-B-341271,SU-125-B,B,Primary,Mini Tipper,,Active
+SU-136-B-341248,SU-136-B,B,Primary,Mini Tipper,,Active
+SU-164-B,SU-164-B,B,Primary,Mini Tipper,,Active
+SU-156-B-341235,SU-156-B,B,Primary,Mini Tipper,,Active
+SU-105-B-341289,SU-105-B,B,Primary,Mini Tipper,,Active
+SU-181-B-341185,SU-181-B,B,Primary,Mini Tipper,,Active
+SU-155-B-341251,SU-155-B,B,Primary,Mini Tipper,,Active
+SU-180-B-341213,SU-180-B,B,Primary,Mini Tipper,,Active
+SU-175-B,SU-175-B,B,Primary,Mini Tipper,,Active
+SU-151-B-341224,SU-151-B,B,Primary,Mini Tipper,,Active
+SU-169-B-341259,SU-169-B,B,Primary,Mini Tipper,,Active
+SU-72-E-SR308PK-341219,SU-72-E,E,Primary,Mini Tipper,,Active
+SU-1-E-230982,SU-1-E,E,Primary,Mini Tipper,,Active
+TRTTS-1-E-71848/10/13,TRTTS-1-E,E,Primary,Tractor,,Active
+PU-AA0954-E-KUN15R-9452274,PU-AA0954-E,E,Primary,PickUp,,Active
+EXC-1-E-SY0061CC18038,EXC-1-E,E,Primary,EXCEVATOR,,Active
+TRT-5037-E-GSH4315037,TRT-5037-E,E,Primary,Tractor,,Active
+TRT-5038-E-GSH4315038,TRT-5038-E,E,Primary,Tractor,,Active
+TRT-5041-E-GSH4315041,TRT-5041-E,E,Primary,Tractor,,Active
+TRT-5091-E-GSH4315091,TRT-5091-E,E,Primary,Tractor,,Active
+TRT-55-E-GSH82440TDT,TRT-55-E,E,Primary,Tractor,,Active
+SU-101-B-341284,SU-101-B,B,Primary,Mini Tipper,,Active
+SU-165-B-341253,SU-165-B,B,Primary,Mini Tipper,,Active
+RL-10-B,RL-10-B,B,Primary,Rickshaw Loader,,Active
+SU-4-B-335657,SU-4-B,B,Primary,Mini Tipper,,Active
+SU-66-B-355617,SU-66-B,B,Primary,Mini Tipper,,Active
+RL-13-B,RL-13-B,B,Primary,Rickshaw Loader,,Active
+SU-46-B-PK-406767,SU-46-B,B,Primary,Mini Tipper,,Active
+SU-49-B-PK-406793,SU-49-B,B,Primary,Mini Tipper,,Active
+SU-50-B-PK-406789,SU-50-B,B,Primary,Mini Tipper,,Active
+SU-162-B,SU-162-B,B,Primary,Mini Tipper,,Active
+BL-812-B,BL-812-B,B,Primary,Bike Loader,,Active
+SU-2-B,SU-2-B,B,Primary,Mini Tipper,,Active
+RL-12-B,RL-12-B,B,Primary,Rickshaw Loader,,Active
+RL-11-B,RL-11-B,B,Primary,Rickshaw Loader,,Active
+RL-8-B,RL-8-B,B,Primary,Rickshaw Loader,,Active
+ML-28-B-MMC-04-CN01455,ML-28-B,B,Primary,Compactor,,Active
+RL-9-B,RL-9-B,B,Primary,Rickshaw Loader,,Active
+BL-8-B,BL-8-B,B,Primary,Bike Loader,,Active
+SUC-78-B,SUC-78-B,B,Primary,Sucking Mechine,,Active
+SVL-60-B-00804211G8,SVL-60-B,B,Primary,Tractor Shavel,,Active
+FAW-57-B-AHFMPS119CC005257,FAW-57-B,B,Secondary,Mini Tipper,,Active
+TRT-4-B-K732006/08/18,TRT-4-B,B,Primary,Tractor,,Active
+TRT-44-B-15770507b4,TRT-44-B,B,Primary,Tractor,,Active
+TRT-5-B-LM913602V509526X,TRT-5-B,B,Primary,Tractor,,Active
+TRT-48-B-20529209N4,TRT-48-B,B,Primary,Tractor,,Active
+TRT-51-B-22903711F4,TRT-51-B,B,Primary,Tractor,,Active
+TRT-53-B-22904711F4,TRT-53-B,B,Primary,Tractor,,Active
+TRT-54-B-22903511F4,TRT-54-B,B,Primary,Tractor,,Active
+TRT-55-B-22904311F4,TRT-55-B,B,Primary,Tractor,,Active
+BL-22-B,BL-22-B,B,Primary,Bike Loader,,Active
+WB-1-B-12867,WB-1-B,B,Primary,Water Tanker,,Active
+TRT-2-B-71809/02/13,TRT-2-B,B,Primary,Tractor,,Active
+MTS-2-B-RJ000019,MTS-2-B,B,Primary,MTS,,Active
+MTS-3-C-RJ000020,MTS-3-C,C,Primary,MTS,,Active
+HARM-6463-C-46215,HARM-6463-C,C,Secondary,Compactor,,Active
+HARM-6465-D-248560,HARM-6465-D,D,Secondary,Compactor,,Active
+HARM-6466-C-248560,HARM-6466-C,C,Primary,Compactor,,Active
+HARM-6467-C-AHFMC2816210150,HARM-6467-C,C,Primary,Compactor,,Active
+HARM-6468-C-02816220153,HARM-6468-C,C,Primary,Compactor,,Active
+HARM-6469-B-AHFMC2816220157,HARM-6469-B,B,Primary,Compactor,,Active
+SARM-12-C-902000734,SARM-12-C,C,Primary,Compactor,,Active
+SARM-17-C-2000735,SARM-17-C,C,Primary,Compactor,,Active
+SARM-6-C-602000772,SARM-6-C,C,Primary,Compactor,,Active
+SARM-13-C-102000775,SARM-13-C,C,Primary,Compactor,,Active
+SARM-8-C-102000774,SARM-8-C,C,Primary,Compactor,,Active
+SARM-1-C-402000768,SARM-1-C,C,Primary,Compactor,,Active
+SARM-14-C-302000745,SARM-14-C,C,Primary,Compactor,,Active
+SARM-10-C-802000773,SARM-10-C,C,Primary,Compactor,,Active
+BL-23-B,BL-23-B,B,Primary,Bike Loader,,Active
+TRT-16-C-NA,TRT-16-C,C,Primary,Tractor,,Active
+COM-4-C-702000172,COM-4-C,C,Primary,Compactor,,Active
+COM-5-C-502000154,COM-5-C,C,Primary,Compactor,,Active
+COM-31-C-MMC-04-CNO1452,COM-31-C,C,Primary,Compactor,,Active
+COM-86-C-80200178,COM-86-C,C,Primary,Compactor,,Active
+Com-93-C-502000308,Com-93-C,C,Primary,Compactor,,Active
+COM-96-C-702000303,COM-96-C,C,Primary,Compactor,,Active
+COM-165-C-2000165,COM-165-C,C,Primary,Compactor,,Active
+COM-3-C-102000006,COM-3-C,C,Primary,Compactor,,Active
+COM-179-C-202000063,COM-179-C,C,Primary,Compactor,,Active
+Exc-1-C-NA,Exc-1-C,C,Primary,EXCEVATOR,,Active
+EXC-2-C-SY0061CC18058S,EXC-2-C,C,Primary,EXCEVATOR,,Active
+PU-4027-C-KUN15R-9455407,PU-4027-C,C,Primary,PickUp,,Active
+JM-20-C-702001591,JM-20-C,C,Primary,Jetting Mechine,,Active
+MS-89-C-NA,MS-89-C,C,Primary,Mechanical Sweeper,,Active
+TRT-67-C-NA,TRT-67-C,C,Primary,Tractor,,Active
+TRT-68-C-NA,TRT-68-C,C,Primary,Tractor,,Active
+SU-69-C-PK-335666,SU-69-C,C,Primary,Mini Tipper,,Active
+SU-108-C-PK-405344,SU-108-C,C,Primary,Mini Tipper,,Active
+SU-109-C-PK-402514,SU-109-C,C,Primary,Mini Tipper,,Active
+SU-110-C-PK-405365,SU-110-C,C,Primary,Mini Tipper,,Active
+SU-111-C-PK-405193,SU-111-C,C,Primary,Mini Tipper,,Active
+SU-112-C-PK-405247,SU-112-C,C,Primary,Mini Tipper,,Active
+SU-118-27-PK-405324,SU-118-27,C,Primary,Mini Tipper,,Active
+SU-113-C-PK-405369,SU-113-C,C,Primary,Mini Tipper,,Active
+SU-114-C-PK-405333,SU-114-C,C,Primary,Mini Tipper,,Active
+SU-115-C-PK-405144,SU-115-C,C,Primary,Mini Tipper,,Active
+SU-116-C-PK-405259,SU-116-C,C,Primary,Mini Tipper,,Active
+SU-117-C-PK-405013,SU-117-C,C,Primary,Mini Tipper,,Active
+SU-119-C-PK-405319,SU-119-C,C,Primary,Mini Tipper,,Active
+SU-120-C-PK-405343,SU-120-C,C,Primary,Mini Tipper,,Active
+SU-127-C-PK-406806,SU-127-C,C,Primary,Mini Tipper,,Active
+SU-126-C-PK-406622,SU-126-C,C,Primary,Mini Tipper,,Active
+SU-128-C-PK-406802,SU-128-C,C,Primary,Mini Tipper,,Active
+SU-M1-C-PK-476115,SU-M1-C,C,Primary,Mini Tipper,,Active
+SU-M3-C-PK-476178,SU-M3-C,C,Primary,Mini Tipper,,Active
+SU-M5-C-PK-476179,SU-M5-C,C,Primary,Mini Tipper,,Active
+SU-M7-C-PK-476187,SU-M7-C,C,Primary,Mini Tipper,,Active
+SU-M11-C-PK-476180,SU-M11-C,C,Primary,Mini Tipper,,Active
+SU-M14-C-PK-476197,SU-M14-C,C,Primary,Mini Tipper,,Active
+FAW-8-C-PS119CC005259,FAW-8-C,C,Primary,Mini Tipper,,Active
+FAW-10-C-PS119CC005260,FAW-10-C,C,Primary,Mini Tipper,,Active
+Faw-1-C-PS119CC005261,Faw-1-C,C,Primary,Mini Tipper,,Active
+FAW-9-C-PS119CC005262,FAW-9-C,C,Primary,Mini Tipper,,Active
+FAW-12-C-PS119CC005263,FAW-12-C,C,Primary,Mini Tipper,,Active
+FAW-100-C-PS119CC005264,FAW-100-C,C,Primary,Mini Tipper,,Active
+Faw-15-C-PS119CC005265,Faw-15-C,C,Primary,Mini Tipper,,Active
+FAW-16-C-AHSMPS120CC005490,FAW-16-C,C,Primary,Mini Tipper,,Active
+FAW-17-C-AHSMPS121CC005633,FAW-17-C,C,Primary,Mini Tipper,,Active
+FAW-18-C-AHSMPS121CC005684,FAW-18-C,C,Primary,Mini Tipper,,Active
+FAW-19-C-AHSMPS120CC005491,FAW-19-C,C,Primary,Mini Tipper,,Active
+FAW-20-C-AHSMPS120CC005281,FAW-20-C,C,Primary,Mini Tipper,,Active
+FAW-21-C-AHSMPS120CC005477,FAW-21-C,C,Primary,Mini Tipper,,Active
+FAW-22-C-AHSMPS121CC005696,FAW-22-C,C,Primary,Mini Tipper,,Active
+FAW-23-C-AHSMPS121CC005810,FAW-23-C,C,Primary,Mini Tipper,,Active
+Faw-24-C-AHSMPS121CC005678,Faw-24-C,C,Primary,Mini Tipper,,Active
+FAW-25-C-AHSMPS121CC005808,FAW-25-C,C,Primary,Mini Tipper,,Active
+FAW-26-C-AHSMPS120CC005412,FAW-26-C,C,Primary,Mini Tipper,,Active
+FAW-27-C-AHSMPS121CC005603,FAW-27-C,C,Primary,Mini Tipper,,Active
+ML-27-C-mmc-04-cno1454,ML-27-C,C,Primary,Compactor,,Active
+SU-1-C-SR308PK-386983,SU-1-C,C,Primary,Mini Tipper,,Active
+TRTSVL-3-C-LMB9572V503704D,TRTSVL-3-C,C,Primary,Tractor,,Active
+TRTSVL-12-C-114-08,TRTSVL-12-C,C,Primary,Tractor,,Active
+TRTSVL-4-C-GSH-82410T,TRTSVL-4-C,C,Primary,Tractor,,Active
+TRTTS-46-C-NA,TRTTS-46-C,C,Primary,Tractor,,Active
+TRT-3-C-LMB9602V520957D,TRT-3-C,C,Primary,Tractor,,Active
+TRT-4-C- GSH-4315076,TRT-4-C,C,Primary,Tractor,,Active
+TRT-5-C-GSH-4315085,TRT-5-C,C,Primary,Tractor,,Active
+TRT-6-C-GSH-4315087,TRT-6-C,C,Primary,Tractor,,Active
+TRT-7-C-GSH-4315081,TRT-7-C,C,Primary,Tractor,,Active
+WB-(WB 03)-C-PK-444104,WB-(WB 03)-C,C,Primary,Water Tanker,,Active
+WB-2015-C-FG8JKKB-31688,WB-2015-C,C,Primary,Water Tanker,,Active
+WT-23-C-12868,WT-23-C,C,Primary,Water Tanker,,Active

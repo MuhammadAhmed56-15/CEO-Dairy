@@ -16,6 +16,7 @@ from .forms import (
 from .models import (
     LogBook,
     LogBookPage,
+    LogBookEntry,
     Vehicle,
     Driver,
 )
@@ -843,12 +844,22 @@ def manager_error_redirect(request, redirect_name):
 
 @login_required
 def vehicle_list(request):
+    from django.db.models import Exists, OuterRef
+    has_pdf_subquery = LogBookEntry.objects.filter(
+        logbook__vehicle=OuterRef('pk'),
+        signed_requisition__isnull=False
+    ).exclude(signed_requisition='')
+
+    base_qs = Vehicle.objects.select_related('driver', 'zone').annotate(
+        has_logbook_pdf=Exists(has_pdf_subquery)
+    ).order_by('vehicle_name')
+
     if is_admin_or_ceo(request.user):
-        vehicles = Vehicle.objects.select_related('driver', 'zone').all().order_by('vehicle_name')
+        vehicles = base_qs
     else:
         user_zone = get_user_zone(request.user)
         if user_zone:
-            vehicles = Vehicle.objects.select_related('driver', 'zone').filter(zone=user_zone).order_by('vehicle_name')
+            vehicles = base_qs.filter(zone=user_zone)
         else:
             vehicles = Vehicle.objects.none()
 

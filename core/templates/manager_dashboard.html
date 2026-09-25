@@ -759,126 +759,142 @@
         <h2 id="dash-title">📊 {{ request.user.username }} Dashboard</h2>
         <script>
             (function() {
-                var rawRole = '{{ request.user.profile.role|default:"" }}';
                 var rawUsername = '{{ request.user.username }}';
-                var username = rawUsername.replace(/_/g, ' ');
-                if (rawUsername === 'AuditManager' || rawUsername === 'mngraudit') username = 'Manager Audit';
-                else if (rawUsername === 'MngrProc') username = 'Manager Procurement';
-                else if (rawUsername === 'MngrHr') username = 'Manager HR';
-                else if (rawUsername === 'MngrProj') username = 'Manager Project';
-                else if (rawUsername === 'MngrFin') username = 'Manager Finance';
-                else if (rawUsername === 'MngrBilling') username = 'Manager Billing';
-                else if (rawUsername === 'MngrPlan') username = 'Manager Planning';
-                else if (rawUsername === 'MngrSWMHO') username = 'Manager SWM HO';
-                else if (rawUsername === 'MngrOPS') username = 'Manager Operation';
-                else if (rawUsername === 'MngrFleet') username = 'Manager Fleet';
-                else if (rawUsername === 'MngrCLC') username = 'Manager CLC';
-                else if (rawUsername === 'MngrMIS' || rawUsername === 'mngrmis') username = 'Manager MIS';
-                else if (rawUsername === 'MngrSWMZoneA') username = 'Manager SWM A';
-                else if (rawUsername === 'MngrSWMZoneB') username = 'Manager SWM B';
-                else if (rawUsername === 'MngrSWMZoneC') username = 'Manager SWM C';
-                else if (rawUsername === 'MngrSWMZoneD') username = 'Manager SWM D';
-                else if (rawUsername === 'MngrSWMZoneE') username = 'Manager SWM E';
-                else if (rawUsername === 'MngrWSA') username = 'Manager WS&WMM A';
-                else if (rawUsername === 'MngrWSB') username = 'Manager WS&WMM B';
-                else if (rawUsername === 'MngrWSC') username = 'Manager WS&WMM C';
-                else if (rawUsername === 'MngrWSD') username = 'Manager WS&WMM D';
-                else if (rawUsername === 'MngrWSE') username = 'Manager WS&WMM E';
-                else if (rawUsername === 'MngrA_AZoneA') username = 'Manager A&A A';
-                else if (rawUsername === 'MngrA_AZoneB') username = 'Manager A&A B';
-                else if (rawUsername === 'MngrA_AZoneC') username = 'Manager A&A C';
-                else if (rawUsername === 'MngrA_AZoneD') username = 'Manager A&A D';
-                else if (rawUsername === 'MngrA_AZoneE') username = 'Manager A&A E';
-                else if (rawUsername === 'fozonea' || rawUsername === 'Fleet_Officer_A') username = 'Fleet Officer Zone A';
-                else if (rawUsername === 'fozoneb' || rawUsername === 'Fleet_Officer_B') username = 'Fleet Officer Zone B';
-                else if (rawUsername === 'fozonec' || rawUsername === 'Fleet_Officer_C') username = 'Fleet Officer Zone C';
-                else if (rawUsername === 'fozoned' || rawUsername === 'Fleet_Officer_D') username = 'Fleet Officer Zone D';
-                else if (rawUsername === 'fozonee' || rawUsername === 'Fleet_Officer_E') username = 'Fleet Officer Zone E';
-                else if (rawUsername === 'ampmerho1' || rawUsername === 'AMPmerHO1') username = 'Assistant Manager PMER HO1';
-                else if (rawUsername === 'ampmerho2' || rawUsername === 'AMPmerHO2') username = 'Assistant Manager PMER HO2';
-                else if (rawUsername === 'amdatabaseho' || rawUsername === 'AMdatabaseHO') username = 'Assistant Manager Database';
-                else if (rawUsername === 'ambillingho' || rawUsername === 'AMbillingHO') username = 'Assistant Manager Billing';
-                else if (rawUsername === 'aoho1') username = 'Accounts Officer HO1';
-                else if (rawUsername === 'aoho2') username = 'Accounts Officer HO2';
-                else if (rawUsername === 'aoho3') username = 'Accounts Officer HO3';
-                else if (rawUsername === 'amcczonea') username = 'Assistant Manager Customer Care Zone A';
-                else if (rawUsername === 'amcczoneb') username = 'Assistant Manager Customer Care Zone B';
-                else if (rawUsername === 'amcczonec') username = 'Assistant Manager Customer Care Zone C';
-                else if (rawUsername === 'amcczoned') username = 'Assistant Manager Customer Care Zone D';
-                else if (rawUsername === 'amcczonee') username = 'Assistant Manager Customer Care Zone E';
-                else if (rawUsername === 'amhrzonea') username = 'Assistant Manager HR & Admin Zone A';
-                else if (rawUsername === 'amhrzoneb') username = 'Assistant Manager HR & Admin Zone B';
-                else if (rawUsername === 'amhrzonec') username = 'Assistant Manager HR & Admin Zone C';
-                else if (rawUsername === 'amhrzoned') username = 'Assistant Manager HR & Admin Zone D';
-                else if (rawUsername === 'amhrzonee') username = 'Assistant Manager HR & Admin Zone E';
-                else if (rawUsername === 'amprocho' || rawUsername === 'AMprocho') username = 'Assistant Manager Procurement HO';
-                
-                var fn = '{{ request.user.first_name|escapejs }}'.trim();
-                var ln = '{{ request.user.last_name|escapejs }}'.trim();
-                var gn = '{{ request.user.get_full_name|escapejs }}'.trim();
-                
-                var fullName = gn || (fn + (ln ? ' ' + ln : '')).trim() || fn || ln;
-                if (!fullName) {
-                    if (rawUsername === 'CFO') fullName = 'Haidar Ali';
-                    else if (rawUsername === 'CIA' || rawUsername === 'cia') fullName = 'Asif Shah';
-                    else if (rawUsername === 'ZM_A') fullName = 'Tariq Aziz';
-                    else if (rawUsername === 'ZM_B') fullName = 'Aamir Gull';
-                    else if (rawUsername === 'ZM_C') fullName = 'Maria Shahnaz';
-                    else if (rawUsername === 'ZM_D') fullName = 'Turab Shah';
-                    else if (rawUsername === 'ZM_E') fullName = 'Anwar Ul Haq';
-                    else if (rawUsername === 'Manager_Media') fullName = 'Ali Hassan';
-                    else if (rawUsername === 'AuditManager' || rawUsername === 'mngraudit') fullName = 'Wajid Ali Khan';
-                    else if (rawUsername === 'MngrProc') fullName = 'Saleem Rafiq';
-                    else if (rawUsername === 'MngrHr') fullName = 'Saqib Nawaz';
-                    else if (rawUsername === 'MngrProj') fullName = 'Jahangir Khan';
-                    else if (rawUsername === 'MngrFin') fullName = 'Sheraz Khan';
-                    else if (rawUsername === 'MngrPlan') fullName = 'Sajjad Khan';
-                    else if (rawUsername === 'MngrSWMHO') fullName = 'Muhammad Saeed';
-                    else if (rawUsername === 'MngrOPS') fullName = 'Muhammad Ijaz';
-                    else if (rawUsername === 'MngrBilling') fullName = 'Nusrat Ali';
-                    else if (rawUsername === 'MngrFleet') fullName = 'Muhammad Anwar';
-                    else if (rawUsername === 'MngrCLC') fullName = 'Muhammad Ismail';
-                    else if (rawUsername === 'MngrMIS' || rawUsername === 'mngrmis') fullName = 'Asim Ghauri';
-                    else if (rawUsername === 'MngrSWMZoneA') fullName = 'Muhammad Basit';
-                    else if (rawUsername === 'MngrSWMZoneB') fullName = 'Gohar Ali';
-                    else if (rawUsername === 'MngrSWMZoneC') fullName = 'Tariq Saddique';
-                    else if (rawUsername === 'MngrSWMZoneD') fullName = 'Muhammad Ziad';
-                    else if (rawUsername === 'MngrSWMZoneE') fullName = 'Usman Khan';
-                    else if (rawUsername === 'MngrWSA') fullName = 'Syed Ali Raza Shah';
-                    else if (rawUsername === 'MngrWSB') fullName = 'Zafar Ullah Bangash';
-                    else if (rawUsername === 'MngrWSC') fullName = 'Muneeb Ullah Khan';
-                    else if (rawUsername === 'MngrWSD') fullName = 'Farman Ali';
-                    else if (rawUsername === 'MngrWSE') fullName = 'Anwar Ul Haq';
-                    else if (rawUsername === 'MngrA_AZoneA') fullName = 'Syed Nasir Shah';
-                    else if (rawUsername === 'MngrA_AZoneB') fullName = 'Jahangir Khan Khattak';
-                    else if (rawUsername === 'MngrA_AZoneC') fullName = 'Mansoor Rehman';
-                    else if (rawUsername === 'MngrA_AZoneD') fullName = 'Maqbool Ali';
-                    else if (rawUsername === 'MngrA_AZoneE') fullName = 'Muhammad Ali Shah';
-                    else if (rawUsername === 'fozonea' || rawUsername === 'Fleet_Officer_A') fullName = 'Mustarif Khan';
-                    else if (rawUsername === 'fozoneb' || rawUsername === 'Fleet_Officer_B') fullName = 'Muhammad Aimal Khan';
-                    else if (rawUsername === 'fozonec' || rawUsername === 'Fleet_Officer_C') fullName = 'Adnan Faraz';
-                    else if (rawUsername === 'fozoned' || rawUsername === 'Fleet_Officer_D') fullName = 'Qaiser Khan';
-                    else if (rawUsername === 'fozonee' || rawUsername === 'Fleet_Officer_E') fullName = 'Muhammad Adnan';
-                    else if (rawUsername === 'ampmerho1' || rawUsername === 'AMPmerHO1') fullName = 'Muhammad Tayyab Sethi';
-                    else if (rawUsername === 'ampmerho2' || rawUsername === 'AMPmerHO2') fullName = 'Behram Khan';
-                    else if (rawUsername === 'amdatabaseho' || rawUsername === 'AMdatabaseHO') fullName = 'Jhangeer Khan';
-                    else if (rawUsername === 'ambillingho' || rawUsername === 'AMbillingHO') fullName = 'Waqas Ahmed';
-                    else if (rawUsername === 'aoho1') fullName = 'Aman Khan';
-                    else if (rawUsername === 'aoho2') fullName = 'Majid Khan';
-                    else if (rawUsername === 'aoho3') fullName = 'Sajid Khan';
-                    else if (rawUsername === 'amcczonea') fullName = 'Ilyas Jehan';
-                    else if (rawUsername === 'amcczoneb') fullName = 'Muhammad Waqas';
-                    else if (rawUsername === 'amcczonec') fullName = 'Maqsood Ali';
-                    else if (rawUsername === 'amcczoned') fullName = 'Muhammad Ilyas';
-                    else if (rawUsername === 'amcczonee') fullName = 'Syed Mohsin Shah';
-                    else if (rawUsername === 'amhrzonea') fullName = 'Muhammad Arif';
-                    else if (rawUsername === 'amhrzoneb') fullName = 'Asif Khan';
-                    else if (rawUsername === 'amhrzonec') fullName = 'Ahmed Ali';
-                    else if (rawUsername === 'amhrzoned') fullName = 'Malghalara Hidayat';
-                    else if (rawUsername === 'amhrzonee') fullName = 'Asif Saeed';
-                    else if (rawUsername === 'amprocho' || rawUsername === 'AMprocho') fullName = 'Siraj Munawar';
-                }
-                
+                // Map raw usernames to friendly display names
+                var nameMap = {
+                    // Audit
+                    'AuditManager':   'Manager Audit',
+                    'mngraudit':      'Manager Audit',
+                    // Procurement
+                    'MngrProc':       'Manager Proc',
+                    'mngrproc':       'Manager Proc',
+                    // HR
+                    'MngrHr':         'Manager HR',
+                    'mngrhr':         'Manager HR',
+                    // Project
+                    'MngrProj':       'Manager Proj',
+                    'mngrproj':       'Manager Proj',
+                    // Finance
+                    'MngrFin':        'Manager Finance',
+                    'mngrfin':        'Manager Finance',
+                    // Billing
+                    'MngrBilling':    'Manager Billing',
+                    'mngrbilling':    'Manager Billing',
+                    // Planning
+                    'MngrPlan':       'Manager Planning',
+                    'mngrplan':       'Manager Planning',
+                    // SWM HO
+                    'MngrSWMHO':      'Manager SWM HO',
+                    'mngrswmho':      'Manager SWM HO',
+                    // OPS
+                    'MngrOPS':        'Manager OPS',
+                    'mngrops':        'Manager OPS',
+                    // Fleet
+                    'MngrFleet':      'Manager Fleet',
+                    'mngrfleet':      'Manager Fleet',
+                    // CLC
+                    'MngrCLC':        'Manager CLC',
+                    'mngrclc':        'Manager CLC',
+                    // MIS
+                    'MngrMIS':        'Manager MIS',
+                    'mngrmis':        'Manager MIS',
+                    // SWM Zones
+                    'MngrSWMZoneA':   'Manager SWM Zone A',
+                    'mngrswmzonea':   'Manager SWM Zone A',
+                    'MngrSWMZoneB':   'Manager SWM Zone B',
+                    'mngrswmzoneb':   'Manager SWM Zone B',
+                    'MngrSWMZoneC':   'Manager SWM Zone C',
+                    'mngrswmzonec':   'Manager SWM Zone C',
+                    'MngrSWMZoneD':   'Manager SWM Zone D',
+                    'mngrswmzoned':   'Manager SWM Zone D',
+                    'MngrSWMZoneE':   'Manager SWM Zone E',
+                    'mngrswmzonee':   'Manager SWM Zone E',
+                    // WS&WMM Zones
+                    'MngrWSA':        'Manager WS Zone A',
+                    'mngrwsa':        'Manager WS Zone A',
+                    'MngrWSB':        'Manager WS Zone B',
+                    'mngrwsb':        'Manager WS Zone B',
+                    'MngrWSC':        'Manager WS Zone C',
+                    'mngrwsc':        'Manager WS Zone C',
+                    'MngrWSD':        'Manager WS Zone D',
+                    'mngrwsd':        'Manager WS Zone D',
+                    'MngrWSE':        'Manager WS Zone E',
+                    'mngrwse':        'Manager WS Zone E',
+                    // A&A Zones
+                    'MngrA_AZoneA':   'Manager A&A Zone A',
+                    'mngra_azonea':   'Manager A&A Zone A',
+                    'mngra azonea':   'Manager A&A Zone A',
+                    'MngrA_AZoneB':   'Manager A&A Zone B',
+                    'mngra_azoneb':   'Manager A&A Zone B',
+                    'mngra azoneb':   'Manager A&A Zone B',
+                    'MngrA_AZoneC':   'Manager A&A Zone C',
+                    'mngra_azonec':   'Manager A&A Zone C',
+                    'mngra azonec':   'Manager A&A Zone C',
+                    'MngrA_AZoneD':   'Manager A&A Zone D',
+                    'mngra_azoned':   'Manager A&A Zone D',
+                    'mngra azoned':   'Manager A&A Zone D',
+                    'MngrA_AZoneE':   'Manager A&A Zone E',
+                    'mngra_azonee':   'Manager A&A Zone E',
+                    'mngra azonee':   'Manager A&A Zone E',
+                    // Fleet Officers
+                    'fozonea':        'FO Zone A',
+                    'Fleet_Officer_A':'FO Zone A',
+                    'fozoneb':        'FO Zone B',
+                    'Fleet_Officer_B':'FO Zone B',
+                    'fozonec':        'FO Zone C',
+                    'Fleet_Officer_C':'FO Zone C',
+                    'fozoned':        'FO Zone D',
+                    'Fleet_Officer_D':'FO Zone D',
+                    'fozonee':        'FO Zone E',
+                    'Fleet_Officer_E':'FO Zone E',
+                    // Asst. Managers PMER
+                    'ampmerho1':      'AM PMER HO1',
+                    'AMPmerHO1':      'AM PMER HO1',
+                    'ampmerho2':      'AM PMER HO2',
+                    'AMPmerHO2':      'AM PMER HO2',
+                    // Asst. Managers Other
+                    'amdatabaseho':   'AM Database HO',
+                    'AMdatabaseHO':   'AM Database HO',
+                    'ambillingho':    'AM Billing HO',
+                    'AMbillingHO':    'AM Billing HO',
+                    // Accounts Officers
+                    'aoho1':          'AO HO1',
+                    'aoho2':          'AO HO2',
+                    'aoho3':          'AO HO3',
+                    // AM Customer Care
+                    'amcczonea':      'AM CC Zone A',
+                    'amcczoneb':      'AM CC Zone B',
+                    'amcczonec':      'AM CC Zone C',
+                    'amcczoned':      'AM CC Zone D',
+                    'amcczonee':      'AM CC Zone E',
+                    // AM HR & Admin
+                    'amhrzonea':      'AM HR Zone A',
+                    'amhrzoneb':      'AM HR Zone B',
+                    'amhrzonec':      'AM HR Zone C',
+                    'amhrzoned':      'AM HR Zone D',
+                    'amhrzonee':      'AM HR Zone E',
+                    // AM Procurement
+                    'amprocho':       'AM Proc HO',
+                    'AMprocho':       'AM Proc HO',
+                    // Senior roles
+                    'CFO':            'CFO',
+                    'CIA':            'CIA',
+                    'cia':            'CIA',
+                    // Zonal Managers
+                    'ZM_A':           'ZMA',
+                    'zma':            'ZMA',
+                    'ZM_B':           'ZMB',
+                    'zmb':            'ZMB',
+                    'ZM_C':           'ZMC',
+                    'zmc':            'ZMC',
+                    'ZM_D':           'ZMD',
+                    'zmd':            'ZMD',
+                    'ZM_E':           'ZME',
+                    'zme':            'ZME',
+                    // Other
+                    'Manager_Media':  'Manager Media',
+                };
+                var username = nameMap[rawUsername] || rawUsername.replace(/_/g, ' ');
                 var titleText = '📊 ' + username + ' Dashboard';
                 var el = document.getElementById('dash-title');
                 if (el) el.innerText = titleText;

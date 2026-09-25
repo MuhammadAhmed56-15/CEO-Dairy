@@ -756,14 +756,11 @@
 {% block content %}
 <div class="welcome-header">
     <div class="welcome-content">
-        <h2 id="gm-dash-title">📊 {{ request.user.username }} Dashboard</h2>
+        <h2 id="gm-dash-title">📊 {{ request.user.username|upper }} Dashboard</h2>
         <script>
             (function() {
-                var rawRole = '{{ request.user.profile.role|default:"" }}';
                 var rawUsername = '{{ request.user.username }}';
-                var username = rawUsername.replace(/_/g, ' ');
-                if (username.toUpperCase() === 'GM HR') username = 'GM HR';
-                
+                var username = rawUsername.replace(/_/g, ' ').toUpperCase();
                 var titleText = '📊 ' + username + ' Dashboard';
                 var el = document.getElementById('gm-dash-title');
                 if (el) el.innerText = titleText;

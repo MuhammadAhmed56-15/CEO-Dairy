@@ -163,7 +163,23 @@
         margin: 15px 0 25px 0;
         border-radius: 4px;
     }
-    
+
+    /* ===== Details grid (Driver Name / Mobile / CNIC / Date) ===== */
+    /* Custom 2-column flex layout (not Bootstrap) so print can force it reliably */
+    .req-details-grid {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 18px;
+        line-height: 2.2;
+        margin-bottom: 20px;
+    }
+    .req-details-item {
+        width: 50%;
+        box-sizing: border-box;
+        padding-right: 16px;
+        margin-bottom: 12px;
+    }
+
     .signature-area {
         margin-top: 50px;
         display: flex;
@@ -204,22 +220,334 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
+    /* Letterhead table — fixed layout so long titles can never squeeze the logo columns */
+    .letterhead-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 4pt;
+    }
+    .letterhead-table td {
+        border: none;
+        vertical-align: middle;
+    }
+    .letterhead-logo-cell {
+        width: 18%;
+        text-align: center;
+        padding: 6pt;
+    }
+    .letterhead-logo-cell img {
+        width: 100px;
+        height: 100px;
+        max-width: 100%;
+        object-fit: contain;
+        display: inline-block;
+    }
+    .letterhead-text-cell {
+        width: 64%;
+        text-align: center;
+        padding: 6pt 8pt;
+    }
+    .letterhead-title {
+        font-weight: 900;
+        font-size: 22px;
+        margin: 0 0 5pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.3;
+        text-transform: uppercase;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+    }
+    .letterhead-subtitle {
+        font-weight: 800;
+        font-size: 18px;
+        margin: 0 0 3pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.3;
+    }
+    .letterhead-govt {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 3pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+    .letterhead-address {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.3;
+    }
+
+    /* ===== Print Styles ===== */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 8mm 9mm;
+        }
+        body {
+            background: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        #sidebar, .sidebar, .main-header, .main-footer, .sidebar-overlay,
+        .navbar, .action-section, .btn-print, .req-card-header, .no-print {
+            display: none !important;
+        }
+        .req-page-wrapper {
+            background: #fff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: auto !important;
+        }
+        .content {
+            margin-left: 0 !important;
+            padding: 0 !important;
+        }
+        .req-container {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .req-card {
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+        }
+        .req-card-body { padding: 0 !important; }
+        .paper-form {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 6pt !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            font-size: 13pt !important;
+            line-height: 1.6 !important;
+        }
+        .action-section { display: none !important; }
+        .forward-history-item { page-break-inside: avoid; }
+
+        /* ---- Letterhead: fixed table layout so text can never squeeze the logo cells ---- */
+        .letterhead-table { table-layout: fixed !important; width: 100% !important; }
+                .letterhead-logo-cell { width: 13% !important; padding: 3pt !important; }
+        .letterhead-logo-cell img {
+            width: 72px !important;
+            height: 72px !important;
+            max-width: 72px !important;
+            max-height: 72px !important;
+            object-fit: contain !important;
+            display: inline-block !important;
+        }
+        .letterhead-text-cell { width: 74% !important; padding: 4pt 4pt !important; }
+        .letterhead-title   { font-size: 13.5pt !important; white-space: nowrap !important; }
+        .letterhead-subtitle{ font-size: 12pt !important; }
+        .letterhead-govt    { font-size: 10.5pt !important; }
+        .letterhead-address { font-size: 9.5pt !important; }
+
+        .form-value-text { font-size: 13pt !important; min-width: 100px !important; }
+        .issue-text-box { font-size: 13pt !important; padding: 10pt 12pt !important; }
+
+        /* ---- Details grid: force 2-column flex row, no matter what base.html print CSS does ---- */
+        .req-details-grid {
+            display: flex !important;
+            flex-flow: row wrap !important;
+            width: 100% !important;
+            font-size: 13pt !important;
+            margin-bottom: 14pt !important;
+        }
+        .req-details-item {
+            display: block !important;
+            width: 50% !important;
+            max-width: 50% !important;
+            flex: 0 0 50% !important;
+            box-sizing: border-box !important;
+            padding-right: 10pt !important;
+            margin-bottom: 8pt !important;
+            float: none !important;
+        }
+
+        /* ---- Signatures: force side-by-side row, no matter what base.html print CSS does ---- */
+        .signature-area {
+            display: flex !important;
+            flex-flow: row nowrap !important;
+            justify-content: space-between !important;
+            align-items: flex-end !important;
+            width: 100% !important;
+            margin-top: 30pt !important;
+            page-break-inside: avoid !important;
+        }
+        .signature-box {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            width: 45% !important;
+            max-width: 45% !important;
+            flex: 0 0 45% !important;
+            float: none !important;
+        }
+        .signature-img { max-width: 200px !important; max-height: 80px !important; }
+        .signature-line { font-size: 12pt !important; }
+
+        /* ---- Attachments: hide card UI, show print version ---- */
+        .attachments-section { display: none !important; }
+        .attachments-print-section { display: block !important; }
+
+        .attachments-print-section { page-break-inside: auto !important; break-inside: auto !important; }
+        .print-items-grid { display: block !important; }
+        .print-att-item {
+            width: 100% !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+        }
+        .print-doc-preview { display: block !important; margin: 6pt 0 14pt; }
+        .doc-sheet { page-break-inside: auto; }
+        .doc-sheet tr { page-break-inside: avoid; break-inside: avoid; }
+    }
+
+
+    /* Print: file ka asal content (PDF pages / Word / Excel) */
+    .print-doc-preview { display: none; }
+    .doc-note {
+        font-family: 'Times New Roman', Times, serif; font-size: 9.5pt; color: #64748b;
+        padding: 8pt 10pt; border: 1px dashed #cbd5e1; border-radius: 4pt; background: #f8fafc;
+    }
+    .doc-html { font-family: 'Times New Roman', Times, serif; font-size: 10.5pt; line-height: 1.5; color: #0f172a; }
+    .doc-html p { margin: 0 0 6pt; }
+    .doc-html img { max-width: 100%; height: auto; }
+    .doc-html table { border-collapse: collapse; width: 100%; margin: 6pt 0; }
+    .doc-html td, .doc-html th { border: 1px solid #cbd5e1; padding: 3pt 6pt; vertical-align: top; }
+    .doc-sheet {
+        font-family: Calibri, Arial, sans-serif;
+        font-size: 8pt;
+        color: #0f172a;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    .doc-sheet-title {
+        font-size: 9pt; font-weight: 700; color: #166534; background: #dcfce7;
+        border: 1px solid #bbf7d0; border-bottom: none; border-radius: 4pt 4pt 0 0; padding: 3pt 8pt; margin-top: 8pt;
+    }
+    /* Excel jaisi look: table apni content ke hisab se width leti hai, text sidha (horizontal) rehta hai */
+    .doc-sheet table {
+        border-collapse: collapse;
+        table-layout: auto;
+        width: auto;
+        min-width: 100%;
+        margin: 0;
+        background: #fff;
+    }
+    .doc-sheet td, .doc-sheet th {
+        border: 1px solid #cbd5e1;
+        padding: 3pt 6pt;
+        white-space: nowrap;
+        text-align: left;
+        font-family: Calibri, Arial, sans-serif;
+    }
+    .doc-sheet tr:first-child td, .doc-sheet tr:first-child th {
+        background: #dcfce7 !important;
+        font-weight: 700;
+        color: #14532d;
+        border-bottom: 1.5px solid #86efac;
+    }
+    .doc-sheet tr:nth-child(even) td { background: #f8fafc; }
+    .doc-sheet tr:nth-child(odd) td { background: #fff; }
+    .pdf-page-img {
+        display: block; width: 100%; height: auto; margin: 0 0 8pt;
+        border: 1px solid #e2e8f0; border-radius: 3pt;
+        page-break-inside: avoid; break-inside: avoid;
+    }
+
+    /* Print attachments section (hidden on screen, shown only in print) */
+    .attachments-print-section {
+        display: none;
+        margin-top: 20pt;
+    }
+    .attachments-print-section h4 { page-break-after: avoid; break-after: avoid; }
+    .attachments-print-section h4 {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 15pt;
+        font-weight: 700;
+        border-bottom: 1px solid #000;
+        padding-bottom: 4pt;
+        margin-bottom: 12pt;
+        color: #000;
+    }
+    .print-items-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12pt;
+    }
+    .print-att-item {
+        width: 31%;
+        min-width: 150pt;
+        border: 1px solid #ddd;
+        border-radius: 4pt;
+        padding: 6pt;
+        box-sizing: border-box;
+        background: #fff;
+        margin-bottom: 12pt;
+    }
+    /* Only the small icon+name row must stay together; full doc preview may flow across pages */
+    .print-att-file-icon { page-break-inside: avoid; break-inside: avoid; }
+    .print-att-item > img {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: 130pt;
+        object-fit: contain;
+        margin: 0 auto 4pt auto;
+        border: 1px solid #eee;
+        background: #fafafa;
+    }
+    .print-att-label {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 9.5pt;
+        color: #333;
+        font-style: italic;
+        text-align: center;
+        word-break: break-word;
+    }
+    .print-att-file-icon {
+        display: flex;
+        align-items: center;
+        gap: 8pt;
+        border: 1px solid #ccc;
+        border-radius: 4pt;
+        padding: 8pt 10pt;
+        background: #f9f9f9;
+        height: 100%;
+        box-sizing: border-box;
+    }
+    .print-att-file-icon .icon-glyph { font-size: 20pt; line-height: 1; flex-shrink: 0; }
+    .print-att-file-icon .file-meta { min-width: 0; }
+    .print-att-file-icon .file-name {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 9.5pt;
+        font-weight: 700;
+        word-break: break-word;
+    }
+    .print-att-file-icon .file-type {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 8.5pt;
+        color: #555;
+    }
+
 </style>
 
 <div class="req-page-wrapper">
     <div class="req-container">
-        
-        {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px; border: none; font-weight: 500;">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <div class="req-card">
             <!-- ===== Professional Card Header ===== -->
             <header class="req-card-header">
@@ -230,38 +558,41 @@
                     <h1 class="req-card-header__title">Vehicle Requisition Detail</h1>
                     <p class="req-card-header__subtitle">Submitted by {{ req.fleet_officer.get_full_name|default:req.fleet_officer.username }}</p>
                 </div>
-                <a href="{% url 'requisition_list' %}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to List
-                </a>
+                <button type="button" onclick="printRequisition()" class="btn-print no-print" style="position: relative; z-index: 2; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; cursor: pointer;">
+                    <i class="fas fa-print"></i> Print Requisition
+                </button>
             </header>
 
             <div class="req-card-body">
                 <div class="paper-form">
                     
-                    <!-- Clean Logos Header -->
-                    <table style="width:100%;border-collapse:collapse;margin-bottom:12pt;">
+                    <!-- Official Letterhead -->
+                    <table class="letterhead-table">
+                        <colgroup>
+                            <col style="width:18%;">
+                            <col style="width:64%;">
+                            <col style="width:18%;">
+                        </colgroup>
                         <tr>
-                            <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-                                <img src="{% static 'images/wssp_logo_new.png' %}"
-                                    alt="WSSP" style="width:95px;height:95px;max-width:100%;object-fit:contain;">
+                            <td class="letterhead-logo-cell">
+                                <img src="{{ request.scheme }}://{{ request.get_host }}{% static 'images/wssp_logo_new.png' %}"
+                                     alt="WSSP Logo"
+                                     onerror="this.onerror=null;this.src='{% static 'images/wssp_logo_new.png' %}'">
                             </td>
-                            <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
-                                <h4 style="font-weight:700;font-size:24px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#2d3748;line-height:1.35;word-wrap:break-word;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER & SANITATION SERVICES, PESHAWAR</h4>
-                                
-                                <p style="font-size:20px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#4a5568;line-height:1.35;word-wrap:break-word;">Local Government Complex, Khyber Pakhtunkhwa</p>
-                                <p style="font-size:19px;margin:0 0 3pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-                                <p style="font-size:11pt;margin:0;font-family:Calibri,Arial,sans-serif;color:#374151;line-height:1.35;word-wrap:break-word;">
-                                    <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u>
-                                    &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219074
-                                </p>
+                            <td class="letterhead-text-cell">
+                                <h4 class="letterhead-title">Office of the Zonal Manager (Zone-D)</h4>
+                                <h4 class="letterhead-subtitle">Water &amp; Sanitation Services Peshawar</h4>
+                                <p class="letterhead-govt">Government of Khyber Pakhtunkhwa</p>
+                                <p class="letterhead-address">House No: 23F, Khushal Khan Khattak Road, University Town, Peshawar</p>
                             </td>
-                            <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
-                                <img src="{% static 'images/kpk_emblem.png' %}"
-                                    alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+                            <td class="letterhead-logo-cell">
+                                <img src="{{ request.scheme }}://{{ request.get_host }}{% static 'images/kpk_emblem.png' %}"
+                                     alt="KPK Emblem"
+                                     onerror="this.onerror=null;this.src='{% static 'images/kpk_emblem.png' %}'">
                             </td>
                         </tr>
                     </table>
-                    <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
+                    <div style="border-top:2px solid #000;margin:6pt 0 12pt 0;"></div>
                     
                     <div class="text-center" style="font-size: 18px; margin-top: 15px; font-weight: bold;">
                         To, &nbsp;&nbsp;&nbsp;The Zonal Manager, Water & Sanitation Services, {% if req.zone %}{{ req.zone }}{% else %}Zone-C{% endif %}, Peshawar.
@@ -319,18 +650,18 @@
                         <span class="form-value-text" style="min-width: 250px;">{{ req.estimated_cost|default:"N/A" }}</span>
                     </div>
                     
-                    <!-- Details Grid -->
-                    <div class="row mb-3" style="font-size: 18px; line-height: 2.2;">
-                        <div class="col-md-6 mb-3">
+                    <!-- Details Grid (custom flex grid — not Bootstrap — so print layout is reliable) -->
+                    <div class="req-details-grid">
+                        <div class="req-details-item">
                             <strong>Driver Name:</strong> <span class="form-value-text">{{ req.driver_name }}</span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="req-details-item">
                             <strong>Mobile Number:</strong> <span class="form-value-text">{{ req.driver_mobile|default:"N/A" }}</span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="req-details-item">
                             <strong>CNIC Number:</strong> <span class="form-value-text">{{ req.driver_cnic|default:"N/A" }}</span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="req-details-item">
                             <strong>Date Submitted:</strong> <span class="form-value-text">{{ req.created_at|date:"d M Y" }}</span>
                         </div>
                     </div>
@@ -358,12 +689,13 @@
                 </div> <!-- End Paper Form -->
 
                 <!-- ===== ATTACHMENTS SECTION ===== -->
-                <div style="
+                <div class="attachments-section" style="
                     background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
                     border: 1.5px solid #a7f3d0;
                     border-radius: 16px;
                     padding: 1.6rem 2rem;
                     margin-top: 28px;
+                    max-width: 1000px; margin-left: auto; margin-right: auto;
                 ">
                     <!-- Header -->
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.2rem;">
@@ -517,36 +849,191 @@
                     {% endif %}
                 </div>
 
-                <!-- Manager Action Section -->
-                {% if is_manager and req.status == 'Pending' %}
+                <!-- ===== ATTACHMENTS PRINT SECTION (only shown in print) ===== -->
+                {% if attachments %}
+                <div class="attachments-print-section">
+                    <h4>Attachments ({{ attachments|length }})</h4>
+                    <div class="print-items-grid">
+                    {% for att in attachments %}
+                    {% with fname_lower=att.file.name|lower disp_name=att.original_name|default:att.file.name %}
+                    <div class="print-att-item">
+                        {% if '.png' in fname_lower or '.jpg' in fname_lower or '.jpeg' in fname_lower or '.gif' in fname_lower or '.webp' in fname_lower %}
+                        <img src="{{ att.file.url }}" alt="{{ disp_name }}">
+                        <div class="print-att-label">{{ forloop.counter }}. {{ disp_name }}</div>
+                        {% elif '.pdf' in fname_lower %}
+                        <div class="print-att-file-icon">
+                            <span class="icon-glyph" style="color:#ef4444;">&#128196;</span>
+                            <div class="file-meta">
+                                <div class="file-name">{{ forloop.counter }}. {{ disp_name }}</div>
+                                <div class="file-type">PDF Document &mdash; {{ att.uploaded_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="print-doc-preview" data-url="{{ att.file.url }}" data-type="pdf"></div>
+                        {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}
+                        <div class="print-att-file-icon">
+                            <span class="icon-glyph" style="color:#16a34a;">&#128196;</span>
+                            <div class="file-meta">
+                                <div class="file-name">{{ forloop.counter }}. {{ disp_name }}</div>
+                                <div class="file-type">Excel Spreadsheet &mdash; {{ att.uploaded_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="print-doc-preview" data-url="{{ att.file.url }}" data-type="sheet"></div>
+                        {% elif '.docx' in fname_lower or '.doc' in fname_lower %}
+                        <div class="print-att-file-icon">
+                            <span class="icon-glyph" style="color:#2563eb;">&#128196;</span>
+                            <div class="file-meta">
+                                <div class="file-name">{{ forloop.counter }}. {{ disp_name }}</div>
+                                <div class="file-type">Word Document &mdash; {{ att.uploaded_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="print-doc-preview" data-url="{{ att.file.url }}" data-type="docx"></div>
+                        {% else %}
+                        <div class="print-att-file-icon">
+                            <span class="icon-glyph" style="color:#6b7280;">&#128196;</span>
+                            <div class="file-meta">
+                                <div class="file-name">{{ forloop.counter }}. {{ disp_name }}</div>
+                                <div class="file-type">{{ att.file_extension|upper }} File &mdash; {{ att.uploaded_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
 
-                <div class="action-section" style="background: #ffffff; border: none; border-radius: 16px; padding: 2.5rem; margin-top: 3.5rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden;">
-                    <!-- Top accent line -->
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #059669, #10b981);"></div>
-                    
-                    <h3 style="font-family: var(--font-display); font-weight: 700; color: #1e293b; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-                        <span style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #ecfdf5; color: #059669; border-radius: 10px;">
-                            <i class="fas fa-clipboard-check"></i>
-                        </span>
-                        Update Requisition Status
+                {% if forwards %}
+                <!-- Forward History Section -->
+                <div style="margin-top: 2rem; max-width: 1000px; margin-left: auto; margin-right: auto;">
+                    <h3 style="font-family: var(--font-display); font-weight: 700; color: #1e293b; margin-bottom: 1.5rem;">
+                        Forward History
                     </h3>
                     
-                    <form action="{% url 'update_requisition_status' req.id %}" method="POST" class="d-flex flex-column flex-md-row align-items-md-center gap-4 mt-2">
+                    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                        {% for fw in forwards %}
+                        <div class="forward-history-item" style="padding: 1.5rem 1.75rem; border-bottom: {% if not forloop.last %}1px solid #f1f5f9{% else %}none{% endif %};">
+                            <div style="display: flex; align-items: flex-start; gap: 14px;">
+
+                                <div style="flex: 1; min-width: 0;">
+                                    <!-- Main action line -->
+                                    <div style="font-size: 0.95rem; color: #1e293b; margin-bottom: 6px; line-height: 1.6;">
+                                        <!-- Forwarded By: short designation -->
+                                        <strong style="color: #0f172a;">
+                                            {% if fw.forwarded_by.profile.role %}{% if fw.forwarded_by.profile.role.category == 'ZM' and fw.forwarded_by.profile.zone %}ZM {{ fw.forwarded_by.profile.zone.name }}{% elif fw.forwarded_by.profile.role.name %}{{ fw.forwarded_by.profile.role.name }}{% else %}{{ fw.forwarded_by.get_full_name|default:fw.forwarded_by.username }}{% endif %}{% else %}{{ fw.forwarded_by.get_full_name|default:fw.forwarded_by.username }}{% endif %}
+                                        </strong>
+
+                                        <!-- Status badge -->
+                                        {% if fw.status_at_forward == 'Approved' %}
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #dcfce7; color: #15803d; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin: 0 6px; vertical-align: middle;">
+                                            <i class="fas fa-check-circle"></i> Approved
+                                        </span>
+                                        {% elif fw.status_at_forward == 'Rejected' %}
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #fee2e2; color: #dc2626; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin: 0 6px; vertical-align: middle;">
+                                            <i class="fas fa-times-circle"></i> Rejected
+                                        </span>
+                                        {% else %}
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #b45309; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin: 0 6px; vertical-align: middle;">
+                                            <i class="fas fa-clock"></i> Pending
+                                        </span>
+                                        {% endif %}
+
+                                        <span style="color: #64748b;">the requisition and forwarded to</span>
+
+                                        <!-- Forwarded To: short designation -->
+                                        <strong style="color: #0f172a;">
+                                            {% if fw.forwarded_to.profile.role %}{% if fw.forwarded_to.profile.role.category == 'ZM' and fw.forwarded_to.profile.zone %}ZM {{ fw.forwarded_to.profile.zone.name }}{% elif fw.forwarded_to.profile.role.name %}{{ fw.forwarded_to.profile.role.name }}{% else %}{{ fw.forwarded_to.get_full_name|default:fw.forwarded_to.username }}{% endif %}{% else %}{{ fw.forwarded_to.get_full_name|default:fw.forwarded_to.username }}{% endif %}
+                                        </strong>
+                                    </div>
+
+                                    <!-- Remark -->
+                                    {% if fw.remark %}
+                                    <div style="background: #f8fafc; border-left: 3px solid #3b82f6; padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 1.05rem; color: #334155; line-height: 1.6; margin-bottom: 12px;">
+                                        {{ fw.remark }}
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Timestamp -->
+                                    <div style="font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 5px;">
+                                        <i class="far fa-clock"></i> {{ fw.forwarded_at|date:"d M Y, h:i A" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Action Section — visible to whoever currently holds the requisition -->
+                {% if is_current_holder %}
+
+                <div class="action-section" style="background: #ffffff; border: none; border-radius: 16px; padding: 2.5rem; margin-top: 3.5rem; max-width: 1000px; margin-left: auto; margin-right: auto; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08); position: relative; overflow: hidden;">
+                    <!-- Top accent line -->
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #059669, #10b981);"></div>
+                    {% if req.status == 'Pending' and is_manager %}
+                    <!-- Update Status Form -->
+                    <form action="{% url 'update_requisition_status' req.id %}" method="POST" class="d-flex flex-column flex-md-row align-items-md-center gap-4">
                         {% csrf_token %}
-                        <div class="position-relative" style="min-width: 280px; max-width: 320px;">
-                            <label for="statusSelect" class="form-label fw-bold mb-2" style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Change Status To</label>
-                            <select name="status" id="statusSelect" class="form-select" style="height: 54px; padding-left: 20px; font-size: 1.05rem; font-weight: 600; color: #1e293b; border: 2px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); appearance: none; cursor: pointer; transition: all 0.2s ease;">
+                        <div class="position-relative" style="flex: 1; max-width: 380px;">
+                            <label for="statusSelect" class="form-label fw-bold mb-2" style="color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.07em;">Status</label>
+                            <select name="status" id="statusSelect" class="form-select" style="height: 48px; padding-left: 16px; font-size: 1rem; font-weight: 600; color: #1e293b; border: 2px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); appearance: none; cursor: pointer; transition: all 0.2s ease;">
                                 <option value="Pending" {% if req.status == 'Pending' %}selected{% endif %}>Pending</option>
                                 <option value="Approved" {% if req.status == 'Approved' %}selected{% endif %}>Approved</option>
                                 <option value="Rejected" {% if req.status == 'Rejected' %}selected{% endif %}>Rejected</option>
                             </select>
                         </div>
                         
-                        <div class="ms-md-auto" style="min-width: 200px;">
+                        <div style="min-width: 180px;">
                             <label class="form-label d-none d-md-block mb-2">&nbsp;</label>
-                            <button type="submit" class="btn w-100 text-white d-flex align-items-center justify-content-center gap-2" style="height: 54px; background: linear-gradient(135deg, #059669, #10b981); border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(16, 185, 129, 0.3)';">
+                            <button type="submit" class="btn w-100 text-white d-flex align-items-center justify-content-center gap-2" style="height: 48px; background: linear-gradient(135deg, #059669, #10b981); border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(16, 185, 129, 0.3)';">
                                 <i class="fas fa-sync-alt"></i> Update Status
                             </button>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <!-- Forward Requisition Form -->
+                    <form action="{% url 'forward_requisition' req.id %}" method="POST" class="mt-4" onsubmit="document.getElementById('hiddenStatus').value = document.getElementById('statusSelect').value;">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" id="hiddenStatus" value="">
+                        
+                        <!-- Remarks -->
+                        <div class="mb-4">
+                            <label for="forwardRemark" class="form-label fw-bold mb-2" style="color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.07em;">
+                                <i class="fas fa-comment-dots me-1" style="color:#3b82f6;"></i> Remarks
+                                <span style="font-weight: 400; text-transform: none; letter-spacing: 0; color: #94a3b8; font-size: 0.8rem;">(Optional)</span>
+                            </label>
+                            <textarea name="remark" id="forwardRemark" class="form-control" rows="3"
+                                placeholder="Write your remarks or instructions here for the next officer..."
+                                style="padding: 14px 18px; font-size: 0.97rem; color: #334155; border: 2px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); resize: vertical; transition: border-color 0.2s ease; font-family: var(--font-sans); line-height: 1.6;"
+                                onfocus="this.style.borderColor='#3b82f6';" onblur="this.style.borderColor='#e2e8f0';"></textarea>
+                        </div>
+
+                        <!-- Forward To & Button (Front to Front) -->
+                        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+                            <div class="position-relative" style="flex: 1; max-width: 380px;">
+                                <label for="forwardSelect" class="form-label fw-bold mb-2" style="color: #64748b; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.07em;">
+                                    <i class="fas fa-arrow-right me-1" style="color:#3b82f6;"></i> Forward Requisition To <span style="color:#ef4444; margin-left:2px;">*</span>
+                                </label>
+                                <select name="forward_to" id="forwardSelect" class="form-select" style="height: 48px; padding-left: 14px; font-size: 0.95rem; font-weight: 500; color: #1e293b; border: 2px solid #e2e8f0; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); cursor: pointer; transition: border-color 0.2s ease;" required
+                                    onfocus="this.style.borderColor='#3b82f6';" onblur="this.style.borderColor='#e2e8f0';">
+                                    <option value="">Select recipient...</option>
+                                    {% for u in recipient_list %}
+                                    <option value="{{ u.id }}">{{ u.display_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div style="min-width: 220px;">
+                                <label class="form-label d-none d-md-block mb-2">&nbsp;</label>
+                                <button type="submit" class="btn w-100 text-white d-flex align-items-center justify-content-center gap-2"
+                                    style="height: 48px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35); transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 22px rgba(59, 130, 246, 0.45)';"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(59, 130, 246, 0.35)';">
+                                    <i class="fas fa-paper-plane"></i> Forward Requisition
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -556,4 +1043,112 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ============================================
+   PRINT: attachments ka asal content render karo
+   PDF -> page images, Word (.docx) -> HTML, Excel/CSV -> tables
+   ============================================ */
+var __printJobs = [];
+
+function __esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function __fetchBuf(url) {
+    return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.arrayBuffer();
+    });
+}
+
+function __renderPdf(url, box) {
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF library not loaded');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    return __fetchBuf(url).then(function (buf) {
+        return pdfjsLib.getDocument({ data: buf }).promise;
+    }).then(function (pdf) {
+        var total = Math.min(pdf.numPages, 50);
+        var chain = Promise.resolve();
+        for (var n = 1; n <= total; n++) {
+            (function (num) {
+                chain = chain.then(function () {
+                    return pdf.getPage(num).then(function (page) {
+                        var vp = page.getViewport({ scale: 1.6 });
+                        var canvas = document.createElement('canvas');
+                        canvas.width = vp.width;
+                        canvas.height = vp.height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        return page.render({ canvasContext: ctx, viewport: vp }).promise.then(function () {
+                            var img = document.createElement('img');
+                            img.className = 'pdf-page-img';
+                            img.src = canvas.toDataURL('image/jpeg', 0.85);
+                            box.appendChild(img);
+                        });
+                    });
+                });
+            })(n);
+        }
+        return chain;
+    });
+}
+
+function __renderDocx(url, box) {
+    if (typeof mammoth === 'undefined') throw new Error('Word library not loaded');
+    return __fetchBuf(url).then(function (buf) {
+        return mammoth.convertToHtml({ arrayBuffer: buf });
+    }).then(function (res) {
+        var div = document.createElement('div');
+        div.className = 'doc-html';
+        div.innerHTML = res.value && res.value.trim() ? res.value : '<div class="doc-note">This document has no printable text.</div>';
+        box.appendChild(div);
+    });
+}
+
+function __renderSheet(url, box) {
+    if (typeof XLSX === 'undefined') throw new Error('Excel library not loaded');
+    return __fetchBuf(url).then(function (buf) {
+        var wb = XLSX.read(buf, { type: 'array' });
+        wb.SheetNames.forEach(function (name) {
+            var ws = wb.Sheets[name];
+            var wrap = document.createElement('div');
+            wrap.className = 'doc-sheet';
+            wrap.innerHTML = (wb.SheetNames.length > 1 ? '<div class="doc-sheet-title">' + __esc(name) + '</div>' : '') +
+                XLSX.utils.sheet_to_html(ws, { header: '', footer: '' });
+            box.appendChild(wrap);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.print-doc-preview[data-type]').forEach(function (box) {
+        var type = box.getAttribute('data-type');
+        var url = box.getAttribute('data-url');
+        if (!type || !url) return;
+        var job;
+        try {
+            if (type === 'pdf') job = __renderPdf(url, box);
+            else if (type === 'docx') job = __renderDocx(url, box);
+            else if (type === 'sheet') job = __renderSheet(url, box);
+        } catch (e) { job = Promise.reject(e); }
+        if (!job) return;
+        __printJobs.push(job.catch(function (err) {
+            console.error('Print preview failed:', err);
+            box.innerHTML = '<div class="doc-note">Content preview is not available for this file. Please open it from the attachment link.</div>';
+        }));
+    });
+});
+
+/* ============================================
+   PRINT REQUISITION (files render hone ka intezar karta hai)
+   ============================================ */
+function printRequisition() {
+    Promise.all(__printJobs).then(function () { window.print(); });
+}
+</script>
+
 {% endblock %}

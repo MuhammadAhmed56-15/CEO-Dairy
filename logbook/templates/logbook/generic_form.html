@@ -39,4 +39,177 @@
         </div>
     </form>
 </div>
+
+<style>
+    .input-wrap {
+        position: relative;
+    }
+    .char-counter {
+        position: absolute;
+        top: -24px;
+        right: 0;
+        font-size: 0.75rem;
+        color: #6c757d;
+        transition: color 0.3s;
+    }
+    .char-counter.near-limit { color: #f59e0b; font-weight: 600; }
+    .char-counter.at-limit { color: #dc3545; font-weight: 600; }
+    
+    .field-valid-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #10b981;
+        font-size: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+    .field-valid-icon.show {
+        opacity: 1;
+    }
+    
+    @keyframes fieldShake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0); }
+    }
+    .field-shake {
+        animation: fieldShake 0.4s ease-in-out;
+        border-color: #dc3545 !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    /* ── Mobile Field ── */
+    const mobileEls = document.querySelectorAll('.driver-mobile-input');
+    mobileEls.forEach(mobileEl => {
+        const wrap = document.createElement('div');
+        wrap.className = 'input-wrap';
+        mobileEl.parentNode.insertBefore(wrap, mobileEl);
+        wrap.appendChild(mobileEl);
+
+        const mCounter = document.createElement('span');
+        mCounter.className = 'char-counter';
+        mCounter.textContent = '0 / 11';
+        wrap.appendChild(mCounter);
+
+        const mTick = document.createElement('span');
+        mTick.className = 'field-valid-icon';
+        mTick.innerHTML = '&#10003;';
+        wrap.appendChild(mTick);
+
+        function updateMobile() {
+            let raw = mobileEl.value.replace(/\D/g, '');
+            if (raw.length > 11) raw = raw.slice(0, 11);
+            mobileEl.value = raw;
+
+            const len = raw.length;
+            mCounter.textContent = `${len} / 11`;
+            mCounter.classList.remove('at-limit', 'near-limit');
+            mTick.classList.remove('show');
+
+            if (len === 11) {
+                mCounter.classList.add('at-limit');
+                mTick.classList.add('show');
+            } else if (len >= 9) {
+                mCounter.classList.add('near-limit');
+            }
+        }
+        mobileEl.addEventListener('input', updateMobile);
+        mobileEl.addEventListener('keydown', function (e) {
+            const raw = this.value.replace(/\D/g, '');
+            const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Home','End'];
+            if (raw.length >= 11 && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                mobileEl.classList.remove('field-shake');
+                void mobileEl.offsetWidth;
+                mobileEl.classList.add('field-shake');
+                mobileEl.addEventListener('animationend', () => mobileEl.classList.remove('field-shake'), { once: true });
+            }
+        });
+        updateMobile();
+    });
+
+    /* ── CNIC Field ── */
+    const cnicEls = document.querySelectorAll('.driver-cnic-input');
+    cnicEls.forEach(cnicEl => {
+        const wrap = document.createElement('div');
+        wrap.className = 'input-wrap';
+        cnicEl.parentNode.insertBefore(wrap, cnicEl);
+        wrap.appendChild(cnicEl);
+
+        const cCounter = document.createElement('span');
+        cCounter.className = 'char-counter';
+        cCounter.textContent = '0 / 13 digits';
+        wrap.appendChild(cCounter);
+
+        const cTick = document.createElement('span');
+        cTick.className = 'field-valid-icon';
+        cTick.innerHTML = '&#10003;';
+        wrap.appendChild(cTick);
+
+        function formatCnic(raw) {
+            raw = raw.replace(/\D/g, '').slice(0, 13);
+            let out = '';
+            if (raw.length <= 5) {
+                out = raw;
+            } else if (raw.length <= 12) {
+                out = raw.slice(0, 5) + '-' + raw.slice(5);
+            } else {
+                out = raw.slice(0, 5) + '-' + raw.slice(5, 12) + '-' + raw.slice(12);
+            }
+            return { formatted: out, digits: raw.length };
+        }
+
+        function updateCnic() {
+            const caretPos = cnicEl.selectionStart;
+            const oldVal   = cnicEl.value;
+
+            const { formatted, digits } = formatCnic(cnicEl.value);
+            cnicEl.value = formatted;
+
+            const diff = formatted.length - oldVal.length;
+            try { cnicEl.setSelectionRange(caretPos + diff, caretPos + diff); } catch(e) {}
+
+            cCounter.textContent = `${digits} / 13 digits`;
+            cCounter.classList.remove('at-limit', 'near-limit');
+            cTick.classList.remove('show');
+
+            if (digits === 13) {
+                cCounter.classList.add('at-limit');
+                cTick.classList.add('show');
+            } else if (digits >= 11) {
+                cCounter.classList.add('near-limit');
+            }
+        }
+        cnicEl.addEventListener('input', updateCnic);
+        cnicEl.addEventListener('keydown', function (e) {
+            const digits = this.value.replace(/\D/g, '').length;
+            const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Home','End','-'];
+            if (digits >= 13 && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                cnicEl.classList.remove('field-shake');
+                void cnicEl.offsetWidth;
+                cnicEl.classList.add('field-shake');
+                cnicEl.addEventListener('animationend', () => cnicEl.classList.remove('field-shake'), { once: true });
+            }
+        });
+        cnicEl.addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text');
+            const cursorPos = this.selectionStart;
+            const before = this.value.slice(0, cursorPos);
+            const after  = this.value.slice(this.selectionEnd);
+            this.value = before + pasted + after;
+            updateCnic();
+        });
+        updateCnic();
+    });
+});
+</script>
 {% endblock %}

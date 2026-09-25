@@ -359,17 +359,18 @@ class UserHierarchy(models.Model):
         User, 
         on_delete=models.CASCADE, 
         related_name='hierarchy_boss',
-        help_text="Wo user jo boss hai (e.g., GM_Operation, CEO, AM)"
+        verbose_name="User",
+        help_text="Select the user for whom you are configuring the forwarding lists."
     )
-    subordinates = models.ManyToManyField(
-        User, 
-        blank=True, 
-        related_name='hierarchy_subordinates',
-        help_text="Is boss ke under jitne bhi log aate hain (e.g., Saare ZMs jo isko report karte hain)"
-    )
+    
+    # Forwarding Lists
+    requisition_subs = models.ManyToManyField(User, blank=True, related_name='req_bosses', verbose_name="Requisition Form List")
+    notesheet_subs = models.ManyToManyField(User, blank=True, related_name='notesheet_bosses', verbose_name="Notesheet List")
+    task_subs = models.ManyToManyField(User, blank=True, related_name='task_bosses', verbose_name="Task List")
+    letter_subs = models.ManyToManyField(User, blank=True, related_name='letter_bosses', verbose_name="Letter List")
 
     def __str__(self):
-        return f"Boss: {self.boss.username} ({self.subordinates.count()} subordinates)"
+        return f"User: {self.boss.username}"
 
     class Meta:
         verbose_name = "User Hierarchy"
@@ -581,3 +582,24 @@ class VehicleRequisitionAttachment(models.Model):
 
     class Meta:
         ordering = ['uploaded_at']
+
+# =====================================================================
+# VEHICLE REQUISITION FORWARD
+# =====================================================================
+class VehicleRequisitionForward(models.Model):
+    requisition = models.ForeignKey(
+        VehicleRequisition,
+        on_delete=models.CASCADE,
+        related_name='forwards'
+    )
+    forwarded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reqs_forwarded")
+    forwarded_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reqs_received_forwards")  
+    remark = models.TextField(blank=True)
+    status_at_forward = models.CharField(max_length=20, blank=True, default='Pending')
+    forwarded_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-forwarded_at']
+
+    def __str__(self):
+        return f"{self.requisition.vehicle_number} → {self.forwarded_by} to {self.forwarded_to}"

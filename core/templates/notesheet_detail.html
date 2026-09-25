@@ -67,7 +67,7 @@
                             <select name="forward_to" class="form-select shadow-sm">
                                 <option value="" selected>-- Finish / Don't Forward --</option>
                                 {% for officer in officers %}
-                                    <option value="{{ officer.id }}">{{ officer.get_full_name|default:officer.username }} ({{ officer.profile.get_role_with_department|default:"--" }})</option>
+                                    <option value="{{ officer.id }}">{{ officer.profile.get_role_with_department|default:"--" }}</option>
                                 {% empty %}
                                     <option disabled>No officers available</option>
                                 {% endfor %}

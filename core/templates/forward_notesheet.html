@@ -1227,8 +1227,8 @@
                 <div class="signature-stamp-box__img-wrap">
                   <img src="{{ user.profile.signature.url }}" alt="Digital Signature" class="signature-stamp-box__img">
                 </div>
-                <span class="signature-stamp-box__name">{{ user.get_full_name|default:user.username }}</span>
-                <span class="signature-stamp-box__role">{{ user.profile.role }} · Signed Digitally</span>
+                <span class="signature-stamp-box__name">{{ user.profile.get_role_with_department|default:user.profile.role }}</span>
+                <span class="signature-stamp-box__role">Signed Digitally</span>
                 <!-- Date/time shown below — reflects notesheet action date -->
                 <span style="
                   display: inline-flex; align-items: center; gap: 0.4rem;
@@ -1267,7 +1267,7 @@
                   aria-required="true" style="width: max-content; max-width: 100%;">
                   <option value="" disabled selected>Select recipient...</option>
                   {% for user in users %}
-                  <option value="{{ user.id }}">{{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})</option>
+                  <option value="{{ user.id }}">{{ user.profile.get_role_with_department|default:user.profile.role }}</option>
                   {% endfor %}
                 </select>
               </div>

@@ -99,6 +99,7 @@ urlpatterns = [
    
     path('requisitions/update/<int:pk>/', views.update_requisition_status, name='update_requisition_status'),
     path('requisitions/<int:pk>/edit/', views.edit_requisition, name='edit_requisition'),
+    path('requisitions/forward/<int:pk>/', views.forward_requisition, name='forward_requisition'),
     path('api/get-vehicles-by-zone/', views.get_vehicles_by_zone, name='get_vehicles_by_zone'),
     path('api/get-vehicle-logbook/', views.get_vehicle_logbook, name='get_vehicle_logbook'),
 

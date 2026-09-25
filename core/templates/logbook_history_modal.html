@@ -435,17 +435,109 @@
       if (title) title.textContent = filename || 'Document Viewer';
       if (newTabBtn) newTabBtn.href = url;
       
-      const pdfUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&zoom=75`;
-      container.innerHTML = `
-        <object data="${pdfUrl}" type="application/pdf" width="100%" height="100%" style="display:block;">
-          <embed src="${pdfUrl}" type="application/pdf" width="100%" height="100%" />
-          <iframe style="width:100%; height:100%; border:none; background:#525659;" src="${pdfUrl}"></iframe>
-        </object>
-      `;
-      modal.style.display = 'flex';
+      const ext = filename ? filename.split('.').pop().toLowerCase() : '';
+      let contentHtml = '';
+      
+      if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext)) {
+          // Native Image Viewer
+          contentHtml = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:auto; background:#525659; padding:20px; box-sizing:border-box;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.3);" /></div>`;
+          container.innerHTML = contentHtml;
+          modal.style.display = 'flex';
+      } else if (ext === 'pdf') {
+          // Native PDF Viewer
+          const pdfUrl = url.includes('#') ? url : `${url}#toolbar=1&navpanes=0&zoom=75`;
+          contentHtml = `
+            <object data="${pdfUrl}" type="application/pdf" width="100%" height="100%" style="display:block;">
+              <embed src="${pdfUrl}" type="application/pdf" width="100%" height="100%" />
+              <iframe style="width:100%; height:100%; border:none; background:#525659;" src="${pdfUrl}"></iframe>
+            </object>
+          `;
+          container.innerHTML = contentHtml;
+          modal.style.display = 'flex';
+      } else if (['doc', 'docx'].includes(ext)) {
+          // Word Document Viewer (using Mammoth)
+          if (ext === 'docx') {
+              container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.2rem;"><i class="fas fa-spinner fa-spin" style="margin-right:10px;"></i> Loading Word Document...</div>';
+              if (typeof mammoth === 'undefined') {
+                  const script = document.createElement('script');
+                  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js';
+                  script.onload = () => renderDocx(url, container);
+                  document.head.appendChild(script);
+              } else {
+                  renderDocx(url, container);
+              }
+          } else {
+              container.innerHTML = getDownloadHtml(ext, url, 'Old Word files (.doc) cannot be previewed natively in the browser. Please download.');
+          }
+          modal.style.display = 'flex';
+      } else if (['xls', 'xlsx', 'csv'].includes(ext)) {
+          // Excel Spreadsheet Viewer (using SheetJS)
+          container.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white; font-size:1.2rem;"><i class="fas fa-spinner fa-spin" style="margin-right:10px;"></i> Loading Spreadsheet...</div>';
+          if (typeof XLSX === 'undefined') {
+              const script = document.createElement('script');
+              script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+              script.onload = () => renderExcel(url, container);
+              document.head.appendChild(script);
+          } else {
+              renderExcel(url, container);
+          }
+          modal.style.display = 'flex';
+      } else {
+          // Fallback for unknown files
+          container.innerHTML = getDownloadHtml(ext, url, 'This file type cannot be previewed in the browser natively.');
+          modal.style.display = 'flex';
+      }
     } else {
       window.open(url, '_blank');
     }
+  }
+
+  function renderDocx(url, container) {
+      fetch(url)
+          .then(res => { if (!res.ok) throw new Error(); return res.arrayBuffer(); })
+          .then(buffer => mammoth.convertToHtml({arrayBuffer: buffer}))
+          .then(result => {
+              container.innerHTML = `<div style="padding:40px; background:white; color:black; height:100%; overflow:auto; font-family:'Times New Roman', Times, serif; font-size:12pt; line-height:1.6; box-sizing:border-box;">${result.value}</div>`;
+          })
+          .catch(err => {
+              container.innerHTML = getDownloadHtml('docx', url, 'Failed to parse Word document. The file might be corrupted or in an unsupported format.');
+          });
+  }
+
+  function renderExcel(url, container) {
+      fetch(url)
+          .then(res => { if (!res.ok) throw new Error(); return res.arrayBuffer(); })
+          .then(buffer => {
+              const workbook = XLSX.read(buffer, {type: 'array'});
+              const firstSheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[firstSheetName];
+              const html = XLSX.utils.sheet_to_html(worksheet);
+              container.innerHTML = `
+                  <style>
+                      .excel-preview table { border-collapse: collapse; min-width: 100%; font-family: Calibri, sans-serif; font-size: 11pt; }
+                      .excel-preview td, .excel-preview th { border: 1px solid #cbd5e1; padding: 6px 10px; white-space: nowrap; }
+                      .excel-preview tr:first-child { background: #f1f5f9; font-weight: bold; }
+                      .excel-preview tr:hover { background: #f8fafc; }
+                  </style>
+                  <div class="excel-preview" style="padding:20px; background:white; color:black; height:100%; overflow:auto; box-sizing:border-box;">
+                      ${html}
+                  </div>
+              `;
+          })
+          .catch(err => {
+              container.innerHTML = getDownloadHtml('excel', url, 'Failed to parse Spreadsheet. The file might be corrupted or in an unsupported format.');
+          });
+  }
+
+  function getDownloadHtml(ext, url, msg) {
+      return `
+        <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f8fafc; color:#334155; padding:2rem; text-align:center; box-sizing:border-box;">
+            <i class="fas fa-file-download" style="font-size:4rem; color:#64748b; margin-bottom:1rem;"></i>
+            <h3 style="font-size:1.5rem; margin-bottom:0.5rem; color:#0f172a;">Cannot Preview Automatically</h3>
+            <p style="font-size:1rem; max-width:500px; margin-bottom: 1rem;">${msg}</p>
+            <a href="${url}" download style="padding:10px 20px; background:#059669; color:white; text-decoration:none; border-radius:8px; font-weight:bold;">Download File Instead</a>
+        </div>
+      `;
   }
 
   function closeDocPreviewModal() {
@@ -474,9 +566,6 @@
         <p style="margin:0.2rem 0 0 0; font-size:0.82rem; color:#a7f3d0; font-weight:500;">Official Document Preview & File Inspection</p>
       </div>
       <div style="display:flex; align-items:center; gap:0.75rem;">
-        <a id="docPreviewNewTabBtn" href="#" target="_blank" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:0.45rem 1.1rem; border-radius:10px; font-size:0.85rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-          <i class="fas fa-external-link-alt"></i> Open in New Tab
-        </a>
         <button type="button" onclick="closeDocPreviewModal()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; border-radius:50%; width:38px; height:38px; font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'" title="Close Viewer">✕</button>
       </div>
     </div>

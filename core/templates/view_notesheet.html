@@ -17,8 +17,6 @@
      DESIGN TOKENS - CSS Custom Properties
      ============================================ */
   :root {
-    /* Color System - Semantic naming (WSSP green brand, kept consistent
-       with GM / CEO / PS dashboards) */
     --color-primary-900: #0a2118;
     --color-primary-800: #0d2b1e;
     --color-primary-700: #1a4731;
@@ -28,7 +26,6 @@
     --color-primary-100: #d1fae5;
     --color-primary-50: #f0fdf4;
 
-    /* Neutral Scale */
     --color-gray-900: #0f172a;
     --color-gray-800: #1e293b;
     --color-gray-700: #334155;
@@ -39,7 +36,6 @@
     --color-gray-100: #f1f5f9;
     --color-gray-50: #f8fafc;
 
-    /* Semantic Colors */
     --color-success-50: #f0fdf4;
     --color-success-500: #22c55e;
     --color-success-700: #15803d;
@@ -55,7 +51,6 @@
     --color-info-500: #3b82f6;
     --color-info-700: #1d4ed8;
 
-    /* Spacing Scale (4px base) */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;
@@ -67,12 +62,10 @@
     --space-10: 2.5rem;
     --space-12: 3rem;
 
-    /* Typography */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-display: 'Space Grotesk', var(--font-sans);
     --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-    /* Shadows - Layered for depth */
     --shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.04);
     --shadow-sm: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.06);
     --shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.06);
@@ -80,19 +73,16 @@
     --shadow-xl: 0 20px 25px -5px rgb(15 23 42 / 0.1), 0 8px 10px -6px rgb(15 23 42 / 0.06);
     --shadow-glow: 0 0 0 3px var(--color-primary-100);
 
-    /* Border Radius */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.25rem;
 
-    /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Layout */
     --container-max: 980px;
   }
 
@@ -107,26 +97,12 @@
     padding: 0;
   }
 
-    @media print {
-      /* Show print-only letterhead and hide screen-only */
-      .print-only-letterhead { display: block !important; }
-      .screen-only-letterhead { display: none !important; }
-      /* Hide navigation and other UI elements not needed in print */
-      .no-print, header, nav, .sidebar, .btn, .signature-stamp__badge { display: none !important; }
-      /* Ensure the main container uses full width and appropriate margins */
-      .content-wrapper { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-      .ns-card { box-shadow: none; border: none; }
-      .ns-body { padding: 0 !important; margin: 0 !important; }
-      /* Page size and margins (A4) */
-      @page { size: A4; margin: 2cm; }
-    }
-
   /* ============================================
      LAYOUT COMPONENTS
      ============================================ */
   .page-container {
     min-height: 100vh;
-    padding: 10px 15px; /* Reduced gap from top and sides */
+    padding: 10px 15px;
     position: relative;
     overflow: hidden;
     font-family: var(--font-sans);
@@ -159,7 +135,7 @@
   }
 
   .content-wrapper {
-    max-width: 98%; /* Reduced side gap to allow more width */
+    max-width: 98%;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -201,7 +177,7 @@
      ============================================ */
   .ns-header {
     background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
-    padding: 15px 20px; /* Reduced header padding */
+    padding: 15px 20px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -222,7 +198,7 @@
       flex-direction: row;
       align-items: flex-start;
       justify-content: space-between;
-      padding: 20px 25px; /* Reduced header padding for desktop */
+      padding: 20px 25px;
     }
   }
 
@@ -251,7 +227,7 @@
 
   .ns-header__title {
     font-family: var(--font-display);
-    font-size: clamp(1.2rem, 3vw, 1.6rem); /* Reduced title size */
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
     font-weight: 700;
     color: white;
     line-height: 1.2;
@@ -530,7 +506,6 @@
 
   .timeline-node:last-child { padding-bottom: 0; }
 
-  /* Vertical rail */
   .timeline-node::before {
     display: none;
   }
@@ -539,7 +514,6 @@
 
   .timeline-node--return::before { background: var(--color-danger-100); }
 
-  /* Dot marker */
   .timeline-node__dot {
     display: none;
   }
@@ -711,7 +685,6 @@
     background: var(--color-gray-50);
   }
 
-  /* Mark text */
   .marking-text {
     margin-top: var(--space-2);
     padding-top: var(--space-2);
@@ -789,6 +762,38 @@
     color: white;
   }
 
+  .attachment-print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    background: var(--color-success-50);
+    border-radius: var(--radius-sm);
+    color: var(--color-success-700);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+  }
+
+  .attachment-print-btn:hover {
+    background: var(--color-success-500);
+    color: white;
+  }
+
+  .timeline-node--return .attachment-print-btn {
+    background: var(--color-danger-50);
+    color: var(--color-danger-700);
+  }
+
+  .timeline-node--return .attachment-print-btn:hover {
+    background: var(--color-danger-500);
+    color: white;
+  }
+
   .timeline-node--return .attachment-link {
     background: var(--color-danger-50);
     color: var(--color-danger-700);
@@ -819,12 +824,12 @@
     margin-bottom: var(--space-1);
   }
 
-  .signature-stamp__img { 
-    max-height: 100%; 
-    max-width: 170px; 
-    object-fit: contain; 
+  .signature-stamp__img {
+    max-height: 100%;
+    max-width: 170px;
+    object-fit: contain;
     object-position: center;
-    mix-blend-mode: multiply; 
+    mix-blend-mode: multiply;
   }
 
   .signature-stamp__name { font-weight: 700; color: var(--color-gray-900); font-size: 0.9375rem; }
@@ -855,7 +860,6 @@
 
   .empty-state__text { font-size: 1rem; font-style: italic; }
 
-  /* Responsive tweaks */
   @media (max-width: 560px) {
     .timeline-node { padding-left: 2.75rem; }
     .timeline-node__dot { width: 2rem; height: 2rem; left: -0.125rem; }
@@ -865,150 +869,325 @@
   }
 
   /* ============================================
-     PRINT STYLES (A4 Optimized)
+     PRINT-ONLY LETTERHEAD (same as Initiate preview)
+     ============================================ */
+  .ph-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  .ph-table td { border: none; vertical-align: middle; }
+  .ph-logo { width: 15%; text-align: center; padding: 4pt 2pt; }
+  .ph-logo img {
+    width: 100px;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .ph-center { width: 70%; text-align: center; padding: 4pt 6pt; }
+  .ph-title {
+    font-weight: 700;
+    font-size: 21px;
+    margin: 0 0 5pt 0;
+    font-family: Calibri, Arial, sans-serif;
+    color: #6b7280;
+    line-height: 1.35;
+    text-transform: uppercase;
+    word-wrap: break-word;
+  }
+  .ph-title u { text-decoration: underline; text-underline-offset: 4px; }
+  .ph-sub {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: Calibri, Arial, sans-serif;
+    color: #6b7280;
+    line-height: 1.35;
+    text-transform: uppercase;
+    margin: 0 0 3pt 0;
+  }
+  .ph-prov {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: Calibri, Arial, sans-serif;
+    color: #6b7280;
+    line-height: 1.35;
+    margin: 0;
+  }
+  .ph-addr {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: Calibri, Arial, sans-serif;
+    color: #6b7280;
+    line-height: 1.35;
+    margin: 0;
+  }
+  .ph-phone {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: Calibri, Arial, sans-serif;
+    color: #6b7280;
+    line-height: 1.35;
+    margin: 3pt 0 0;
+  }
+  .ph-rule { border-top: 2px solid #d1d5db; margin: 6pt 0 14pt 0; }
+  .ph-subject-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16pt;
+    margin: 0 0 16pt 0;
+    font-family: Calibri, Arial, sans-serif;
+    color: #000;
+  }
+  .ph-subject { font-size: 13pt; font-weight: 700; flex: 1; }
+  .ph-date { font-size: 10pt; font-weight: 700; white-space: nowrap; padding-top: 3pt; }
+
+  /* ============================================
+     PRINT ATTACHMENT PREVIEWS (image / file card)
+     ============================================ */
+  .print-image-preview,
+  .print-file-card {
+    display: none;
+  }
+
+  .print-file-card {
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin: 10px 0 14px;
+    padding: 14px 18px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 6px solid #64748b;
+    border-radius: 10px;
+    font-family: Calibri, Arial, sans-serif;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .print-file-icon {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #64748b;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .print-file-info { flex: 1; min-width: 0; }
+  .print-file-name {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 3px 0;
+    word-break: break-word;
+  }
+  .print-file-meta { font-size: 10.5pt; color: #475569; margin: 0; }
+  .print-file-badge {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 10pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .print-file-card.ft-pdf   { border-left-color: #dc2626; background: #fef2f2; }
+  .print-file-card.ft-pdf   .print-file-icon { background: #dc2626; }
+  .print-file-card.ft-word  { border-left-color: #2563eb; background: #eff6ff; }
+  .print-file-card.ft-word  .print-file-icon { background: #2563eb; }
+  .print-file-card.ft-excel { border-left-color: #16a34a; background: #f0fdf4; }
+  .print-file-card.ft-excel .print-file-icon { background: #16a34a; }
+  .print-file-card.ft-ppt   { border-left-color: #ea580c; background: #fff7ed; }
+  .print-file-card.ft-ppt   .print-file-icon { background: #ea580c; }
+  .print-file-card.ft-zip   { border-left-color: #7c3aed; background: #f5f3ff; }
+  .print-file-card.ft-zip   .print-file-icon { background: #7c3aed; }
+
+
+  /* ============================================
+     PRINT: file ka asal content (PDF pages / Word / Excel)
+     ============================================ */
+  .print-doc-preview { display: none; }
+  .doc-note {
+    font-family: Calibri, Arial, sans-serif; font-size: 10pt; color: #64748b;
+    padding: 8px 12px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;
+  }
+  .doc-html { font-family: Calibri, Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: #0f172a; }
+  .doc-html p { margin: 0 0 6pt; }
+  .doc-html img { max-width: 100%; height: auto; }
+  .doc-html table, .doc-sheet table { border-collapse: collapse; width: 100%; margin: 6pt 0; }
+  .doc-html td, .doc-html th { border: 1px solid #cbd5e1; padding: 3pt 6pt; vertical-align: top; }
+  .doc-sheet { font-family: Calibri, Arial, sans-serif; font-size: 8.5pt; color: #0f172a; overflow: hidden; }
+  .doc-sheet-title {
+    font-size: 9pt; font-weight: 700; color: #166534; background: #dcfce7;
+    border: 1px solid #bbf7d0; border-bottom: none; border-radius: 6px 6px 0 0; padding: 3pt 8pt; margin-top: 8pt;
+  }
+  .doc-sheet td, .doc-sheet th { border: 1px solid #cbd5e1; padding: 2pt 5pt; word-break: break-word; }
+  .doc-sheet tr:nth-child(even) td { background: #f8fafc; }
+  .pdf-page-img {
+    display: block; width: 100%; height: auto; margin: 0 0 8px;
+    border: 1px solid #e2e8f0; border-radius: 6px;
+    page-break-inside: avoid; break-inside: avoid;
+  }
+
+  /* ============================================
+     PRINT STYLES (A4, same page width as Initiate preview)
      ============================================ */
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 0;   /* margin 0 = browser header/footer (date, title, URL, page no.) print nahi hoti */
   }
 
+  /* Screen par wrapper table invisible rehta hai */
+  .print-frame, .print-frame > tbody, .print-frame > tbody > tr, .print-frame > tbody > tr > td {
+    display: block; width: 100%; padding: 0; border: 0;
+  }
+  .print-frame > thead, .print-frame > tfoot { display: none; }
+
   @media print {
-    /* Show print-only images */
-    .print-image-preview, .print-docx-preview {
-      display: block !important;
-      margin-top: 15px;
-      page-break-inside: auto;
-    }
-    .print-image-preview { text-align: center; }
-    .print-docx-preview { text-align: left; }
-    .print-image-preview img {
-      max-width: 100%;
-      height: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
+    html, body {
+      width: auto !important;
+      max-width: none !important;
+      background: #fff !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* Force background colors and exact colors (dark header) */
     * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
-    /* Hide layout elements like sidebar, navbar, buttons, and the top headers */
-    #sidebar, .sidebar, .nav, .navbar, .topbar, .header, header, .main-header, .footer, footer, .btn, .ns-header, .meta-grid, .attachment-link, .section__header {
+    #sidebar, .sidebar, .nav, .navbar, .topbar, .header, header,
+    .main-header, .footer, footer, .btn,
+    .attachment-link, .attachment-print-btn,
+    .timeline-node__dot, .ns-header, .meta-grid, .section__header,
+    .screen-only-letterhead, .timeline-letterhead,
+    .page-container::before, .page-container::after {
       display: none !important;
     }
-    
-    /* Reset body and container backgrounds/margins */
-    body, html { background: white !important; padding: 0 !important; margin: 0 !important; }
-    .page-container, .content-wrapper, .container-fluid, .main-panel, .content {
+
+    .main-container, .content, .main-content, main, .main-wrapper,
+    .page-container, .content-wrapper, .ns-card {
       width: 100% !important;
       max-width: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
-      display: block !important;
-      background: white !important;
-    }
-
-    .ns-card {
-      width: 100% !important;
-      max-width: 950px !important;
-      margin: 0 auto !important;
-      padding: 0 !important;
+      border: none !important;
       box-shadow: none !important;
-      border: none !important;
-      background: white !important;
-      display: block !important;
-    }
-    
-    .ns-body {
-      padding: 10px 0 !important; /* Remove heavy side padding */
-    }
-
-    /* Style the header for print exactly like view (dark theme) */
-    .ns-header {
-      padding: 20px 10px !important;
-      margin-bottom: 15px !important;
       border-radius: 0 !important;
+      background: #fff !important;
+      overflow: visible !important;
+      contain: none !important;
+      animation: none !important;
     }
 
-    /* Meta Grid */
-    .meta-grid {
-      border: none !important;
-      border-top: 1px solid #e5e7eb !important;
-      border-bottom: 1px solid #e5e7eb !important;
-      padding-left: 10px !important;
-      padding-right: 10px !important;
-    }
 
-    /* Show our custom print letterhead and hide the UI letterhead */
+    .print-frame { display: table !important; width: 100% !important; table-layout: fixed; border-collapse: collapse; }
+    .print-frame > thead { display: table-header-group !important; }
+    .print-frame > tfoot { display: table-footer-group !important; }
+    .print-frame > tbody { display: table-row-group !important; }
+    .print-frame > thead > tr, .print-frame > tfoot > tr, .print-frame > tbody > tr { display: table-row !important; }
+    .print-frame > thead > tr > td, .print-frame > tfoot > tr > td { display: table-cell !important; padding: 0 !important; }
+    .print-frame > tbody > tr > td { display: table-cell !important; padding: 0 10mm !important; }
+    .print-frame .pf-space { height: 10mm; }
+
+    .print-only-letterhead { margin-top: 0 !important; }
+    .print-line {
+      border-left: 2.5px solid #000 !important;
+      padding-left: 8pt !important;
+      margin-left: 4pt !important;
+    }
+    .print-only-subject { display: block !important; }
+    .print-line .ph-subject-row { margin-top: 4pt !important; }
+
     .print-only-letterhead {
       display: block !important;
-    }
-    .screen-only-letterhead {
-      display: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* Timeline Section for Print */
+    .ns-body {
+      padding: 0 0 20px !important;
+      background: #fff !important;
+      border: none !important;
+    }
     .timeline {
       padding: 0 !important;
+      margin: 0 !important;
       border: none !important;
       box-shadow: none !important;
-      margin: 0 !important;
-      max-width: 100% !important;
       border-radius: 0 !important;
+      background: #fff !important;
+      width: 100% !important;
     }
     .timeline-node {
-      padding-left: 0 !important;
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
-    .timeline-node::before { display: none !important; }
-    .timeline-node__dot { display: none !important; }
-    .timeline-card__body { padding: 0 !important; }
-
-    .timeline-card { border: none !important; margin-bottom: 15px !important; display: block !important; box-shadow: none !important; }
-    .timeline-card__head { border: 1px solid #e5e7eb !important; border-radius: 8px !important; background: #fafafa !important; padding: 10px 15px !important; margin-bottom: 10px !important; }
-    
-    .ns-text {
-      border: none !important;
       padding: 0 !important;
-      background: white !important;
+      margin: 0 0 18px 0 !important;
+      animation: none !important;
+      page-break-inside: auto;
+      break-inside: auto;
     }
-    
-    /* Fix page breaking */
-    .timeline-card, .ns-text, .ns-card, .timeline-node {
-      page-break-inside: auto !important;
-      break-inside: auto !important;
-    }
-    .action-attachments-modern {
-      page-break-inside: auto !important;
-      break-inside: auto !important;
-    }
-    .timeline-card__head {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-    }
-    
-    /* Ensure attachments keep their layout in print */
-    .attachment-row-modern {
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      border-bottom: 1px solid #f3f4f6 !important;
-    }
-    .action-attachments-modern {
+    .timeline-card {
       border: none !important;
-      padding-top: 0 !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      width: 100% !important;
     }
-    .action-attachments__label-modern {
-      background-color: transparent !important;
-      border: none !important;
+    .timeline-card__body { padding: 0 !important; }
+    .ns-text-content { font-size: 12pt; line-height: 1.6; }
+    .ns-text-content ol, .ns-text-content ul { margin-left: 0 !important; padding-left: 15pt !important; }
+
+    /* Attachments remarks ke foran baad shuru hon (poora block agle page par nahi jata) */
+    .ns-att-sig-row { display: block !important; margin-top: 14px !important; }
+    .ns-att-sig-row > div { min-width: 0 !important; }
+    .action-attachments-modern { page-break-inside: auto !important; break-inside: auto !important; padding-top: 0 !important; }
+    .action-attachments__label-modern { break-after: avoid; page-break-after: avoid; margin-bottom: 6px !important; }
+    .attachment-row-modern { break-after: avoid; page-break-after: avoid; break-inside: avoid; margin-top: 8px; }
+    .print-image-preview {
+      display: block !important;
+      margin: 6px 0 10px !important;
+      text-align: left;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
+    .print-image-preview img {
+      width: auto;
+      max-width: 40%;
+      max-height: 60mm;
+      height: auto;
+      object-fit: contain;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 4px;
+      background: #fff;
+    }
+    .print-file-card { display: flex !important; }
+    .print-doc-preview { display: block !important; margin: 4px 0 14px; }
+    .doc-sheet { page-break-inside: auto; }
+    .doc-sheet tr { page-break-inside: avoid; break-inside: avoid; }
+
+    .signature-stamp { page-break-inside: avoid; break-inside: avoid; margin: 14px 0 0 auto !important; width: max-content; }
+    .marking-text { page-break-inside: avoid; break-inside: avoid; }
   }
 </style>
 
 <div class="page-container col-lg-12 col-md-12">
   <div class="content-wrapper col-lg-12">
+    <table class="print-frame">
+    <thead><tr><td><div class="pf-space"></div></td></tr></thead>
+    <tfoot><tr><td><div class="pf-space"></div></td></tr></tfoot>
+    <tbody><tr><td>
     <article class="ns-card" aria-labelledby="notesheet-title">
 
       {# Header Section #}
@@ -1156,34 +1335,6 @@
         </div>
       </dl>
 
-      {# Print-Only Letterhead - hidden on screen, only shown via popup window #}
-      <div class="print-only-letterhead" style="display: none; padding: 10px 15px 0;">
-        <table class="letterhead-table">
-          <tr>
-            <td class="letterhead-logo-cell">
-              <img src="{% static 'images/wssp_logo.png' %}" alt="WSSP Logo"
-                   onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
-            </td>
-            <td class="letterhead-center">
-              <p class="letterhead-title">WATER &amp; SANITATION SERVICES PESHAWAR,</p>
-              <p class="letterhead-title">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-              <p class="letterhead-address">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad,</p>
-              <p class="letterhead-contact"><strong>Email:</strong> <u>wsspeshawar@gmail.com</u>      <strong>Phone #</strong> 091-9219621-23</p>
-            </td>
-            <td class="letterhead-logo-cell">
-              <img src="{% static 'images/kp_emblem.png' %}" alt="Government of Khyber Pakhtunkhwa Emblem"
-                   onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
-                   style="width: 135px; height: 135px; object-fit: contain;">
-            </td>
-          </tr>
-        </table>
-        <div style="border-top:2px solid #d1d5db;margin:6pt 0 14pt 0;"></div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14pt;">
-          <div style="font-size:14pt;font-weight:bold;color:#111827;text-transform:uppercase; flex:1; padding-right:15pt;">Subject: {{ notesheet.title }}</div>
-          <div style="font-size:12pt;font-weight:bold;color:#111827;white-space:nowrap;padding-top:2pt;">Date: {{ notesheet.created_at|date:"d M Y" }}</div>
-        </div>
-      </div>
-
       {# Main Content Body - Unified Chronological Timeline #}
       <div class="ns-body">
 
@@ -1197,6 +1348,53 @@
             </div>
             <h2 id="timeline-heading" class="section__title">Notesheet Workflow</h2>
             <span class="section__count">{{ timeline|length|add:1 }} event{{ timeline|length|add:1|pluralize }}</span>
+          </div>
+
+          {# Print-Only Letterhead - hidden on screen, shown only in print (same look as Initiate preview) #}
+          <div class="print-only-letterhead" style="display: none;">
+            <table class="ph-table">
+              <tr>
+                <td class="ph-logo">
+                  <img src="{% if notesheet.created_by.profile.zone and notesheet.created_by.profile.zone.logo_left %}{{ notesheet.created_by.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}"
+                       alt="Left Logo" onerror="this.style.display='none';">
+                </td>
+                <td class="ph-center">
+                  {% if notesheet.created_by.profile.zone %}
+                    <h4 class="ph-title"><u>{{ notesheet.created_by.profile.zone.title|default:"WATER & SANITATION SERVICES PESHAWAR" }}</u></h4>
+                    {% if notesheet.created_by.profile.zone.subtitle %}
+                    <p class="ph-sub">{{ notesheet.created_by.profile.zone.subtitle }}</p>
+                    {% endif %}
+                    {% if notesheet.created_by.profile.zone.province %}
+                    <p class="ph-prov">{{ notesheet.created_by.profile.zone.province }}</p>
+                    {% endif %}
+                    {% if notesheet.created_by.profile.zone.address %}
+                    <p class="ph-addr">{{ notesheet.created_by.profile.zone.address }}</p>
+                    {% endif %}
+                    {% if notesheet.created_by.profile.zone.phone %}
+                    <p class="ph-phone">Phone: {{ notesheet.created_by.profile.zone.phone }}</p>
+                    {% endif %}
+                  {% else %}
+                    <h4 class="ph-title"><u>WATER AND SANITATION SERVICES PESHAWAR</u></h4>
+                    <p class="ph-sub">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
+                    <p class="ph-addr">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                  {% endif %}
+                </td>
+                <td class="ph-logo">
+                  <img src="{% if notesheet.created_by.profile.zone and notesheet.created_by.profile.zone.logo_right %}{{ notesheet.created_by.profile.zone.logo_right.url }}{% else %}{% static 'images/kpk_emblem.png' %}{% endif %}"
+                       alt="Right Logo" onerror="this.style.display='none';">
+                </td>
+              </tr>
+            </table>
+            <div class="ph-rule"></div>
+          </div>
+
+          {# Preview jaisi left black line: Subject + poora content is wrapper ke andar #}
+          <div class="print-line">
+          <div class="print-only-subject" style="display: none;">
+            <div class="ph-subject-row">
+              <div class="ph-subject">Subject: {{ notesheet.title }}</div>
+              <div class="ph-date">Date: {{ notesheet.created_at|date:"d M Y" }}</div>
+            </div>
           </div>
 
           <div class="timeline">
@@ -1233,14 +1431,15 @@
                         <div class="ns-text ns-text--empty">No agendas added.</div>
                       {% endif %}
                     </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+
+                    <div class="ns-att-sig-row" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
                       <div style="flex: 1; min-width: 0;">
                         {% if initial_attachments %}
                           <div class="action-attachments-modern">
                             <div class="action-attachments__label-modern">ATTACHMENTS</div>
                             <div class="action-attachments__list-modern">
                               {% for att in initial_attachments %}
+                              {% with fname_lower=att.file.name|lower %}
                               <div class="attachment-row-modern" style="display:inline-flex; align-items:center; gap:10px; padding:6px 12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
                                 <div class="attachment-row__info" style="display:inline-flex; align-items:center; gap:8px;">
                                   {% if att.flag_name %}
@@ -1261,25 +1460,49 @@
                                   </a>
                                 </div>
                               </div>
-                              
-                              {# Print-only image preview for screenshots/images #}
-                              {% if '.png' in att.file.name|lower or '.jpg' in att.file.name|lower or '.jpeg' in att.file.name|lower %}
-                              <div class="print-image-preview" style="display: none; margin-top: 10px;">
-                                <img src="{{ att.file.url }}" alt="Attachment Image" style="max-width: 100%; border-radius: 4px; border: 1px solid #e5e7eb;">
+
+                              {# Print-only attachment preview #}
+                              {% if '.png' in fname_lower or '.jpg' in fname_lower or '.jpeg' in fname_lower or '.gif' in fname_lower or '.webp' in fname_lower %}
+                              <div class="print-image-preview">
+                                <img src="{{ att.file.url }}" alt="{{ att.file.name|cut:'notesheet_attachments/' }}">
                               </div>
-                              {% elif att.file.url|lower|slice:"-5:" == ".docx" or att.file.url|lower|slice:"-4:" == ".doc" %}
-                              <div class="print-docx-preview" data-docx-url="{{ att.file.url }}" style="display: none; margin-top: 10px; border: 1px dashed #ccc; padding: 20px; font-family: 'Times New Roman', Times, serif; color: black; background: white;">
-                                <div style="color: #666; font-style: italic; font-size: 10pt; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Document Content: {{ att.file.name|cut:"notesheet_attachments/" }}</div>
-                                <div class="docx-content">Loading document content for print...</div>
+                              {% else %}
+                              <div class="print-file-card
+                                {% if '.pdf' in fname_lower %}ft-pdf
+                                {% elif '.docx' in fname_lower or '.doc' in fname_lower %}ft-word
+                                {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}ft-excel
+                                {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}ft-ppt
+                                {% elif '.zip' in fname_lower or '.rar' in fname_lower %}ft-zip{% endif %}">
+                                <div class="print-file-icon">
+                                  {% if '.pdf' in fname_lower %}PDF
+                                  {% elif '.docx' in fname_lower or '.doc' in fname_lower %}DOC
+                                  {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}XLS
+                                  {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}PPT
+                                  {% elif '.zip' in fname_lower or '.rar' in fname_lower %}ZIP
+                                  {% else %}FILE{% endif %}
+                                </div>
+                                <div class="print-file-info">
+                                  <p class="print-file-name">{{ att.file.name|cut:"notesheet_attachments/" }}</p>
+                                  <p class="print-file-meta">
+                                    {% if '.pdf' in fname_lower %}PDF Document
+                                    {% elif '.docx' in fname_lower or '.doc' in fname_lower %}Word Document
+                                    {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}Excel Spreadsheet
+                                    {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}PowerPoint Presentation
+                                    {% elif '.zip' in fname_lower or '.rar' in fname_lower %}Compressed Archive
+                                    {% else %}Attached File{% endif %}
+                                  </p>
+                                </div>
+                                <span class="print-file-badge">Attachment</span>
                               </div>
+                              <div class="print-doc-preview" data-url="{{ att.file.url }}" data-type="{% if '.pdf' in fname_lower %}pdf{% elif '.docx' in fname_lower %}docx{% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}sheet{% endif %}"></div>
                               {% endif %}
-                              
+                              {% endwith %}
                               {% endfor %}
                             </div>
                           </div>
                         {% endif %}
                       </div>
-                      
+
                       {% if notesheet.created_by.profile.signature %}
                         <div class="signature-stamp" style="flex-shrink: 0;">
                           <div class="signature-stamp__img-wrap">
@@ -1333,66 +1556,91 @@
                         </div>
                       </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
-                      <div style="flex: 1; min-width: 0;">
-                        {% if item.rich_attachments %}
-                          <div class="action-attachments-modern">
-                            <div class="action-attachments__label-modern">ATTACHMENTS</div>
-                            <div class="action-attachments__list-modern">
-                              {% for att in item.rich_attachments %}
-                              <div class="attachment-row-modern" style="display:inline-flex; align-items:center; gap:10px; padding:6px 12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
-                                <div class="attachment-row__info" style="display:inline-flex; align-items:center; gap:8px;">
-                                  {% if att.flag_name %}
-                                    {% if "Flag" in att.flag_name %}
-                                    <span class="attachment-flag attachment-flag--red">{{ att.flag_name }}</span>
-                                    {% elif "Annexure" in att.flag_name %}
-                                    <span class="attachment-flag attachment-flag--green">{{ att.flag_name }}</span>
-                                    {% elif "PUC" in att.flag_name %}
-                                    <span class="attachment-flag attachment-flag--blue">{{ att.flag_name }}</span>
-                                    {% else %}
-                                    <span class="attachment-flag attachment-flag--gray">{{ att.flag_name }}</span>
+                      <div class="ns-att-sig-row" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 0;">
+                          {% if item.rich_attachments %}
+                            <div class="action-attachments-modern">
+                              <div class="action-attachments__label-modern">ATTACHMENTS</div>
+                              <div class="action-attachments__list-modern">
+                                {% for att in item.rich_attachments %}
+                                {% with fname_lower=att.file.name|lower %}
+                                <div class="attachment-row-modern" style="display:inline-flex; align-items:center; gap:10px; padding:6px 12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+                                  <div class="attachment-row__info" style="display:inline-flex; align-items:center; gap:8px;">
+                                    {% if att.flag_name %}
+                                      {% if "Flag" in att.flag_name %}
+                                      <span class="attachment-flag attachment-flag--red">{{ att.flag_name }}</span>
+                                      {% elif "Annexure" in att.flag_name %}
+                                      <span class="attachment-flag attachment-flag--green">{{ att.flag_name }}</span>
+                                      {% elif "PUC" in att.flag_name %}
+                                      <span class="attachment-flag attachment-flag--blue">{{ att.flag_name }}</span>
+                                      {% else %}
+                                      <span class="attachment-flag attachment-flag--gray">{{ att.flag_name }}</span>
+                                      {% endif %}
                                     {% endif %}
-                                  {% endif %}
-                                  <span class="attachment-row__name" style="font-weight: 600; font-size: 0.88rem; color:#0f172a;"><i class="fas fa-file-pdf" style="color:#dc2626; font-size:0.95rem;"></i> {{ att.file.name|cut:"notesheet_attachments/" }}</span>
-                                  <a href="/view-document/?url={{ att.file.url|urlencode }}" target="_blank" class="attachment-link" onclick="event.preventDefault(); previewAttachmentModal('/view-document/?url={{ att.file.url|urlencode }}', '{{ att.file.name|cut:"notesheet_attachments/"|escapejs }}');" style="margin-left: 4px;">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                    View
-                                  </a>
+                                    <span class="attachment-row__name" style="font-weight: 600; font-size: 0.88rem; color:#0f172a;"><i class="fas fa-file-pdf" style="color:#dc2626; font-size:0.95rem;"></i> {{ att.file.name|cut:"notesheet_attachments/" }}</span>
+                                    <a href="/view-document/?url={{ att.file.url|urlencode }}" target="_blank" class="attachment-link" onclick="event.preventDefault(); previewAttachmentModal('/view-document/?url={{ att.file.url|urlencode }}', '{{ att.file.name|cut:"notesheet_attachments/"|escapejs }}');" style="margin-left: 4px;">
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                      View
+                                    </a>
+                                  </div>
                                 </div>
+
+                                {# Print-only attachment preview #}
+                                {% if '.png' in fname_lower or '.jpg' in fname_lower or '.jpeg' in fname_lower or '.gif' in fname_lower or '.webp' in fname_lower %}
+                                <div class="print-image-preview">
+                                  <img src="{{ att.file.url }}" alt="{{ att.file.name|cut:'notesheet_attachments/' }}">
+                                </div>
+                                {% else %}
+                                <div class="print-file-card
+                                  {% if '.pdf' in fname_lower %}ft-pdf
+                                  {% elif '.docx' in fname_lower or '.doc' in fname_lower %}ft-word
+                                  {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}ft-excel
+                                  {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}ft-ppt
+                                  {% elif '.zip' in fname_lower or '.rar' in fname_lower %}ft-zip{% endif %}">
+                                  <div class="print-file-icon">
+                                    {% if '.pdf' in fname_lower %}PDF
+                                    {% elif '.docx' in fname_lower or '.doc' in fname_lower %}DOC
+                                    {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}XLS
+                                    {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}PPT
+                                    {% elif '.zip' in fname_lower or '.rar' in fname_lower %}ZIP
+                                    {% else %}FILE{% endif %}
+                                  </div>
+                                  <div class="print-file-info">
+                                    <p class="print-file-name">{{ att.file.name|cut:"notesheet_attachments/" }}</p>
+                                    <p class="print-file-meta">
+                                      {% if '.pdf' in fname_lower %}PDF Document
+                                      {% elif '.docx' in fname_lower or '.doc' in fname_lower %}Word Document
+                                      {% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}Excel Spreadsheet
+                                      {% elif '.pptx' in fname_lower or '.ppt' in fname_lower %}PowerPoint Presentation
+                                      {% elif '.zip' in fname_lower or '.rar' in fname_lower %}Compressed Archive
+                                      {% else %}Attached File{% endif %}
+                                    </p>
+                                  </div>
+                                  <span class="print-file-badge">Attachment</span>
+                                </div>
+                                <div class="print-doc-preview" data-url="{{ att.file.url }}" data-type="{% if '.pdf' in fname_lower %}pdf{% elif '.docx' in fname_lower %}docx{% elif '.xlsx' in fname_lower or '.xls' in fname_lower or '.csv' in fname_lower %}sheet{% endif %}"></div>
+                                {% endif %}
+                                {% endwith %}
+                                {% endfor %}
                               </div>
-                              
-                              {# Print-only image preview for screenshots/images #}
-                              {% if '.png' in att.file.name|lower or '.jpg' in att.file.name|lower or '.jpeg' in att.file.name|lower %}
-                              <div class="print-image-preview" style="display: none; margin-top: 10px;">
-                                <img src="{{ att.file.url }}" alt="Attachment Image" style="max-width: 100%; border-radius: 4px; border: 1px solid #e5e7eb;">
-                              </div>
-                              {% elif att.file.url|lower|slice:"-5:" == ".docx" or att.file.url|lower|slice:"-4:" == ".doc" %}
-                              <div class="print-docx-preview" data-docx-url="{{ att.file.url }}" style="display: none; margin-top: 10px; border: 1px dashed #ccc; padding: 20px; font-family: 'Times New Roman', Times, serif; color: black; background: white;">
-                                <div style="color: #666; font-style: italic; font-size: 10pt; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Document Content: {{ att.file.name|cut:"notesheet_attachments/" }}</div>
-                                <div class="docx-content">Loading document content for print...</div>
-                              </div>
-                              {% endif %}
-                              
-                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+
+                        {% if item.actor.profile.signature %}
+                          <div class="signature-stamp" style="flex-shrink: 0;">
+                            <div class="signature-stamp__img-wrap">
+                              <img class="signature-stamp__img" src="{{ item.actor.profile.signature.url }}" alt="Signature">
+                            </div>
+                            <div class="signature-stamp__name">{{ item.actor.get_full_name|default:item.actor.username }}</div>
+                            <div class="signature-stamp__badge">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                              {{ item.action_date|date:"d M Y · h:i A" }}
                             </div>
                           </div>
                         {% endif %}
                       </div>
-
-                      {% if item.actor.profile.signature %}
-                        <div class="signature-stamp" style="flex-shrink: 0;">
-                          <div class="signature-stamp__img-wrap">
-                            <img class="signature-stamp__img" src="{{ item.actor.profile.signature.url }}" alt="Signature">
-                          </div>
-                          <div class="signature-stamp__name">{{ item.actor.get_full_name|default:item.actor.username }}</div>
-                          <div class="signature-stamp__badge">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            {{ item.action_date|date:"d M Y · h:i A" }}
-                          </div>
-                        </div>
-                      {% endif %}
                     </div>
-                  </div>
 
                     <div class="marking-text">
                       {{ item.actor.username }} {% if item.type == 'return' %}Returned{% else %}Marked{% endif %} to {{ item.receiver.username }}
@@ -1403,268 +1651,203 @@
             {% endfor %}
 
           </div>
+          </div>{# /print-line #}
         </section>
 
       </div>
 
     </article>
+    </td></tr></tbody>
+    </table>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Automatically render all DOCX files for print view
-    document.querySelectorAll('.print-docx-preview').forEach(function(container) {
-        var url = container.getAttribute('data-docx-url');
-        var contentDiv = container.querySelector('.docx-content');
-        
-        fetch(url)
-            .then(function(response) {
-                if (!response.ok) throw new Error("Network response was not ok");
-                return response.arrayBuffer();
-            })
-            .then(function(arrayBuffer) {
-                return mammoth.convertToHtml({arrayBuffer: arrayBuffer});
-            })
-            .then(function(result) {
-                if (result.value.trim() === "") {
-                    contentDiv.innerHTML = '<span style="color:red;">[This document appears to be empty or contains only images/charts which cannot be printed natively.]</span>';
-                } else {
-                    contentDiv.innerHTML = result.value;
-                }
-            })
-            .catch(function(err) {
-                contentDiv.innerHTML = '<span style="color:red;">[Error loading document content for print: ' + err.message + ']</span>';
-                console.error("Mammoth Error for print:", err);
-            });
+/* ============================================
+   PRINT: attachments ka asal content render karo
+   PDF -> page images, Word (.docx) -> HTML, Excel/CSV -> tables
+   ============================================ */
+var __printJobs = [];
+
+function __esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function __fetchBuf(url) {
+    return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.arrayBuffer();
+    });
+}
+
+function __renderPdf(url, box) {
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF library not loaded');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    return __fetchBuf(url).then(function (buf) {
+        return pdfjsLib.getDocument({ data: buf }).promise;
+    }).then(function (pdf) {
+        var total = Math.min(pdf.numPages, 50);
+        var chain = Promise.resolve();
+        for (var n = 1; n <= total; n++) {
+            (function (num) {
+                chain = chain.then(function () {
+                    return pdf.getPage(num).then(function (page) {
+                        var vp = page.getViewport({ scale: 1.6 });
+                        var canvas = document.createElement('canvas');
+                        canvas.width = vp.width;
+                        canvas.height = vp.height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        return page.render({ canvasContext: ctx, viewport: vp }).promise.then(function () {
+                            var img = document.createElement('img');
+                            img.className = 'pdf-page-img';
+                            img.src = canvas.toDataURL('image/jpeg', 0.85);
+                            box.appendChild(img);
+                        });
+                    });
+                });
+            })(n);
+        }
+        return chain;
+    });
+}
+
+function __renderDocx(url, box) {
+    if (typeof mammoth === 'undefined') throw new Error('Word library not loaded');
+    return __fetchBuf(url).then(function (buf) {
+        return mammoth.convertToHtml({ arrayBuffer: buf });
+    }).then(function (res) {
+        var div = document.createElement('div');
+        div.className = 'doc-html';
+        div.innerHTML = res.value && res.value.trim() ? res.value : '<div class="doc-note">This document has no printable text.</div>';
+        box.appendChild(div);
+    });
+}
+
+function __renderSheet(url, box) {
+    if (typeof XLSX === 'undefined') throw new Error('Excel library not loaded');
+    return __fetchBuf(url).then(function (buf) {
+        var wb = XLSX.read(buf, { type: 'array' });
+        wb.SheetNames.forEach(function (name) {
+            var ws = wb.Sheets[name];
+            var wrap = document.createElement('div');
+            wrap.className = 'doc-sheet';
+            wrap.innerHTML = (wb.SheetNames.length > 1 ? '<div class="doc-sheet-title">' + __esc(name) + '</div>' : '') +
+                XLSX.utils.sheet_to_html(ws, { header: '', footer: '' });
+            box.appendChild(wrap);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.print-doc-preview[data-type]').forEach(function (box) {
+        var type = box.getAttribute('data-type');
+        var url = box.getAttribute('data-url');
+        if (!type || !url) return;
+        var job;
+        try {
+            if (type === 'pdf') job = __renderPdf(url, box);
+            else if (type === 'docx') job = __renderDocx(url, box);
+            else if (type === 'sheet') job = __renderSheet(url, box);
+        } catch (e) { job = Promise.reject(e); }
+        if (!job) return;
+        __printJobs.push(job.catch(function (err) {
+            console.error('Print preview failed:', err);
+            box.innerHTML = '<div class="doc-note">Content preview is not available for this file. Please open it from the attachment link.</div>';
+        }));
     });
 });
 
 /* ============================================
-   PRINT NOTESHEET - Clean Popup Window
-   Exactly matches initiate_notesheet preview
+   PRINT NOTESHEET (files render hone ka intezar karta hai)
    ============================================ */
 function printNotesheet() {
-    // 1. Collect agenda content from all timeline nodes
-    var agendaHtml = '';
-    var contentNodes = document.querySelectorAll('.ns-text-content .ns-text');
-    contentNodes.forEach(function(node) {
-        if (!node.classList.contains('ns-text--empty')) {
-            agendaHtml += node.innerHTML;
-        }
-    });
+    Promise.all(__printJobs).then(function () { window.print(); });
+}
 
-    // 2. Collect all attachments info
-    var attachmentsHtml = '';
-    var attachmentRows = document.querySelectorAll('.attachment-row-modern');
-    if (attachmentRows.length > 0) {
-        attachmentsHtml += '<div style="margin-top:14pt;">';
-        attachmentsHtml += '<div style="font-weight:700;font-size:10pt;text-transform:uppercase;letter-spacing:0.08em;color:#374151;margin-bottom:8pt;">ATTACHMENTS</div>';
-        attachmentRows.forEach(function(row) {
-            var flagEl = row.querySelector('.attachment-flag');
-            var nameEl = row.querySelector('.attachment-row__name');
-            var flagText = flagEl ? flagEl.textContent.trim() : '';
-            var fileName = nameEl ? nameEl.textContent.trim() : '';
-            
-            // Determine badge color
-            var badgeBg = '#6b7280';
-            if (flagText.indexOf('Flag') !== -1) badgeBg = '#ef4444';
-            else if (flagText.indexOf('Annexure') !== -1) badgeBg = '#059669';
-            else if (flagText.indexOf('PUC') !== -1) badgeBg = '#0369a1';
-            
-            attachmentsHtml += '<div style="display:flex;align-items:center;gap:10px;padding:5pt 0;border-bottom:1px solid #f3f4f6;">';
-            if (flagText) {
-                attachmentsHtml += '<span style="background:' + badgeBg + ';color:white;padding:2pt 8pt;border-radius:4px;font-size:8pt;font-weight:700;white-space:nowrap;">' + flagText + '</span>';
-            }
-            attachmentsHtml += '<span style="font-size:10pt;color:#111827;font-weight:500;">📎 ' + fileName + '</span>';
-            attachmentsHtml += '</div>';
-        });
-        attachmentsHtml += '</div>';
+/* ============================================
+   PRINT SINGLE ATTACHMENT
+   Opens the file in a popup window and
+   automatically triggers the print dialog.
+   ============================================ */
+function printAttachment(fileUrl, fileName) {
+    var lowerName = fileName.toLowerCase();
+    var isImage = /\.(png|jpg|jpeg|gif|webp|bmp|svg)$/i.test(lowerName);
+    var isPdf   = /\.pdf$/i.test(lowerName);
+    var isCsv   = /\.csv$/i.test(lowerName);
+
+    var printWin = window.open('', '_blank', 'width=950,height=750,scrollbars=yes,resizable=yes');
+    if (!printWin) {
+        alert('Please allow popups to print attachments.');
+        return;
     }
 
-    // 3. Collect image attachments for inline print
-    var imageAttachmentsHtml = '';
-    document.querySelectorAll('.print-image-preview img').forEach(function(img) {
-        imageAttachmentsHtml += '<div style="page-break-before:always; text-align:center; padding:20mm 0;">';
-        imageAttachmentsHtml += '<img src="' + img.src + '" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:4px;" />';
-        imageAttachmentsHtml += '</div>';
-    });
+    var htmlContent = '<!DOCTYPE html><html><head><title>Print - ' + fileName + '</title>';
+    htmlContent += '<style>';
+    htmlContent += 'body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif;}';
+    htmlContent += 'h3{text-align:center;padding:10px 0 5px;margin:0;font-size:14pt;color:#111;}';
+    htmlContent += 'iframe{width:100%;height:calc(100vh - 50px);border:none;}';
+    htmlContent += 'img.print-img{display:block;max-width:100%;max-height:95vh;margin:20px auto;object-fit:contain;}';
+    htmlContent += '@media print{';
+    htmlContent += '  body{margin:0;padding:0;}';
+    htmlContent += '  h3{display:none;}';
+    htmlContent += '  iframe{height:100vh;width:100%;}';
+    htmlContent += '  img.print-img{max-width:100%;max-height:100%;margin:0 auto;}';
+    htmlContent += '}';
+    htmlContent += '</style></head><body>';
 
-    // 4. Collect docx rendered content for inline print
-    var docxPrintsHtml = '';
-    document.querySelectorAll('.print-docx-preview').forEach(function(container) {
-        var contentDiv = container.querySelector('.docx-content');
-        var labelDiv = container.querySelector('div[style*="font-style: italic"]');
-        if (contentDiv && contentDiv.innerHTML.indexOf('Loading') === -1) {
-            docxPrintsHtml += '<div style="page-break-before:always; padding:10mm 0;">';
-            if (labelDiv) {
-                docxPrintsHtml += '<div style="color:#666;font-style:italic;font-size:10pt;margin-bottom:10pt;border-bottom:1px solid #eee;padding-bottom:5pt;">' + labelDiv.innerHTML + '</div>';
-            }
-            docxPrintsHtml += '<div style="font-family:Times New Roman, Times, serif; font-size:12pt; line-height:1.6; color:#000;">' + contentDiv.innerHTML + '</div>';
-            docxPrintsHtml += '</div>';
-        }
-    });
-
-    // 5. Collect signature info
-    var signatureHtml = '';
-    var sigStamps = document.querySelectorAll('.signature-stamp');
-    if (sigStamps.length > 0) {
-        var firstSig = sigStamps[0];
-        var sigImg = firstSig.querySelector('.signature-stamp__img');
-        var sigName = firstSig.querySelector('.signature-stamp__name');
-        var sigBadge = firstSig.querySelector('.signature-stamp__badge');
-        
-        signatureHtml += '<div style="display:flex;justify-content:flex-end;margin-top:24pt;">';
-        signatureHtml += '<div style="text-align:center;">';
-        if (sigImg) {
-            signatureHtml += '<div style="margin-bottom:4pt;"><img src="' + sigImg.src + '" style="max-height:60px;max-width:170px;object-fit:contain;" /></div>';
-        }
-        if (sigName) {
-            signatureHtml += '<div style="font-weight:700;font-size:11pt;color:#111827;">' + sigName.textContent.trim() + '</div>';
-        }
-        if (sigBadge) {
-            signatureHtml += '<div style="font-size:9pt;color:#6b7280;margin-top:2pt;">' + sigBadge.textContent.trim() + '</div>';
-        }
-        signatureHtml += '</div></div>';
+    if (isPdf) {
+        htmlContent += '<iframe src="' + fileUrl + '#toolbar=0&navpanes=0" id="printFrame"></iframe>';
+        htmlContent += '<script>';
+        htmlContent += 'var f=document.getElementById("printFrame");';
+        htmlContent += 'f.onload=function(){setTimeout(function(){window.focus();window.print();},1000);};';
+        htmlContent += '<\/script>';
+    } else if (isCsv) {
+        htmlContent += '<h3>' + fileName + '</h3>';
+        htmlContent += '<div id="csvContent" style="padding:10px 20px;overflow:auto;"></div>';
+        htmlContent += '<script>';
+        htmlContent += 'fetch("' + fileUrl + '").then(function(r){return r.text();}).then(function(text){';
+        htmlContent += '  var rows=text.trim().split("\\n");';
+        htmlContent += '  var html="<table style=\\"width:100%;border-collapse:collapse;font-size:10pt;\\">";';
+        htmlContent += '  for(var i=0;i<rows.length;i++){';
+        htmlContent += '    var cells=rows[i].split(",");';
+        htmlContent += '    html+="<tr>";';
+        htmlContent += '    for(var j=0;j<cells.length;j++){';
+        htmlContent += '      var tag=i===0?"th":"td";';
+        htmlContent += '      html+="<"+tag+" style=\\"border:1px solid #ccc;padding:4px 8px;text-align:left;\\">"+cells[j].replace(/"/g,"")+"</"+tag+">";';
+        htmlContent += '    }';
+        htmlContent += '    html+="</tr>";';
+        htmlContent += '  }';
+        htmlContent += '  html+="</table>";';
+        htmlContent += '  document.getElementById("csvContent").innerHTML=html;';
+        htmlContent += '  setTimeout(function(){window.focus();window.print();},500);';
+        htmlContent += '}).catch(function(err){';
+        htmlContent += '  document.getElementById("csvContent").innerHTML="<p style=\\"color:red;\\">Error loading CSV: "+err.message+"</p>";';
+        htmlContent += '});';
+        htmlContent += '<\/script>';
+    } else if (isImage) {
+        htmlContent += '<img class="print-img" src="' + fileUrl + '" onload="setTimeout(function(){window.focus();window.print();},400);" onerror="document.body.innerHTML=\'<p style=padding:20px;color:red>Error loading image.</p>\';">';
+    } else {
+        htmlContent += '<h3>' + fileName + '</h3>';
+        htmlContent += '<iframe src="' + fileUrl + '" id="printFrame"></iframe>';
+        htmlContent += '<script>';
+        htmlContent += 'var f=document.getElementById("printFrame");';
+        htmlContent += 'f.onload=function(){setTimeout(function(){window.focus();window.print();},1200);};';
+        htmlContent += '<\/script>';
     }
 
-    // 6. Collect marking info
-    var markingHtml = '';
-    var markingNodes = document.querySelectorAll('.marking-text');
-    markingNodes.forEach(function(node) {
-        markingHtml += '<div style="margin-top:10pt;padding-top:8pt;border-top:1px dashed #d1d5db;font-weight:600;font-size:10pt;color:#059669;">' + node.textContent.trim() + '</div>';
-    });
+    htmlContent += '</body></html>';
 
-    // 7. Build the exact same popup window as initiate_notesheet preview
-    var noteTitle = '{{ notesheet.title|escapejs }}';
-    var noteDate = '{{ notesheet.created_at|date:"d M Y" }}';
-    
-    var printWindow = window.open('', '_blank', 'width=900,height=700');
-    
-    printWindow.document.write('<!DOCTYPE html>\
-<html lang="en">\
-<head>\
-<meta charset="UTF-8">\
-<title>Notesheet Print - ' + noteTitle + '</title>\
-<style>\
-  @import url("https://fonts.googleapis.com/css2?family=Calibri&display=swap");\
-  * { box-sizing: border-box; margin: 0; padding: 0; }\
-  html { height: 100%; }\
-  body {\
-    width: 100%;\
-    min-height: 100vh;\
-    font-family: Arial, Calibri, sans-serif;\
-    font-size: 12pt;\
-    line-height: 1.5;\
-    color: #000;\
-    background: white;\
-    padding: 20mm 22mm 30mm 22mm;\
-    display: flex;\
-    flex-direction: column;\
-  }\
-  @media print {\
-    body { padding: 0; }\
-    @page {\
-      size: A4;\
-      margin: 20mm 22mm 30mm 22mm;\
-    }\
-    .no-print { display: none !important; }\
-  }\
-  p { margin: 0 0 6pt 0; }\
-  table { border-collapse: collapse; width: 100%; }\
-  td, th { padding: 4pt 6pt; }\
-  h1 { font-size: 18pt; font-weight: bold; margin-bottom: 8pt; }\
-  h2 { font-size: 14pt; font-weight: bold; margin-bottom: 6pt; }\
-  h3 { font-size: 12pt; font-weight: bold; margin-bottom: 4pt; }\
-  ul, ol { margin-left: 0 !important; padding-left: 14pt !important; margin-bottom: 6pt !important; }\
-  li { margin-bottom: 4pt !important; padding-left: 0 !important; }\
-  blockquote { border-left: 3pt solid #059669; padding-left: 10pt; color: #4b5563; }\
-  a { color: #059669; }\
-  strong, b { font-weight: bold; }\
-  em, i { font-style: italic; }\
-  u { text-decoration: underline; }\
-  img { max-width: 100%; }\
-  .print-toolbar {\
-    position: fixed;\
-    top: 10px;\
-    right: 10px;\
-    display: flex;\
-    gap: 10px;\
-    z-index: 9999;\
-  }\
-  .btn-do-print {\
-    padding: 10px 20px;\
-    background: #0d2b1e;\
-    color: white;\
-    border: none;\
-    border-radius: 8px;\
-    font-size: 14px;\
-    font-weight: 600;\
-    cursor: pointer;\
-  }\
-  .btn-do-print:hover { background: #0a2118; }\
-  .btn-do-close {\
-    padding: 10px 20px;\
-    background: #6b7280;\
-    color: white;\
-    border: none;\
-    border-radius: 8px;\
-    font-size: 14px;\
-    font-weight: 600;\
-    cursor: pointer;\
-  }\
-</style>\
-</head>\
-<body>\
-  <div class="print-toolbar no-print">\
-    <button class="btn-do-print" onclick="window.print()">🖨️ Print / Save as PDF</button>\
-    <button class="btn-do-close" onclick="window.close()">✕ Close</button>\
-  </div>\
-  <table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:0;padding:0;border:none;">\
-    <tr>\
-      <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">\
-        <img src="{% if notesheet.created_by.profile.zone and notesheet.created_by.profile.zone.logo_left %}{{ notesheet.created_by.profile.zone.logo_left.url }}{% else %}/static/images/wssp_logo_new.png{% endif %}" onerror="this.style.display=\'none\'" alt="WSSP" style="width:135px;height:135px;max-width:100%;object-fit:contain;">\
-      </td>\
-           <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">\
-        {% if notesheet.created_by.profile.zone %}\
-        <h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">{{ notesheet.created_by.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</u></h4>\
-        <p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">{{ notesheet.created_by.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>\
-        <p style="font-size:18px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">{{ notesheet.created_by.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>\
-        {% if notesheet.created_by.profile.zone.address %}\
-        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">{{ notesheet.created_by.profile.zone.address }}</p>\
-        {% endif %}\
-        {% if notesheet.created_by.profile.zone.phone %}\
-        <p style="font-size:16px;font-weight:700;margin:3pt 0 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Phone: {{ notesheet.created_by.profile.zone.phone }}</p>\
-        {% endif %}\
-        {% else %}\
-        <h4 style="font-weight:700;font-size:34px;margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;">WATER AND SANITATION SERVICES PESHAWAR</h4>\
-        <p style="font-size:24px;font-weight:700;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;text-transform:uppercase;margin:0 0 3pt 0;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>\
-        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;word-wrap:break-word;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>\
-        {% endif %}\
-      </td>\
-      <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">\
-        <img src="{% if notesheet.created_by.profile.zone and notesheet.created_by.profile.zone.logo_right %}{{ notesheet.created_by.profile.zone.logo_right.url }}{% else %}/static/images/kpk_emblem.png{% endif %}" onerror="this.style.display=\'none\'" alt="KPK Emblem" style="width:135px;height:135px;max-width:100%;object-fit:contain;">\
-      </td>\
-    </tr>\
-  </table>\
-  <div style="border-top:2px solid #d1d5db;margin:6pt 0 14pt 0;"></div>\
-  <div style="border-left: 2.5px solid #000; padding-left: 14pt; margin-left: 6pt; flex: 1;">\
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14pt;">\
-      <div style="font-size:14pt;font-weight:bold;color:#111827;text-transform:uppercase;flex:1;padding-right:15pt;">SUBJECT: ' + noteTitle + '</div>\
-      <div style="font-size:12pt;font-weight:bold;color:#111827;white-space:nowrap;padding-top:2pt;">Date: ' + noteDate + '</div>\
-    </div>\
-    ' + agendaHtml + '\
-    ' + attachmentsHtml + '\
-    ' + signatureHtml + '\
-    ' + markingHtml + '\
-    ' + imageAttachmentsHtml + '\
-    ' + docxPrintsHtml + '\
-  </div>\
-</body>\
-</html>');
-    
-    printWindow.document.close();
+    printWin.document.write(htmlContent);
+    printWin.document.close();
+}
+
+function openLogBookModal(notesheetId) {
+  // existing log book modal trigger logic stays wherever it was defined
 }
 </script>
 

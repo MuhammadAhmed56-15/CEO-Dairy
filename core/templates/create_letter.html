@@ -182,14 +182,14 @@
     }
 
     .letterhead-logo-cell img {
-        width: 95px;
-        height: 95px;
+        width: 130px;
+        height: 130px;
         max-width: 100%;
         object-fit: contain;
     }
 
     .letterhead-center {
-        width: 68%;
+        width: 64%;
         text-align: center;
         vertical-align: middle;
         padding: 6pt 8pt;
@@ -197,42 +197,44 @@
 
     .letterhead-title-main {
         font-weight: 900;
-        font-size: clamp(15px, 1.6vw, 22px);
+        font-size: 26px;
         margin: 0 0 5pt 0;
-        font-family: Calibri, Arial, sans-serif;
-        color: #0d1b2a;
-        line-height: 1.25;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.35;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        white-space: nowrap;
     }
 
     .letterhead-subtitle {
-        font-size: 19px;
+        font-size: 21px;
         font-weight: 800;
-        margin: 0 0 2pt 0;
-        font-family: Calibri, Arial, sans-serif;
-        color: #1a2a3a;
+        margin: 0 0 3pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
         line-height: 1.35;
         text-transform: uppercase;
-        letter-spacing: 0.2px;
     }
 
     .letterhead-address {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
-        margin: 0 0 5pt 0;
-        font-family: Calibri, Arial, sans-serif;
-        color: #1a2a3a;
+        margin: 0 0 3pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
         line-height: 1.35;
         text-transform: uppercase;
     }
 
     .letterhead-contact {
-        font-size: 17px;
-        font-weight: 700;
+        font-size: 18px;
+        font-weight: 600;
         margin: 0;
-        font-family: Calibri, Arial, sans-serif;
-        color: #1a2a3a;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
         line-height: 1.35;
     }
 
@@ -445,33 +447,32 @@
                         </td>
                         <td class="letterhead-center">
                             {% if request.user.profile.zone %}
-                                <h4 class="letterhead-title-main"><u style="text-decoration: underline; text-underline-offset: 4px;">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</u></h4>
-                                <p class="letterhead-subtitle">{{ request.user.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
+                                <h4 class="letterhead-title-main">{{ request.user.profile.zone.title|default:"OFFICE OF THE ZONAL MANAGER (ZONE-D)" }}</h4>
+                                <p class="letterhead-subtitle">{{ request.user.profile.zone.subtitle|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</p>
                                 <p class="letterhead-address">{{ request.user.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
                                 {% if request.user.profile.zone.address %}
-                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">{{ request.user.profile.zone.address }}</p>
+                                <p class="letterhead-contact">{{ request.user.profile.zone.address }}</p>
                                 {% endif %}
                                 <p class="letterhead-contact">
                                     {% if request.user.profile.zone.phone %}
                                     Phone-No. {{ request.user.profile.zone.phone }}
-                                    {% else %}
-                                    Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219621-23
                                     {% endif %}
                                 </p>
                             {% else %}
-                                <h4 class="letterhead-title-main" style="color: #6b7280; font-size: 26px;">WATER AND SANITATION SERVICES PESHAWAR</h4>
-                                <p class="letterhead-subtitle" style="color: #6b7280;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-                                <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#6b7280;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                                <h4 class="letterhead-title-main">OFFICE OF THE ZONAL MANAGER (ZONE-D)</h4>
+                                <p class="letterhead-subtitle">WATER &amp; SANITATION SERVICES PESHAWAR</p>
+                                <p class="letterhead-address">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
+                                <p class="letterhead-contact">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
                             {% endif %}
                         </td>
                         <td class="letterhead-logo-cell">
                             <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url }}{% else %}{% static 'images/kpk_emblem.png' %}{% endif %}" alt="Government of Khyber Pakhtunkhwa Emblem"
                                  onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/c/c9/KP_logo.png';"
-                                 style="width: 72px; height: 72px; object-fit: contain;">
+                                 style="width: 130px; height: 130px; object-fit: contain;">
                         </td>
                     </tr>
                 </table>
-                <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
+                <div style="border-top:1px solid #000;margin:6pt 0 10pt 0;"></div>
 
                 <!-- Ref No & Date -->
 
@@ -672,7 +673,7 @@
                     <select name="receiver" class="form-select" id="receiverSelect" style="width: max-content; max-width: 100%;">
                         <option value="">-- Select System Recipient --</option>
                         {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({% if u.profile %}{{ u.profile.get_role_with_department }}{% endif %})</option>
+                        <option value="{{ u.id }}">{% if u.profile %}{{ u.profile.get_role_with_department|default:u.profile.role }}{% else %}{{ u.get_full_name|default:u.username }}{% endif %}</option>
                         {% endfor %}
                     </select>
                     <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i>Optional if saving as Draft</small>

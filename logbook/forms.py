@@ -128,13 +128,19 @@ class DriverForm(forms.ModelForm):
 
             "mobile": forms.TextInput(
                 attrs={
-                    "class": "form-control"
+                    "class": "form-control driver-mobile-input",
+                    "maxlength": "11",
+                    "inputmode": "numeric",
+                    "placeholder": "e.g. 03001234567"
                 }
             ),
 
             "cnic": forms.TextInput(
                 attrs={
-                    "class": "form-control"
+                    "class": "form-control driver-cnic-input",
+                    "maxlength": "15",
+                    "inputmode": "numeric",
+                    "placeholder": "e.g. 17301-1234567-1"
                 }
             ),
 
@@ -154,6 +160,9 @@ class DriverForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        self.fields['vehicle'].label_from_instance = lambda obj: f"{obj.vehicle_name} ({obj.vehicle_id_number})" if obj.vehicle_id_number else obj.vehicle_name
+        self.fields['cnic'].label = "CNIC"
+        
         if user and not (user.username in ['CEO', 'Fleet_Manager', 'Manager_Admin'] or (hasattr(user, 'profile') and user.profile.role in ['CEO', 'Manager', 'GM', 'PS'])):
             if hasattr(user, 'profile') and user.profile.zone:
                 self.fields['vehicle'].queryset = Vehicle.objects.filter(zone=user.profile.zone)

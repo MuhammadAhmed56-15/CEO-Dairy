@@ -233,24 +233,13 @@
 <div class="req-page-wrapper">
     <div class="req-container">
 
-        {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px; border: none; font-weight: 500;">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <div class="req-card">
             <header class="req-card-header">
                 <div class="req-card-header-content">
                     <div class="req-card-header__badge">
                         <i class="fas fa-list"></i> Requisitions Log
                     </div>
-                    <h1 class="req-card-header__title">{% if is_manager %}Requisition Inbox{% else %}My Submitted Requisitions{% endif %}</h1>
+                    <h1 class="req-card-header__title">{% if is_manager %}Requisition Inbox{% else %}Requisitions Inbox{% endif %}</h1>
                     <p class="req-card-header__subtitle">View and manage vehicle maintenance requests</p>
                 </div>
                 {% if not is_manager %}

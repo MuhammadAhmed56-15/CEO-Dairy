@@ -161,11 +161,9 @@
     .letterhead-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 18px;
+        margin-bottom: 6px;
         padding: 0;
         border: none;
-        border-bottom: 3px double var(--ink);
-        padding-bottom: 16px;
     }
 
     .letterhead-logo-cell {
@@ -185,36 +183,39 @@
         text-align: center;
         vertical-align: middle;
         padding: 12px 20px;
-        border-left: 1px solid #d8dee5;
-        border-right: 1px solid #d8dee5;
     }
 
     .letterhead-title {
         font-weight: 900;
-        font-size: 15pt;
-        margin: 0 0 4px;
-        font-family: Calibri, Arial, sans-serif;
-        color: #2d3748;
-        letter-spacing: .4px;
-        line-height: 1.4;
+        font-size: 26px;
+        margin: 0 0 5pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.35;
+        text-transform: uppercase;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        white-space: nowrap;
     }
 
     .letterhead-address {
-        font-size: 12pt;
-        font-weight: bold;
-        margin: 0 0 4px;
-        font-family: Calibri, Arial, sans-serif;
-        color: #1a202c;
-        line-height: 1.4;
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 3pt 0;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.35;
+        text-transform: uppercase;
     }
 
     .letterhead-contact {
-        font-size: 12pt;
-        font-weight: bold;
+        font-size: 18px;
+        font-weight: 600;
         margin: 0;
-        font-family: Calibri, Arial, sans-serif;
-        color: #1a202c;
-        line-height: 1.4;
+        font-family: 'Times New Roman', Times, serif;
+        color: #000;
+        line-height: 1.35;
     }
 
     .letterhead-contact u {
@@ -540,29 +541,29 @@
                 <tr>
                     <td class="letterhead-logo-cell">
                         <img src="{% if letter.sender.profile.zone and letter.sender.profile.zone.logo_left %}{{ letter.sender.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}" alt="WSSP Logo"
-                            onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';"
-                            style="">
+                            onerror="this.onerror=null; this.src='https://via.placeholder.com/135x135?text=WSSP';">
                     </td>
 
                     <td class="letterhead-center">
                         {% if letter.sender.profile.zone %}
-                            <p class="letterhead-title" style="font-size: 15pt; text-transform: uppercase;"><u style="text-decoration: underline; text-underline-offset: 4px;">{{ letter.sender.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</u></p>
-                            <p class="letterhead-address" style="font-size: 13pt; text-transform: uppercase;">{{ letter.sender.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
-                            <p class="letterhead-address" style="font-size: 13pt; text-transform: uppercase;">{{ letter.sender.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
+                            <p class="letterhead-title">{{ letter.sender.profile.zone.title|default:"OFFICE OF THE ZONAL MANAGER (ZONE-D)" }}</p>
+                            <p class="letterhead-address" style="font-size: 21px; font-weight:800;">{{ letter.sender.profile.zone.subtitle|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</p>
+                            <p class="letterhead-address">{{ letter.sender.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
                             {% if letter.sender.profile.zone.address %}
-                            <p class="letterhead-address" style="font-weight: 600;">{{ letter.sender.profile.zone.address }}</p>
+                            <p class="letterhead-contact">{{ letter.sender.profile.zone.address }}</p>
                             {% endif %}
                             <p class="letterhead-contact">
                                 {% if letter.sender.profile.zone.phone %}
                                 <strong>Phone:</strong> {{ letter.sender.profile.zone.phone }}
                                 {% else %}
-                                <strong>Email:</strong> <u style="color:#059669;">wsspeshawar@gmail.com</u> &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Phone:</strong> 091-9219074
+                                Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219621-23
                                 {% endif %}
                             </p>
                         {% else %}
-                            <p class="letterhead-title" style="color: #6b7280; font-size: 20pt;">WATER AND SANITATION SERVICES PESHAWAR</p>
-                            <p class="letterhead-address" style="color: #6b7280; font-size: 13pt;">LOCAL GOVERNMENT COMPLEX, KHYBER PAKHTUNKHWA.</p>
-                            <p class="letterhead-address" style="color: #6b7280; font-weight: 600;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
+                            <p class="letterhead-title">OFFICE OF THE ZONAL MANAGER (ZONE-D)</p>
+                            <p class="letterhead-address" style="font-size: 21px; font-weight:800;">WATER &amp; SANITATION SERVICES PESHAWAR</p>
+                            <p class="letterhead-address">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
+                            <p class="letterhead-contact">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
                         {% endif %}
                     </td>
 
@@ -573,6 +574,7 @@
                     </td>
                 </tr>
             </table>
+            <div style="border-top:1px solid #000;margin:6pt 0 10pt 0;"></div>
 
             <!-- Reference No & Date -->
             <table style="width: 100%; border-collapse: collapse; margin: 18px 0 12px; font-family: 'Times New Roman', Times, serif; font-size: 16px;">
@@ -675,7 +677,7 @@
                     <select name="receiver" class="form-select" required style="width: max-content; max-width: 100%; border: 1px solid #dbe3ec; border-radius: 10px; padding: 11px 14px; font-size: .9rem; background-color: #fbfcfe;">
                         <option value="">-- Select System Recipient --</option>
                         {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({% if u.profile %}{{ u.profile.get_role_with_department }}{% endif %})</option>
+                        <option value="{{ u.id }}">{% if u.profile %}{{ u.profile.get_role_with_department|default:u.profile.role }}{% else %}{{ u.get_full_name|default:u.username }}{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>

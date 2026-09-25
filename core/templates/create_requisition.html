@@ -12,6 +12,49 @@
 
 {% block content %}
 <style>
+    /* ===== Custom Date Picker ===== */
+    .req-date-input {
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: 17px !important;
+        color: #000 !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1.5px dashed #555 !important;
+        border-radius: 0 !important;
+        padding: 0 28px 2px 5px !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-appearance: none;
+        cursor: pointer;
+    }
+    .req-date-input:focus {
+        border-bottom: 2px dashed #000 !important;
+    }
+    /* Remove browser default calendar icon */
+    .req-date-input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    .req-date-icon {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #555;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+    }
+    /* Ensure date input wrapper is a flex row */
+    #requisition_date_input:focus ~ .req-date-icon {
+        color: #059669;
+    }
+
     :root {
         --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
         --font-display: 'Playfair Display', Georgia, serif;
@@ -316,6 +359,229 @@
         color: #065f46;
     }
 
+    /* ===== Searchable Vehicle Dropdown ===== */
+    .vehicle-search-wrapper {
+        position: relative;
+        width: 100%;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .vehicle-search-display {
+        display: flex;
+        align-items: center;
+        border: none;
+        border-bottom: 1.5px dashed #555;
+        background: transparent;
+        cursor: pointer;
+        padding: 0 24px 2px 5px;
+        min-height: 26px;
+        font-size: 17px;
+        color: #000;
+        font-family: 'Times New Roman', Times, serif;
+        user-select: none;
+        position: relative;
+        gap: 6px;
+        transition: border-bottom-color 0.2s;
+    }
+    .vehicle-search-display:hover {
+        border-bottom-color: #000;
+    }
+    .vehicle-search-display .vsd-text {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #555;
+    }
+    .vehicle-search-display .vsd-text.selected {
+        color: #000;
+    }
+    .vehicle-search-display .vsd-arrow {
+        position: absolute;
+        right: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        transition: transform 0.2s;
+        color: #555;
+    }
+    .vehicle-search-display.open .vsd-arrow {
+        transform: translateY(-50%) rotate(180deg);
+    }
+
+    .vehicle-dropdown-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: max(280px, 100%);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        border: 1.5px solid #e5e7eb;
+        z-index: 9999;
+        overflow: hidden;
+        animation: vDropIn 0.18s ease;
+    }
+    .vehicle-dropdown-panel.open {
+        display: block;
+    }
+
+    @keyframes vDropIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .vdp-search-box {
+        padding: 10px 12px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fafafa;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .vdp-search-input {
+        width: 100%;
+        border: 1.5px solid #d1d5db;
+        border-radius: 8px;
+        padding: 7px 32px 7px 34px;
+        font-size: 0.875rem;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        outline: none;
+        color: #111827;
+        background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+        background-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .vdp-search-input:focus {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+    }
+    .vdp-search-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .vdp-list {
+        max-height: 230px;
+        overflow-y: auto;
+        padding: 6px 0;
+    }
+    .vdp-list::-webkit-scrollbar { width: 5px; }
+    .vdp-list::-webkit-scrollbar-track { background: transparent; }
+    .vdp-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+    .vdp-item {
+        padding: 9px 16px;
+        font-size: 14px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: #111827;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.12s;
+        border-radius: 0;
+    }
+    .vdp-item:hover, .vdp-item.highlighted {
+        background: #f0fdf4;
+        color: #065f46;
+    }
+    .vdp-item.selected-item {
+        background: #d1fae5;
+        color: #065f46;
+        font-weight: 600;
+    }
+    .vdp-item .vdp-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #059669, #10b981);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* ===== Driver Info Card ===== */
+    .driver-info-card {
+        padding: 0;
+        margin-bottom: 25px;
+        animation: dicSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes dicSlideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dic-no-details {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+    .dic-no-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 2px;
+    }
+    .dic-no-sub {
+        font-size: 0.76rem;
+        color: #b45309;
+        line-height: 1.4;
+    }
+
+    /* Animated label flash on auto-fill */
+    @keyframes fieldAutoFill {
+        0%   { background: rgba(16,185,129,0.12); }
+        100% { background: transparent; }
+    }
+    .autofill-flash {
+        animation: fieldAutoFill 1.2s ease forwards;
+    }
+
+    .vdp-item .vdp-icon svg { display: block; }
+    .vdp-item.parking .vdp-icon {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+    .vdp-item-name {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .vdp-item-sub {
+        font-size: 11px;
+        color: #6b7280;
+        font-weight: 400;
+    }
+    .vdp-separator {
+        padding: 4px 14px 2px;
+        font-size: 10px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        text-transform: uppercase;
+        background: transparent;
+        pointer-events: none;
+        border-top: 1px solid #f3f4f6;
+        margin-top: 4px;
+    }
+    .vdp-empty {
+        padding: 20px 16px;
+        text-align: center;
+        font-size: 13px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: #9ca3af;
+        pointer-events: none;
+    }
+    .vdp-match {
+        color: #059669;
+        font-weight: 700;
+    }
+
     /* Forward To select */
     .req-forward-select {
         width: max-content;
@@ -411,42 +677,23 @@
                         <!-- Clean Logos Header -->
                         <table style="width:100%;border-collapse:collapse;margin-bottom:12pt;">
                             <tr>
-                                <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+                                <td style="width:18%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
                                     <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_left %}{{ request.user.profile.zone.logo_left.url }}{% else %}{% static 'images/wssp_logo_new.png' %}{% endif %}"
-                                        alt="WSSP" style="width:95px;height:95px;max-width:100%;object-fit:contain;">
+                                        alt="WSSP" style="width:130px;height:130px;max-width:100%;object-fit:contain;">
                                 </td>
-                                <td style="width:68%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
-                                    {% if request.user.profile.zone %}
-                                        <h4 style="font-weight:900;font-size:clamp(15px, 1.6vw, 22px);margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#0d1b2a;line-height:1.25;text-transform:uppercase;letter-spacing:0.3px;">{{ request.user.profile.zone.title|default:"WATER &amp; SANITATION SERVICES PESHAWAR" }}</h4>
-                                        <p style="font-size:19px;font-weight:800;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;letter-spacing:0.2px;">{{ request.user.profile.zone.subtitle|default:"WATER AND SANITATION SERVICES PESHAWAR" }}</p>
-                                        <p style="font-size:18px;font-weight:700;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;">{{ request.user.profile.zone.province|default:"GOVERNMENT OF KHYBER PAKHTUNKHWA" }}</p>
-                                        {% if request.user.profile.zone.address %}
-                                        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">{{ request.user.profile.zone.address }}</p>
-                                        {% endif %}
-                                        <p style="font-size:17px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">
-                                            {% if request.user.profile.zone.phone %}
-                                            Phone-No. {{ request.user.profile.zone.phone }}
-                                            {% else %}
-                                            Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
-                                            {% endif %}
-                                        </p>
-                                    {% else %}
-                                        <h4 style="font-weight:900;font-size:clamp(15px, 1.6vw, 22px);margin:0 0 5pt 0;font-family:Calibri,Arial,sans-serif;color:#0d1b2a;line-height:1.25;text-transform:uppercase;letter-spacing:0.3px;">OFFICE OF THE CHIEF EXECUTIVE OFFICER (CEO) WATER &amp; SANITATION SERVICES, PESHAWAR</h4>
-                                        <p style="font-size:19px;font-weight:800;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;letter-spacing:0.2px;">WATER AND SANITATION SERVICES PESHAWAR</p>
-                                        <p style="font-size:18px;font-weight:700;margin:0 0 2pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;text-transform:uppercase;">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
-                                        <p style="font-size:16px;font-weight:600;margin:0 0 4pt 0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">Plot # 33, Street No. 13, Sector E-8, Phase-VII, Hayatabad</p>
-                                        <p style="font-size:17px;font-weight:700;margin:0;font-family:Calibri,Arial,sans-serif;color:#1a2a3a;line-height:1.35;">
-                                            Email: wsspeshawar@gmail.com &nbsp;|&nbsp; Phone: 091-9219074
-                                        </p>
-                                    {% endif %}
+                                <td style="width:64%;text-align:center;vertical-align:middle;padding:6pt 8pt;">
+                                    <h4 style="font-weight:900;font-size:clamp(15px, 1.6vw, 26px);margin:0 0 5pt 0;font-family:'Times New Roman', Times, serif;color:#000;line-height:1.25;text-transform:uppercase;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;white-space:nowrap;">OFFICE OF THE ZONAL MANAGER (ZONE-D)</h4>
+                                    <h4 style="font-weight:800;font-size:clamp(14px, 1.5vw, 21px);margin:0 0 3pt 0;font-family:'Times New Roman', Times, serif;color:#000;line-height:1.35;word-wrap:break-word;">WATER & SANITATION SERVICES PESHAWAR</h4>
+                                    <p style="font-size:clamp(13px, 1.4vw, 20px);font-weight:700;margin:0 0 2pt 0;font-family:'Times New Roman', Times, serif;color:#000;line-height:1.35;text-transform:uppercase;">GOVERNMENT OF KHYBER PAKHTUNKHWA</p>
+                                    <p style="font-size:clamp(12px, 1.3vw, 18px);font-weight:600;margin:0;font-family:'Times New Roman', Times, serif;color:#000;line-height:1.35;">House No: 23F, Khushal Khan Khattak Road, University Town, Peshawar</p>
                                 </td>
-                                <td style="width:16%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
+                                <td style="width:18%;text-align:center;vertical-align:middle;padding:6pt 4pt;">
                                     <img src="{% if request.user.profile.zone and request.user.profile.zone.logo_right %}{{ request.user.profile.zone.logo_right.url }}{% else %}{% static 'images/kpk_emblem.png' %}{% endif %}"
-                                        alt="KPK Emblem" style="width:72px;height:72px;max-width:100%;object-fit:contain;">
+                                        alt="KPK Emblem" style="width:115px;height:115px;max-width:100%;object-fit:contain;">
                                 </td>
                             </tr>
                         </table>
-                        <div style="border-top:3px solid #7a2e2e;margin:6pt 0 10pt 0;"></div>
+                        <div style="border-top:1px solid #000;margin:6pt 0 10pt 0;"></div>
                         
                         <div class="text-center" style="font-size: 18px; margin-top: 15px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             To, &nbsp;&nbsp;&nbsp;The Zonal Manager, Water & Sanitation Services,
@@ -468,10 +715,31 @@
                         <!-- Line 1: vehicle number + UC route -->
                         <div style="display:flex; align-items:flex-end; gap:8px; font-size:18px; margin-bottom:6px; flex-wrap:nowrap;">
                             <span style="white-space:nowrap; flex-shrink:0;">It is respectfully submitted that vehicle number</span>
-                            <span style="flex: 2 1 200px; min-width:160px;">
-                                <select id="id_vehicle_select" name="vehicle_number" class="form-input-line" required>
-                                    <option value="">-- Select Zone First --</option>
-                                </select>
+                            <span style="flex: 2 1 220px; min-width:180px; position:relative;">
+
+                                <!-- Hidden real input submitted with form -->
+                                <input type="hidden" id="id_vehicle_select" name="vehicle_number" required>
+
+                                <!-- Custom searchable dropdown trigger -->
+                                <div class="vehicle-search-wrapper" id="vehicleSearchWrapper">
+                                    <div class="vehicle-search-display" id="vehicleDisplayBtn" tabindex="0"
+                                         role="combobox" aria-haspopup="listbox" aria-expanded="false"
+                                         aria-controls="vehicleDropdownPanel">
+                                        <span class="vsd-text" id="vehicleDisplayText">— Select Zone First —</span>
+                                        <svg class="vsd-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </div>
+
+                                    <!-- Dropdown panel -->
+                                    <div class="vehicle-dropdown-panel" id="vehicleDropdownPanel" role="listbox">
+                                        <div class="vdp-search-box">
+                                            <input type="text" class="vdp-search-input" id="vehicleSearchInput"
+                                                   placeholder="Search vehicle…" autocomplete="off"
+                                                   aria-label="Search vehicles">
+                                        </div>
+                                        <div class="vdp-list" id="vehicleList" role="listbox"></div>
+                                    </div>
+                                </div>
+
                             </span>
                             <span style="white-space:nowrap; flex-shrink:0;">serving in U.C / Route</span>
                             <span style="flex: 2 1 200px; min-width:160px;">{{ form.uc_route }}</span>
@@ -604,6 +872,19 @@
                         
                         <div class="row mt-5 pt-3">
                             <div class="col-md-12">
+
+                                <!-- ===== Driver Missing Info Card ===== -->
+                                <div id="driverInfoCard" class="driver-info-card missing-card" style="display:none;" aria-live="polite">
+                                    <div class="dic-no-details">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                        <div>
+                                            <div class="dic-no-title">Details Not Provided</div>
+                                            <div class="dic-no-sub">No driver is assigned to this vehicle. Please fill the details manually below.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ===== END Driver Card ===== -->
+
                                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
                                     <div style="flex: 1; display: flex; align-items: flex-end;">
                                         <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">Driver Name:</span>
@@ -618,7 +899,22 @@
                                     </div>
                                     <div style="flex: 1; display: flex; align-items: flex-end;">
                                         <span class="form-label-custom" style="font-size: 18px; font-weight: normal;">Date:</span>
-                                        <input type="text" class="form-input-line" value="{% now 'd M Y' %}" readonly style="flex: 1;">
+                                        <div style="flex: 1; position: relative;">
+                                            <input type="date"
+                                                   id="requisition_date_input"
+                                                   name="requisition_date"
+                                                   class="form-input-line req-date-input"
+                                                   style="flex: 1; width: 100%; padding-right: 28px; cursor: pointer;"
+                                                   required>
+                                            <span class="req-date-icon" onclick="document.getElementById('requisition_date_input').showPicker()">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                                </svg>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -766,7 +1062,7 @@
                                 <option value="" disabled selected>Select recipient...</option>
                                 {% for u in recipient_list %}
                                 <option value="{{ u.id }}">
-                                    {{ u.display_label }} — {{ u.get_full_name|default:u.username }}
+                                    {{ u.profile.get_role_with_department|default:u.profile.role }}
                                 </option>
                                 {% empty %}
                                 <option value="" disabled>No recipients found in system</option>
@@ -926,103 +1222,335 @@
     });
 </script>
 
-<!-- Zone -> Vehicle -> Auto-fill Driver Script -->
+<!-- Zone -> Vehicle -> Auto-fill Driver Script (Searchable Dropdown) -->
 <script>
 (function() {
-    // Pre-fetched data from Django view (no API call needed)
+    /* ── Data from Django ── */
     const VEHICLES_BY_ZONE = {{ vehicles_by_zone_json|safe }};
 
-    const zoneSelect   = document.getElementById('id_zone');
-    const vehicleSelect = document.getElementById('id_vehicle_select');
-    const logbookContainer = document.getElementById('logbook_container');
+    /* ── DOM refs ── */
+    const zoneSelect        = document.getElementById('id_zone');
+    const hiddenVehicle     = document.getElementById('id_vehicle_select');   // hidden input
+    const displayBtn        = document.getElementById('vehicleDisplayBtn');
+    const displayText       = document.getElementById('vehicleDisplayText');
+    const dropdownPanel     = document.getElementById('vehicleDropdownPanel');
+    const searchInput       = document.getElementById('vehicleSearchInput');
+    const vehicleList       = document.getElementById('vehicleList');
+    const logbookContainer  = document.getElementById('logbook_container');
 
-    // Driver auto-fill fields
     const driverNameField   = document.querySelector('[name="driver_name"]');
     const driverMobileField = document.querySelector('[name="driver_mobile"]');
     const driverCnicField   = document.querySelector('[name="driver_cnic"]');
 
+    /* ── State ── */
+    let allItems   = [];   // { label, value, sub, driverName, driverMobile, driverCnic, vehicleId, isParking }
+    let isDisabled = true;
+    let selectedValue = '';
+    let highlightIdx  = -1;
+
+    /* ── Open / Close ── */
+    function openDropdown() {
+        if (isDisabled) return;
+        dropdownPanel.classList.add('open');
+        displayBtn.classList.add('open');
+        displayBtn.setAttribute('aria-expanded', 'true');
+        searchInput.value = '';
+        renderList(allItems);
+        searchInput.focus();
+        highlightIdx = -1;
+    }
+
+    function closeDropdown() {
+        dropdownPanel.classList.remove('open');
+        displayBtn.classList.remove('open');
+        displayBtn.setAttribute('aria-expanded', 'false');
+        highlightIdx = -1;
+    }
+
+    /* ── Highlight helpers ── */
+    function getVisibleItems() {
+        return vehicleList.querySelectorAll('.vdp-item');
+    }
+    function applyHighlight(items) {
+        items.forEach((el, i) => {
+            el.classList.toggle('highlighted', i === highlightIdx);
+            if (i === highlightIdx) el.scrollIntoView({ block: 'nearest' });
+        });
+    }
+
+    /* ── Escape regex special chars ── */
+    function escapeRegex(s) {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    /* ── Highlight matching text ── */
+    function highlightText(text, query) {
+        if (!query) return escapeHtml(text);
+        const re = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+        return escapeHtml(text).replace(re, '<mark class="vdp-match">$1</mark>');
+    }
+    function escapeHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Render list ── */
+    function renderList(items, query) {
+        vehicleList.innerHTML = '';
+        if (!items.length) {
+            vehicleList.innerHTML = '<div class="vdp-empty">No vehicles found</div>';
+            return;
+        }
+
+        // Parking first
+        const parkingItems  = items.filter(i => i.isParking);
+        const vehicleItems  = items.filter(i => !i.isParking);
+
+        if (parkingItems.length) {
+            appendItems(parkingItems, query);
+        }
+        if (vehicleItems.length) {
+            if (parkingItems.length) {
+                const sep = document.createElement('div');
+                sep.className = 'vdp-separator';
+                sep.textContent = 'Vehicles';
+                vehicleList.appendChild(sep);
+            }
+            appendItems(vehicleItems, query);
+        }
+    }
+
+    function appendItems(items, query) {
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vdp-item' + (item.isParking ? ' parking' : '') + (item.value === selectedValue ? ' selected-item' : '');
+            div.setAttribute('role', 'option');
+            div.setAttribute('aria-selected', item.value === selectedValue ? 'true' : 'false');
+
+            const iconSvg = item.isParking
+                ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>`
+                : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v5a2 2 0 0 1-2 2h-2m-9 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>`;
+
+            div.innerHTML = `
+                <div class="vdp-icon">${iconSvg}</div>
+                <div>
+                    <div class="vdp-item-name">${highlightText(item.label, query)}</div>
+                    ${item.sub ? `<div class="vdp-item-sub">${highlightText(item.sub, query)}</div>` : ''}
+                </div>`;
+
+            div.addEventListener('click', () => selectItem(item));
+            vehicleList.appendChild(div);
+        });
+    }
+
+    /* ── Select an item ── */
+    function selectItem(item) {
+        selectedValue = item.value;
+        // Store the full Vehicle ID (e.g. BL-19-D-8L000025) as the vehicle_number.
+        // If no vehicle_id_number is available, fall back to the vehicle_name.
+        hiddenVehicle.value = item.sub ? item.sub : item.value;
+
+        displayText.textContent = item.sub ? `${item.sub}  (${item.label})` : item.label;
+        displayText.classList.add('selected');
+
+        // Auto-fill or clear driver
+        if (driverNameField)   driverNameField.value   = item.driverName   || '';
+        if (driverMobileField) driverMobileField.value = item.driverMobile || '';
+        if (driverCnicField)   driverCnicField.value   = item.driverCnic   || '';
+
+        // Trigger formatting on auto-filled values
+        if (driverMobileField) driverMobileField.dispatchEvent(new Event('input'));
+        if (driverCnicField)   driverCnicField.dispatchEvent(new Event('input'));
+
+        // ── Show Driver Info Card ──
+        showDriverCard(item);
+        // Logbook check
+        if (logbookContainer) {
+            if (item.vehicleId) {
+                fetch(`/check-logbook/?vehicle_id=${item.vehicleId}`)
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (data && data.logbook_id) {
+                            logbookContainer.style.display = 'block';
+                            const btn = document.getElementById('logbook_download_btn');
+                            if (btn) btn.href = data.logbook_url || '#';
+                            const hidden = document.getElementById('id_auto_logbook');
+                            if (hidden) hidden.value = data.logbook_id;
+                        } else {
+                            logbookContainer.style.display = 'none';
+                        }
+                    })
+                    .catch(() => { logbookContainer.style.display = 'none'; });
+            } else {
+                logbookContainer.style.display = 'none';
+            }
+        }
+
+        closeDropdown();
+    }
+
+    /* ── Populate from zone ── */
     function populateVehicles(zoneId) {
-        vehicleSelect.innerHTML = '';
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
+        allItems = [];
+        selectedValue = '';
+        hiddenVehicle.value = '';
+        displayText.textContent = '';
+        displayText.classList.remove('selected');
+        if (logbookContainer) logbookContainer.style.display = 'none';
+        hideDriverCard();
 
         if (!zoneId) {
-            placeholder.textContent = '— Select Zone First —';
-            vehicleSelect.appendChild(placeholder);
-            vehicleSelect.disabled = true;
-            if (logbookContainer) logbookContainer.style.display = 'none';
+            displayText.textContent = '— Select Zone First —';
+            isDisabled = true;
+            displayBtn.style.opacity = '0.55';
+            displayBtn.style.cursor  = 'not-allowed';
             return;
         }
 
         const vehicles = VEHICLES_BY_ZONE[String(zoneId)] || [];
-        if (vehicles.length === 0) {
-            placeholder.textContent = '— No vehicles in this zone —';
-            vehicleSelect.appendChild(placeholder);
-            vehicleSelect.disabled = true;
-        } else {
-            placeholder.textContent = '— Select Vehicle —';
-            vehicleSelect.appendChild(placeholder);
-            vehicles.forEach(function(v) {
-                const opt = document.createElement('option');
-                opt.value = v.vehicle_name;
-                opt.textContent = v.vehicle_id_number
-                    ? `${v.vehicle_name}  (${v.vehicle_id_number})`
-                    : v.vehicle_name;
-                opt.dataset.driverName   = v.driver_name;
-                opt.dataset.driverMobile = v.driver_mobile;
-                opt.dataset.driverCnic   = v.driver_cnic;
-                opt.dataset.vehicleId    = v.id;
-                vehicleSelect.appendChild(opt);
+
+        // Parking Yard always present
+        allItems.push({
+            label: 'Parking Yard Items',
+            value: 'Parking Yard Items',
+            sub: '',
+            isParking: true,
+            driverName: '', driverMobile: '', driverCnic: '', vehicleId: null
+        });
+
+        vehicles.forEach(v => {
+            allItems.push({
+                label: v.vehicle_name,
+                value: v.vehicle_name,
+                sub: v.vehicle_id_number || '',
+                isParking: false,
+                driverName:   v.driver_name   || '',
+                driverMobile: v.driver_mobile || '',
+                driverCnic:   v.driver_cnic   || '',
+                vehicleId:    v.id            || null
             });
-            vehicleSelect.disabled = false;
+        });
+
+        if (vehicles.length === 0) {
+            displayText.textContent = '— No vehicles in this zone —';
+            isDisabled = false;  // allow parking yard at least
+        } else {
+            displayText.textContent = '— Select Vehicle —';
+            isDisabled = false;
+        }
+        displayBtn.style.opacity = '1';
+        displayBtn.style.cursor  = 'pointer';
+    }
+
+    /* ── Event Listeners ── */
+    displayBtn.addEventListener('click', () => {
+        dropdownPanel.classList.contains('open') ? closeDropdown() : openDropdown();
+    });
+    displayBtn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDropdown(); }
+        if (e.key === 'Escape') closeDropdown();
+    });
+
+    searchInput.addEventListener('input', function() {
+        const q = this.value.trim().toLowerCase();
+        const filtered = q
+            ? allItems.filter(i =>
+                i.label.toLowerCase().includes(q) ||
+                (i.sub && i.sub.toLowerCase().includes(q)))
+            : allItems;
+        renderList(filtered, this.value.trim());
+        highlightIdx = -1;
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+        const items = getVisibleItems();
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+            applyHighlight(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            highlightIdx = Math.max(highlightIdx - 1, 0);
+            applyHighlight(items);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (highlightIdx >= 0 && items[highlightIdx]) items[highlightIdx].click();
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('vehicleSearchWrapper').contains(e.target)) {
+            closeDropdown();
+        }
+    });
+
+    /* ── Driver Info Card helpers ── */
+    function showDriverCard(item) {
+        const card = document.getElementById('driverInfoCard');
+        if (!card) return;
+
+        const hasDetails = !item.isParking && (item.driverName || item.driverMobile || item.driverCnic);
+
+        if (hasDetails) {
+            // Just quietly flash input fields to show auto-fill, hide the card completely
+            card.style.display = 'none';
+            [driverNameField, driverMobileField, driverCnicField].forEach(f => {
+                if (f) {
+                    f.classList.remove('autofill-flash');
+                    void f.offsetWidth;
+                    f.classList.add('autofill-flash');
+                    f.addEventListener('animationend', () => f.classList.remove('autofill-flash'), { once: true });
+                }
+            });
+            return;
+        } else if (item.isParking) {
+            // Parking Yard — hide card
+            card.style.display = 'none';
+            return;
+        } else {
+            // Show warning card
+            card.style.display = 'none';
+            void card.offsetWidth; // trigger reflow
+            card.style.display = 'block';
         }
     }
 
-    function autoFillDriver(opt) {
-        if (!opt || !opt.value) return;
-        if (driverNameField   && opt.dataset.driverName)   driverNameField.value   = opt.dataset.driverName;
-        if (driverMobileField && opt.dataset.driverMobile) driverMobileField.value = opt.dataset.driverMobile;
-        if (driverCnicField   && opt.dataset.driverCnic)   driverCnicField.value   = opt.dataset.driverCnic;
+    function hideDriverCard() {
+        const card = document.getElementById('driverInfoCard');
+        if (card) card.style.display = 'none';
     }
 
-    // Zone change
+    /* ── Zone change ── */
     if (zoneSelect) {
         zoneSelect.addEventListener('change', function() {
             populateVehicles(this.value);
-            if (logbookContainer) logbookContainer.style.display = 'none';
-            // Clear driver fields when zone changes
             if (driverNameField)   driverNameField.value   = '';
             if (driverMobileField) driverMobileField.value = '';
             if (driverCnicField)   driverCnicField.value   = '';
         });
     }
 
-    // Vehicle change → auto-fill driver
-    if (vehicleSelect) {
-        vehicleSelect.addEventListener('change', function() {
-            const selectedOpt = this.options[this.selectedIndex];
-            autoFillDriver(selectedOpt);
-        });
-    }
-
-    // On page load: auto-select user's zone and populate vehicles immediately
+    /* ── On page load ── */
     document.addEventListener('DOMContentLoaded', function() {
         if (zoneSelect && zoneSelect.value) {
             populateVehicles(zoneSelect.value);
-            // Restore vehicle selection in edit mode
-            const currentVehicle = vehicleSelect.dataset.currentVehicle || '';
-            if (currentVehicle) {
-                for (let i = 0; i < vehicleSelect.options.length; i++) {
-                    if (vehicleSelect.options[i].value === currentVehicle) {
-                        vehicleSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
         } else {
-            populateVehicles(null); // disable with placeholder
+            populateVehicles(null);
+        }
+
+        // Pre-fill date picker with today's date
+        const datePicker = document.getElementById('requisition_date_input');
+        if (datePicker && !datePicker.value) {
+            const today = new Date();
+            const yyyy  = today.getFullYear();
+            const mm    = String(today.getMonth() + 1).padStart(2, '0');
+            const dd    = String(today.getDate()).padStart(2, '0');
+            datePicker.value = `${yyyy}-${mm}-${dd}`;
         }
     });
+
 })();
 </script>
 
@@ -1145,5 +1673,277 @@ function syncFileInput() {
     attachedFiles.forEach(f => dt.items.add(f));
     input.files = dt.files;
 }
+</script>
+
+<!-- ===== Mobile & CNIC Input Formatting ===== -->
+<style>
+    /* Shake animation for max-limit reached */
+    @keyframes fieldShake {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-5px); }
+        40%      { transform: translateX(5px); }
+        60%      { transform: translateX(-4px); }
+        80%      { transform: translateX(4px); }
+    }
+    .field-shake { animation: fieldShake 0.35s ease; }
+
+    /* Character counter badge */
+    .char-counter {
+        position: absolute;
+        right: 0;
+        top: -18px;
+        font-size: 10px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-weight: 600;
+        color: #9ca3af;
+        letter-spacing: 0.03em;
+        transition: color 0.2s;
+        pointer-events: none;
+    }
+    .char-counter.at-limit { color: #ef4444; }
+    .char-counter.near-limit { color: #f59e0b; }
+
+    /* Input wrapper for counter positioning */
+    .mobile-input-wrap,
+    .cnic-input-wrap {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Green tick icon when valid */
+    .field-valid-icon {
+        position: absolute;
+        right: 0;
+        bottom: 4px;
+        font-size: 13px;
+        color: #059669;
+        opacity: 0;
+        transition: opacity 0.25s;
+        pointer-events: none;
+    }
+    .field-valid-icon.show { opacity: 1; }
+</style>
+
+<script>
+(function () {
+
+    /* ── Mobile Number Field ──────────────────────────────── */
+    const mobileEl = document.getElementById('id_driver_mobile');
+
+    if (mobileEl) {
+        // Wrap in a relative container for counter
+        const mWrap = document.createElement('div');
+        mWrap.className = 'mobile-input-wrap';
+        mobileEl.parentNode.insertBefore(mWrap, mobileEl);
+        mWrap.appendChild(mobileEl);
+
+        // Counter badge
+        const mCounter = document.createElement('span');
+        mCounter.className = 'char-counter';
+        mCounter.textContent = '0 / 11';
+        mWrap.appendChild(mCounter);
+
+        // Valid tick
+        const mTick = document.createElement('span');
+        mTick.className = 'field-valid-icon';
+        mTick.innerHTML = '&#10003;';
+        mWrap.appendChild(mTick);
+
+        function updateMobile() {
+            // Strip non-digits
+            let raw = mobileEl.value.replace(/\D/g, '');
+            // Enforce max 11
+            if (raw.length > 11) raw = raw.slice(0, 11);
+            mobileEl.value = raw;
+
+            const len = raw.length;
+            mCounter.textContent = `${len} / 11`;
+            mCounter.classList.remove('at-limit', 'near-limit');
+            mTick.classList.remove('show');
+
+            if (len === 11) {
+                mCounter.classList.add('at-limit');
+                mTick.classList.add('show');
+            } else if (len >= 9) {
+                mCounter.classList.add('near-limit');
+            }
+        }
+
+        mobileEl.addEventListener('input', updateMobile);
+
+        // Block keydown beyond 11 digits (for held keys)
+        mobileEl.addEventListener('keydown', function (e) {
+            const raw = this.value.replace(/\D/g, '');
+            const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Home','End'];
+            if (raw.length >= 11 && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                // Shake feedback
+                mobileEl.classList.remove('field-shake');
+                void mobileEl.offsetWidth; // reflow
+                mobileEl.classList.add('field-shake');
+                mobileEl.addEventListener('animationend', () => mobileEl.classList.remove('field-shake'), { once: true });
+            }
+        });
+
+        // Init
+        updateMobile();
+    }
+
+    /* ── CNIC Field (XXXXX-XXXXXXX-X → 13 digits + 2 dashes = 15 chars) ─ */
+    const cnicEl = document.getElementById('id_driver_cnic');
+
+    if (cnicEl) {
+        const cWrap = document.createElement('div');
+        cWrap.className = 'cnic-input-wrap';
+        cnicEl.parentNode.insertBefore(cWrap, cnicEl);
+        cWrap.appendChild(cnicEl);
+
+        // Counter
+        const cCounter = document.createElement('span');
+        cCounter.className = 'char-counter';
+        cCounter.textContent = '0 / 13 digits';
+        cWrap.appendChild(cCounter);
+
+        // Valid tick
+        const cTick = document.createElement('span');
+        cTick.className = 'field-valid-icon';
+        cTick.innerHTML = '&#10003;';
+        cWrap.appendChild(cTick);
+
+        function formatCnic(raw) {
+            // keep only digits, max 13
+            raw = raw.replace(/\D/g, '').slice(0, 13);
+            let out = '';
+            if (raw.length <= 5) {
+                out = raw;
+            } else if (raw.length <= 12) {
+                out = raw.slice(0, 5) + '-' + raw.slice(5);
+            } else {
+                out = raw.slice(0, 5) + '-' + raw.slice(5, 12) + '-' + raw.slice(12);
+            }
+            return { formatted: out, digits: raw.length };
+        }
+
+        function updateCnic() {
+            const caretPos = cnicEl.selectionStart;
+            const oldVal   = cnicEl.value;
+
+            const { formatted, digits } = formatCnic(cnicEl.value);
+            cnicEl.value = formatted;
+
+            // Restore caret roughly
+            const diff = formatted.length - oldVal.length;
+            try { cnicEl.setSelectionRange(caretPos + diff, caretPos + diff); } catch(e) {}
+
+            cCounter.textContent = `${digits} / 13 digits`;
+            cCounter.classList.remove('at-limit', 'near-limit');
+            cTick.classList.remove('show');
+
+            if (digits === 13) {
+                cCounter.classList.add('at-limit');
+                cTick.classList.add('show');
+            } else if (digits >= 11) {
+                cCounter.classList.add('near-limit');
+            }
+        }
+
+        cnicEl.addEventListener('input', updateCnic);
+
+        // Block beyond 13 digits
+        cnicEl.addEventListener('keydown', function (e) {
+            const digits = this.value.replace(/\D/g, '').length;
+            const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Home','End','-'];
+            if (digits >= 13 && !allowedKeys.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                cnicEl.classList.remove('field-shake');
+                void cnicEl.offsetWidth;
+                cnicEl.classList.add('field-shake');
+                cnicEl.addEventListener('animationend', () => cnicEl.classList.remove('field-shake'), { once: true });
+            }
+        });
+
+        // Paste handler — strip and reformat
+        cnicEl.addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text');
+            const cursorPos = this.selectionStart;
+            const before = this.value.slice(0, cursorPos);
+            const after  = this.value.slice(this.selectionEnd);
+            this.value = before + pasted + after;
+            updateCnic();
+        });
+
+        // Init
+        updateCnic();
+    }
+
+    /* ── Also wire auto-fill from vehicle selection to apply formatting ── */
+    const origAutoFill = window._reqAutoFillHook;
+    document.addEventListener('vehicleAutoFill', function () {
+        if (mobileEl) updateMobile && updateMobile();
+        if (cnicEl)   updateCnic  && updateCnic();
+    });
+
+    /* ── Form Auto-Save (Draft functionality) ───────────────────────── */
+    const form = document.querySelector('form[action="{% url "create_requisition" %}"]');
+    if (form) {
+        const FORM_STORAGE_KEY = 'draft_requisition_form_data';
+
+        // Restore data on load
+        const savedData = sessionStorage.getItem(FORM_STORAGE_KEY);
+        if (savedData) {
+            try {
+                const formData = JSON.parse(savedData);
+                Object.keys(formData).forEach(key => {
+                    // Support Radio NodeLists and standard inputs
+                    const el = form.elements[key];
+                    if (!el) return;
+                    
+                    if (el instanceof NodeList) {
+                        el.forEach(node => {
+                            if (node.value === formData[key]) node.checked = true;
+                        });
+                    } else if (el.type !== 'file' && el.type !== 'submit' && el.name !== 'csrfmiddlewaretoken') {
+                        if (el.type === 'checkbox') {
+                            el.checked = formData[key];
+                        } else {
+                            el.value = formData[key];
+                        }
+                    }
+                });
+                
+                // Trigger input events for dependent fields (like formatting/counters)
+                setTimeout(() => {
+                    if (mobileEl) updateMobile && updateMobile();
+                    if (cnicEl)   updateCnic  && updateCnic();
+                }, 100);
+            } catch(e) {
+                console.error("Error restoring form draft", e);
+            }
+        }
+
+        // Save data on input/change
+        const saveFormState = function(e) {
+            if (e.target.name && e.target.type !== 'file' && e.target.name !== 'csrfmiddlewaretoken') {
+                const currentData = JSON.parse(sessionStorage.getItem(FORM_STORAGE_KEY) || '{}');
+                if (e.target.type === 'checkbox') {
+                    currentData[e.target.name] = e.target.checked;
+                } else {
+                    currentData[e.target.name] = e.target.value;
+                }
+                sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(currentData));
+            }
+        };
+
+        form.addEventListener('input', saveFormState);
+        form.addEventListener('change', saveFormState);
+
+        // Clear data on submit so it's fresh for the next requisition
+        form.addEventListener('submit', function() {
+            sessionStorage.removeItem(FORM_STORAGE_KEY);
+        });
+    }
+
+})();
 </script>
 {% endblock %}

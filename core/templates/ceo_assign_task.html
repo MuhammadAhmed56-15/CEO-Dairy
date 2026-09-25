@@ -368,21 +368,21 @@
                                 {# 2. Agar CEO hai toh sab ko dikhao #}
                                 {% if request.user.profile.role == 'CEO' %}
                                 <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
-                                    {{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})
+                                    {{ user.profile.get_role_with_department|default:user.profile.role }}
                                 </option>
 
                                 {# 3. Agar GM hai toh CEO, PS aur dusre GMs ko chhupa do #}
                                 {% elif request.user.profile.role == 'GM' or request.user.username in 'GM_PMER,GM_Operation,GM_Project' %}
                                     {% if user.profile.role != 'CEO' and user.profile.role != 'PS' and user.profile.role != 'GM' and 'GM' not in user.username %}
                                     <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
-                                        {{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})
+                                        {{ user.profile.get_role_with_department|default:user.profile.role }}
                                     </option>
                                     {% endif %}
 
                                 {# 4. Baqi sab roles ke liye #}
                                 {% else %}
                                 <option value="{{ user.id }}" {% if form.assigned_to.value|stringformat:"s" == user.id|stringformat:"s" %}selected{% endif %}>
-                                    {{ user.get_full_name|default:user.username|title }} ({{ user.profile.get_role_with_department|default:user.profile.role }})
+                                    {{ user.profile.get_role_with_department|default:user.profile.role }}
                                 </option>
                                 {% endif %}
 

@@ -152,6 +152,20 @@ class VehicleRequisitionForm(forms.ModelForm):
             'previous_issue_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input form-input-line'}),
             'estimated_cost': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Rs. 10000'}),
             'driver_name': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'Driver Name'}),
-            'driver_mobile': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': '03XX-XXXXXXX'}),
-            'driver_cnic': forms.TextInput(attrs={'class': 'form-input form-input-line', 'placeholder': 'XXXXX-XXXXXXX-X'}),
+            'driver_mobile': forms.TextInput(attrs={
+                'class': 'form-input form-input-line',
+                'placeholder': '03XX-XXXXXXX',
+                'id': 'id_driver_mobile',
+                'maxlength': '11',
+                'inputmode': 'numeric',
+                'autocomplete': 'off',
+            }),
+            'driver_cnic': forms.TextInput(attrs={
+                'class': 'form-input form-input-line',
+                'placeholder': 'XXXXX-XXXXXXX-X',
+                'id': 'id_driver_cnic',
+                'maxlength': '15',
+                'inputmode': 'numeric',
+                'autocomplete': 'off',
+            }),
         }

@@ -452,7 +452,7 @@ def get_chart_data(request):
     from .models import Commitment, Notesheet, Task, Letter, Profile
     
     profile = Profile.objects.get(user=request.user)
-    if profile.role not in ["CEO", "Manager", "ZM", "AM", "IT", "CFO", "HR", "GM", "Auditor"]:
+    if profile.role not in ["CEO", "Manager", "ZM", "AM", "IT", "CFO", "HR", "GM", "Auditor", "PS"]:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     dates_str = request.GET.get('dates', '')
@@ -755,8 +755,8 @@ def assign_task_view(request):
         filtered_users = User.objects.filter(username__in=['Fleet_Officer_A', 'Fleet_Officer_B', 'Fleet_Officer_C', 'Fleet_Officer_D', 'Fleet_Officer_E'])
     else:
         hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
-        if hierarchy:
-            filtered_users = hierarchy.subordinates.all()
+        if hierarchy and hierarchy.task_subs.exists():
+            filtered_users = hierarchy.task_subs.all()
         else:
             filtered_users = User.objects.exclude(id=request.user.id)
             
@@ -1440,7 +1440,14 @@ def initiate_notesheet(request):
 
     file_id = request.GET.get('file_id')
     from django.db.models import Case, When, Value, IntegerField
-    all_users = User.objects.exclude(id=request.user.id).annotate(
+    
+    hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
+    if hierarchy and hierarchy.notesheet_subs.exists():
+        base_qs = hierarchy.notesheet_subs.all()
+    else:
+        base_qs = User.objects.exclude(id=request.user.id)
+
+    all_users = base_qs.annotate(
         role_order=Case(
             When(Q(profile__role__category='CEO') | Q(profile__role__code='CEO'), then=Value(1)),
             When(Q(profile__role__category='PS') | Q(profile__role__code='PS'), then=Value(2)),
@@ -1996,7 +2003,14 @@ def forward_notesheet(request, pk):
                 existing_flag_count += 1
 
     from django.db.models import Case, When, Value, IntegerField
-    users = User.objects.exclude(id=request.user.id).annotate(
+    
+    hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
+    if hierarchy and hierarchy.notesheet_subs.exists():
+        base_qs = hierarchy.notesheet_subs.all()
+    else:
+        base_qs = User.objects.exclude(id=request.user.id)
+
+    users = base_qs.annotate(
         role_order=Case(
             When(Q(profile__role__category='CEO') | Q(profile__role__code='CEO'), then=Value(1)),
             When(Q(profile__role__category='PS') | Q(profile__role__code='PS'), then=Value(2)),
@@ -2394,7 +2408,12 @@ def create_letter_file(request):
 @login_required
 def create_letter(request):
     files = LetterFile.objects.filter(created_by=request.user)
-    users = User.objects.exclude(id=request.user.id)
+    
+    hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
+    if hierarchy and hierarchy.letter_subs.exists():
+        users = hierarchy.letter_subs.all()
+    else:
+        users = User.objects.exclude(id=request.user.id)
 
     if request.method == 'POST':
         file_id = request.POST.get('letter_file', '').strip()
@@ -2665,7 +2684,7 @@ def api_unread_counts(request):
     Returns real-time unread count totals for sidebar badges and notification icon.
     """
     from django.http import JsonResponse
-    from .models import Notesheet, Letter, Notification
+    from .models import Notesheet, Letter, Notification, Task, VehicleRequisition, Commitment
 
     unread_ns_count = Notesheet.objects.filter(
         current_holder=request.user,
@@ -2677,6 +2696,27 @@ def api_unread_counts(request):
         is_read=False,
         is_draft=False
     ).count()
+    
+    unread_tasks_count = Task.objects.filter(
+        assigned_to=request.user,
+        status='Pending'
+    ).count()
+    
+    is_manager = False
+    if hasattr(request.user, 'profile') and request.user.profile.role:
+        if request.user.profile.role.category in ['ZM', 'Manager', 'GM', 'CEO'] or request.user.profile.role.code in ['Manager_Admin', 'Fleet_Manager', 'MngrFleet']:
+            is_manager = True
+            
+    if is_manager:
+        unread_requisitions_count = VehicleRequisition.objects.filter(manager_admin=request.user).exclude(status__in=['Completed', 'Rejected']).count()
+    else:
+        unread_requisitions_count = 0
+        
+    unread_commitments_count = Commitment.objects.filter(
+        invited_managers=request.user,
+        is_sent_to_manager=True,
+        status='Pending'
+    ).count()
 
     unread_notifs_count = Notification.objects.filter(
         recipient=request.user,
@@ -2687,6 +2727,9 @@ def api_unread_counts(request):
         'status': 'success',
         'unread_notesheets_count': unread_ns_count,
         'unread_letters_count': unread_letters_count,
+        'unread_tasks_count': unread_tasks_count,
+        'unread_requisitions_count': unread_requisitions_count,
+        'unread_commitments_count': unread_commitments_count,
         'unread_notifications_count': unread_notifs_count,
     })
 
@@ -2788,7 +2831,15 @@ def requisition_list(request):
             is_manager = True
             
     if is_manager:
-        requisitions = VehicleRequisition.objects.filter(manager_admin=request.user).order_by('-created_at')
+        from django.db.models import Q
+        from .models import VehicleRequisitionForward
+        forwarded_ids = VehicleRequisitionForward.objects.filter(
+            Q(forwarded_by=request.user) | Q(forwarded_to=request.user)
+        ).values_list('requisition_id', flat=True)
+        
+        requisitions = VehicleRequisition.objects.filter(
+            Q(manager_admin=request.user) | Q(id__in=forwarded_ids)
+        ).distinct().order_by('-created_at')
     else:
         requisitions = VehicleRequisition.objects.filter(fleet_officer=request.user).order_by('-created_at')
         is_manager = False
@@ -2805,27 +2856,32 @@ def create_requisition(request):
     from django.contrib.auth.models import User
 
     from django.db.models import Q
+    from .models import UserHierarchy
     
-    # --- Build the dynamic recipient list based on User Zone ---
+    # --- Always define user_zone for the template ---
     user_zone = request.user.profile.zone if hasattr(request.user, 'profile') else None
     
-    if user_zone:
-        recipient_users = User.objects.filter(
-            Q(profile__zone=user_zone, profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
-            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
-        ).distinct()
+    hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
+    
+    if hierarchy and hierarchy.requisition_subs.exists():
+        recipient_users = hierarchy.requisition_subs.all()
     else:
-        recipient_users = User.objects.filter(
-            Q(profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
-            Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
-        ).distinct()
+        if user_zone:
+            recipient_users = User.objects.filter(
+                Q(profile__zone=user_zone, profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+                Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+            ).distinct()
+        else:
+            recipient_users = User.objects.filter(
+                Q(profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+                Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+            ).distinct()
 
     recipient_list = []
     for u in recipient_users:
         if hasattr(u, 'profile') and u.profile.role:
-            role_name = u.profile.role.name
-            zone_name = f" — {u.profile.zone.name}" if u.profile.zone else ""
-            u.display_label = f"{role_name}{zone_name}"
+            role_code = u.profile.role.code or u.profile.role.name
+            u.display_label = role_code
         else:
             u.display_label = u.get_full_name() or u.username
         recipient_list.append(u)
@@ -2920,17 +2976,18 @@ def create_requisition(request):
     # Pre-build vehicles grouped by zone as JSON for JS
     import json
     vehicles_by_zone = {}
-    for v in Vehicle.objects.select_related('zone', 'driver').filter(status='Active'):
+    for v in Vehicle.objects.prefetch_related('drivers').select_related('zone', 'driver').filter(status='Active'):
         zid = str(v.zone_id) if v.zone_id else '0'
         if zid not in vehicles_by_zone:
             vehicles_by_zone[zid] = []
+        actual_driver = v.driver or v.drivers.filter(is_active=True).first()
         vehicles_by_zone[zid].append({
             'id': v.id,
             'vehicle_name': v.vehicle_name,
             'vehicle_id_number': v.vehicle_id_number or '',
-            'driver_name': v.driver.name if v.driver else '',
-            'driver_mobile': v.driver.mobile if v.driver else '',
-            'driver_cnic': v.driver.cnic if v.driver else '',
+            'driver_name': actual_driver.name if actual_driver else '',
+            'driver_mobile': actual_driver.mobile if actual_driver else '',
+            'driver_cnic': actual_driver.cnic if actual_driver else '',
         })
     return render(request, 'create_requisition.html', {
         'form': form,
@@ -2970,7 +3027,7 @@ def update_requisition_status(request, pk):
 
 @login_required
 def view_requisition(request, pk):
-    from .models import VehicleRequisition
+    from .models import VehicleRequisition, VehicleRequisitionAttachment
     req = get_object_or_404(VehicleRequisition, pk=pk)
     
     # Only allow the fleet officer who created it, or managers to view it
@@ -2983,15 +3040,120 @@ def view_requisition(request, pk):
         messages.error(request, "You are not authorized to view this requisition.")
         return redirect('requisition_list')
         
+    try:
+        attachments = VehicleRequisitionAttachment.objects.filter(requisition=req)
+    except Exception:
+        attachments = getattr(req, 'attachments', [])
+        
+    forwards = req.forwards.all().order_by('forwarded_at')
+        
+    # Build recipient list for ANYONE who is the current holder (manager_admin)
+    from django.contrib.auth.models import User
+    from django.db.models import Q
+    recipient_list = []
+    
+    # The current "holder" is whoever is req.manager_admin
+    is_current_holder = (req.manager_admin == request.user)
+    
+    if is_current_holder:
+        from .models import UserHierarchy
+        hierarchy = UserHierarchy.objects.filter(boss=request.user).first()
+        
+        if hierarchy and hierarchy.requisition_subs.exists():
+            recipient_users = hierarchy.requisition_subs.all()
+        else:
+            user_zone = request.user.profile.zone if hasattr(request.user, 'profile') else None
+            if user_zone:
+                recipient_users = User.objects.filter(
+                    Q(profile__zone=user_zone, profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+                    Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+                ).distinct()
+            else:
+                recipient_users = User.objects.filter(
+                    Q(profile__role__category__in=['ZM', 'Manager', 'GM', 'CEO']) |
+                    Q(profile__role__code__in=['MngrFleet', 'Manager_Admin', 'Fleet_Manager'])
+                ).distinct()
+        
+        for u in recipient_users:
+            if u == request.user:
+                continue
+            if hasattr(u, 'profile') and u.profile.role:
+                role_code = u.profile.role.code or u.profile.role.name
+                u.display_label = role_code
+            else:
+                u.display_label = u.get_full_name() or u.username
+            recipient_list.append(u)
+
     return render(request, 'view_requisition.html', {
         'req': req,
         'is_manager': is_manager,
-        'attachments': req.attachments.all(),
+        'is_current_holder': is_current_holder,
+        'attachments': attachments,
+        'recipient_list': recipient_list,
+        'forwards': forwards,
     })
+
+@login_required
+def forward_requisition(request, pk):
+    from .models import VehicleRequisition, Notification
+    from django.contrib.auth.models import User
+    
+    if request.method == "POST":
+        req = get_object_or_404(VehicleRequisition, pk=pk)
+        
+        if req.manager_admin != request.user:
+            messages.error(request, "You are not the current holder of this requisition.")
+            return redirect('requisition_list')
+            
+        forward_to_id = request.POST.get('forward_to')
+        remark = request.POST.get('remark', '').strip()
+        new_status = request.POST.get('status')
+
+        if new_status and new_status in dict(VehicleRequisition.STATUS_CHOICES):
+            req.status = new_status
+            req.save()
+        if forward_to_id:
+            try:
+                new_admin = User.objects.get(id=forward_to_id)
+                req.manager_admin = new_admin
+                req.save()
+                
+                from .models import VehicleRequisitionForward
+                VehicleRequisitionForward.objects.create(
+                    requisition=req,
+                    forwarded_by=request.user,
+                    forwarded_to=new_admin,
+                    remark=remark,
+                    status_at_forward=req.status
+                )
+                
+                # Notify the new manager
+                from .models import Notification
+                Notification.objects.create(
+                    recipient=new_admin,
+                    sender=request.user,
+                    title="Requisition Forwarded",
+                    message=f"Requisition for {req.vehicle_number} has been forwarded to you by {request.user.get_full_name() or request.user.username}.",
+                    link=f"/requisitions/view/{req.id}/",
+                    notification_type='notesheet'
+                )
+                
+                messages.success(request, f"Requisition forwarded to {new_admin.get_full_name() or new_admin.username} successfully.")
+            except User.DoesNotExist:
+                messages.error(request, "Selected user does not exist.")
+        else:
+            messages.error(request, "Please select a user to forward to.")
+            
+    return redirect('requisition_list')
 
 
 @login_required
 def edit_requisition(request, pk):
+    from .models import VehicleRequisition, VehicleRequisitionAttachment
+    from .forms import VehicleRequisitionForm
+    from django.contrib.auth.models import User
+    from django.db.models import Q
+
     req = get_object_or_404(VehicleRequisition, pk=pk)
     
     # 1. Sirf wahi Fleet Officer edit kar sakta hai jisne requisition create ki ho
@@ -3089,17 +3251,18 @@ def edit_requisition(request, pk):
     zones = Zone.objects.all().order_by('name')
     import json
     vehicles_by_zone = {}
-    for v in Vehicle.objects.select_related('zone', 'driver').filter(status='Active'):
+    for v in Vehicle.objects.prefetch_related('drivers').select_related('zone', 'driver').filter(status='Active'):
         zid = str(v.zone_id) if v.zone_id else '0'
         if zid not in vehicles_by_zone:
             vehicles_by_zone[zid] = []
+        actual_driver = v.driver or v.drivers.filter(is_active=True).first()
         vehicles_by_zone[zid].append({
             'id': v.id,
             'vehicle_name': v.vehicle_name,
             'vehicle_id_number': v.vehicle_id_number or '',
-            'driver_name': v.driver.name if v.driver else '',
-            'driver_mobile': v.driver.mobile if v.driver else '',
-            'driver_cnic': v.driver.cnic if v.driver else '',
+            'driver_name': actual_driver.name if actual_driver else '',
+            'driver_mobile': actual_driver.mobile if actual_driver else '',
+            'driver_cnic': actual_driver.cnic if actual_driver else '',
         })
     # For edit, use the requisition's zone id to pre-select
     edit_zone_id = req.zone if req.zone else None

@@ -725,7 +725,7 @@
 
                     {% for user in managers %}
                     <option value="{{ user.id }}">
-                        {{ user.get_full_name|default:user.username }} {% if user.profile.department %}({{ user.profile.department }}){% endif %}
+                        {{ user.profile.get_role_with_department|default:user.profile.role }}
                     </option>
                     {% empty %}
                     <option disabled>No managers available</option>
